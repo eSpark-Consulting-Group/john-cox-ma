@@ -1,10 +1,13 @@
 import React from 'react';
 import {StyleSheet, Text, View} from 'react-native';
+import MyText from '../../components/MyText';
 
 export default function Login() {
   return (
     <View>
-      <Text>LOGIN</Text>
+      <MyText fontFamily={'AnonymousPro-Bold'} size={20}>
+        LOGIN{' '}
+      </MyText>
     </View>
   );
 }
