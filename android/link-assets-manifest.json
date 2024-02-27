@@ -1,0 +1,29 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "src/assets/fonts/AnonymousPro-Bold.ttf",
+      "sha1": "bfc8d198336c84f11f43c33671de9e23ddf3d058"
+    },
+    {
+      "path": "src/assets/fonts/AnonymousPro-Regular.ttf",
+      "sha1": "e5a1581199fe0058ba03e322b9a4823e199dd2b6"
+    },
+    {
+      "path": "src/assets/fonts/CrimsonText-Bold.ttf",
+      "sha1": "4079be58c5ebc634879a096cc63ad82d858ed2c9"
+    },
+    {
+      "path": "src/assets/fonts/CrimsonText-Regular.ttf",
+      "sha1": "61b3f0d113dcf62c7619aff1bae3a6646286720b"
+    },
+    {
+      "path": "src/assets/fonts/NotoSerif-Bold.ttf",
+      "sha1": "0c517e9769777aad8eb0ac5dccfbd7f737e83c13"
+    },
+    {
+      "path": "src/assets/fonts/NotoSerif-Regular.ttf",
+      "sha1": "e75978c49a8a21f9180cb476ffdb7b0d637f6622"
+    }
+  ]
+}
