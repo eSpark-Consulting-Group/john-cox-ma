@@ -2,13 +2,13 @@ import React from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import MyText from '../../components/MyText';
 import {Logo} from '../../assets';
+import {MyTheme} from '../../types';
+import {useTheme} from '@react-navigation/native';
 
 export default function Login() {
+  const theme = useTheme() as MyTheme;
   return (
-    <View>
-      <MyText fontFamily={'AnonymousPro-Bold'} size={20}>
-        LOGIN{' '}
-      </MyText>
+    <View style={{backgroundColor: theme.colors.text}}>
       <Logo />
     </View>
   );

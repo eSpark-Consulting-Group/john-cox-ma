@@ -1,4 +1,12 @@
 import {TextStyle} from 'react-native';
+import {Theme} from '@react-navigation/native';
+
+export type MyTheme = Theme & {
+  colors: {
+    placeholder?: string;
+    secondary?: string;
+  };
+};
 
 type Fonts =
   | 'AnonymousPro-Bold'
