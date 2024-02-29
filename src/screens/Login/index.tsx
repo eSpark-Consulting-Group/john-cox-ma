@@ -2,39 +2,58 @@ import React from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 
-import {GapView, MyButton, MyHeader, MyText} from '../../components';
+import {
+  GapView,
+  LabelInput,
+  MyButton,
+  MyCard,
+  MyFooter,
+  MyHeader,
+} from '../../components';
 import {MyTheme} from '../../types';
-import MyFooter from '../../components/MyFooter';
 
 export default function Login() {
   const theme = useTheme() as MyTheme;
   return (
-    <ScrollView style={[styles.container]}>
+    <ScrollView
+      contentContainerStyle={{
+        alignItems: 'center',
+        justifyContent: 'center',
+        flex: 1,
+      }}>
       <MyHeader />
-      <MyButton label="Sign In" style={{width: 79, alignSelf: 'center'}} />
-      <GapView length={10} />
-      <MyButton
-        label="Back"
-        style={{width: 130, alignSelf: 'center'}}
-        gradient
-      />
+      <MyCard>
+        <GapView length={10} />
+        <LabelInput text="Username:" width={114} height={21} size={16} />
+        <GapView length={20} />
+        <LabelInput text="Password:" width={114} height={21} size={16} />
+        <GapView length={30} />
+        <MyButton label="Sign In" style={styles({}).signin} />
+        <GapView length={30} />
+      </MyCard>
+      <GapView length={30} />
+      <MyButton label="Back" style={styles({}).button} gradient />
+      <MyFooter />
     </ScrollView>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  linearGradient: {
-    ...StyleSheet.absoluteFillObject,
-    height: '41%',
-  },
-  lowerGradient: {
-    ...StyleSheet.absoluteFillObject,
-    marginBottom: -20,
-  },
-});
+const styles = (theme: {theme?: MyTheme}) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+    },
+    linearGradient: {
+      ...StyleSheet.absoluteFillObject,
+      height: '41%',
+    },
+    lowerGradient: {
+      ...StyleSheet.absoluteFillObject,
+      marginBottom: -20,
+    },
+    signin: {width: 79, alignSelf: 'center'},
+    button: {width: 130, alignSelf: 'center'},
+  });
 
 {
   /* to be corrected */

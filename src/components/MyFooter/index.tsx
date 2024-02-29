@@ -27,6 +27,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 10,
     paddingTop: 15,
+    paddingBottom: 27,
+    bottom: 0,
+    position: 'absolute',
   },
 });
 

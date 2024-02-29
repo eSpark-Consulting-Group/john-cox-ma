@@ -25,8 +25,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     alignItems: 'center',
+    width: '100%',
     paddingHorizontal: 10,
     paddingTop: 15,
+    top: 0,
+    position: 'absolute',
   },
 });
 

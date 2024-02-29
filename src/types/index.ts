@@ -1,4 +1,10 @@
-import {ColorValue, TextStyle, ViewStyle} from 'react-native';
+import {
+  ColorValue,
+  DimensionValue,
+  StyleProp,
+  TextStyle,
+  ViewStyle,
+} from 'react-native';
 import {Theme} from '@react-navigation/native';
 
 export type MyTheme = Theme & {
@@ -21,7 +27,7 @@ export type MyTextProps = {
   textColor?: string;
   style?: TextStyle;
   size?: number;
-  fontFamily: Fonts;
+  fontFamily?: Fonts;
 };
 
 export interface MyButtonProps {
@@ -34,4 +40,20 @@ export interface MyButtonProps {
   key?: string;
   fontFamily?: Fonts;
   gradient?: boolean;
+}
+
+export interface MyInputProps {
+  text?: string;
+  onChange?: (val: string) => void;
+  onChangeText?: (value: string) => void;
+  width?: any;
+  height?: any;
+}
+
+export interface LabelInputProps {
+  text: string;
+  size?: number;
+  checkbox?: boolean;
+  width?: DimensionValue | any;
+  height?: DimensionValue | any;
 }
