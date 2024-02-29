@@ -20,7 +20,10 @@ type Fonts =
   | 'CrimsonText-Bold'
   | 'CrimsonText-Regular'
   | 'NotoSerif-Bold'
-  | 'NotoSerif-Regular';
+  | 'NotoSerif-Regular'
+  | 'NotoSans-Bold'
+  | 'NotoSans-Regular'
+  | 'NotoSans-BoldItalic';
 
 export type MyTextProps = {
   text?: string;

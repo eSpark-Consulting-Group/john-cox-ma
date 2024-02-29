@@ -9,6 +9,7 @@ import {
   MyCard,
   MyFooter,
   MyHeader,
+  MyText,
 } from '../../components';
 import {MyTheme} from '../../types';
 
@@ -22,6 +23,12 @@ export default function Login() {
         flex: 1,
       }}>
       <MyHeader />
+      <MyText
+        text="Login"
+        size={18}
+        fontFamily="NotoSans-Bold"
+        style={{alignSelf: 'flex-start', paddingLeft: 18, paddingBottom: 20}}
+      />
       <MyCard>
         <GapView length={10} />
         <LabelInput text="Username:" width={114} height={21} size={16} />
@@ -31,7 +38,7 @@ export default function Login() {
         <MyButton label="Sign In" style={styles({}).signin} />
         <GapView length={30} />
       </MyCard>
-      <GapView length={30} />
+      <GapView length={120} />
       <MyButton label="Back" style={styles({}).button} gradient />
       <MyFooter />
     </ScrollView>
