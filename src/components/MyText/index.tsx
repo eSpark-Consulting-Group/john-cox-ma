@@ -11,7 +11,7 @@ function MyText({
   size,
   style,
   numberOfLines,
-  fontFamily,
+  fontFamily = 'AnonymousPro-Bold',
 }: MyTextProps & TextProps) {
   const theme = useTheme();
 
