@@ -2,7 +2,7 @@ import React from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 
-import {MyHeader, MyText} from '../../components';
+import {GapView, MyButton, MyHeader, MyText} from '../../components';
 import {MyTheme} from '../../types';
 import MyFooter from '../../components/MyFooter';
 
@@ -11,7 +11,13 @@ export default function Login() {
   return (
     <ScrollView style={[styles.container]}>
       <MyHeader />
-      <MyFooter />
+      <MyButton label="Sign In" style={{width: 79, alignSelf: 'center'}} />
+      <GapView length={10} />
+      <MyButton
+        label="Back"
+        style={{width: 130, alignSelf: 'center'}}
+        gradient
+      />
     </ScrollView>
   );
 }

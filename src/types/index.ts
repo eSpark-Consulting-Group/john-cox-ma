@@ -1,4 +1,4 @@
-import {TextStyle} from 'react-native';
+import {ColorValue, TextStyle, ViewStyle} from 'react-native';
 import {Theme} from '@react-navigation/native';
 
 export type MyTheme = Theme & {
@@ -23,3 +23,15 @@ export type MyTextProps = {
   size?: number;
   fontFamily: Fonts;
 };
+
+export interface MyButtonProps {
+  label?: string;
+  onPress?: () => void;
+  textColor?: string;
+  backgroundColor?: ColorValue | undefined | string;
+  style?: ViewStyle | ViewStyle[];
+  labelStyle?: TextStyle;
+  key?: string;
+  fontFamily?: Fonts;
+  gradient?: boolean;
+}
