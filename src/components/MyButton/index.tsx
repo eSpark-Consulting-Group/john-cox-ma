@@ -51,15 +51,7 @@ function MyButton({
           start={[0, 1]}
           end={[0.9, 1]}
           style={{borderRadius: 10}}>
-          <TouchableOpacity
-            style={{
-              width: '95%',
-              height: 30,
-              margin: 1,
-              borderRadius: 10,
-              justifyContent: 'center',
-            }}
-            onPress={onPress}>
+          <TouchableOpacity style={styles.inner} onPress={onPress}>
             <LinearGradient
               colors={['#4d92e16f', '#090824']}
               style={[styles.gradient]}
@@ -104,5 +96,12 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     justifyContent: 'center',
     ...StyleSheet.absoluteFillObject,
+  },
+  inner: {
+    width: '95%',
+    height: 30,
+    margin: 1,
+    borderRadius: 10,
+    justifyContent: 'center',
   },
 });
