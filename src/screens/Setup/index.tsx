@@ -1,5 +1,5 @@
 import React from 'react';
-import {ScrollView, StyleSheet, View} from 'react-native';
+import {ScrollView, StyleProp, StyleSheet, View, ViewStyle} from 'react-native';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 
@@ -10,7 +10,9 @@ import {
   MyCard,
   MyFooter,
   MyHeader,
+  MyInput,
   MyText,
+  MyDropdown,
 } from '../../components';
 import {MyTheme} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
@@ -37,11 +39,23 @@ export default function Setup() {
       />
       <MyCard>
         <GapView length={10} />
-        <LabelInput text="Volume:" width={114} height={21} size={16} />
+
+        <LabelDropdown
+          data={['US Gallons', 'Liters']}
+          onSelect={() => {}}
+          text="Volume"
+          zIndex={50}
+        />
         <GapView length={20} />
-        <LabelInput text="Distance:" width={114} height={21} size={16} />
+        <LabelDropdown
+          data={['Kilometers', 'Statute Miles', 'Nautical Miles']}
+          onSelect={() => {}}
+          text="Distance"
+          zIndex={48}
+        />
         <GapView length={30} />
       </MyCard>
+      <GapView length={30} />
       <MyButton
         label="Fuel Mgt Module Setup"
         style={styles({}).signin}
@@ -65,6 +79,49 @@ export default function Setup() {
   );
 }
 
+interface LabelDropdownProps {
+  text: string;
+  size?: number;
+  data: string[];
+  zIndex?: number;
+  onSelect: (value: string) => void;
+  style?: StyleProp<ViewStyle>;
+  containerStyle?: ViewStyle;
+  height?: number;
+}
+
+function LabelDropdown({
+  text,
+  size,
+  data,
+  zIndex,
+  onSelect,
+  style,
+  containerStyle,
+  height,
+}: LabelDropdownProps) {
+  const theme = useTheme() as MyTheme;
+  return (
+    <View
+      style={{
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+      }}>
+      <MyText text={text} size={size || 18} />
+      <MyDropdown
+        data={data}
+        onSelect={onSelect}
+        theme={theme}
+        zIndex={zIndex}
+        style={style}
+        containerStyle={containerStyle}
+        height={height}
+      />
+    </View>
+  );
+}
+
 const styles = (theme: {theme?: MyTheme}) =>
   StyleSheet.create({
     container: {
@@ -78,6 +135,6 @@ const styles = (theme: {theme?: MyTheme}) =>
       ...StyleSheet.absoluteFillObject,
       marginBottom: -20,
     },
-    signin: {width: 130, alignSelf: 'center'},
+    signin: {width: 130, alignSelf: 'center', zIndex: -1},
     button: {width: 130, alignSelf: 'center'},
   });

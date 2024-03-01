@@ -6,3 +6,4 @@ export {default as MyInput} from './MyInput';
 export {default as GapView} from './GapView';
 export {default as MyCard} from './MyCard';
 export {default as LabelInput} from './LabelInput';
+export {default as MyDropdown} from './MyDropdown';

@@ -60,3 +60,13 @@ export interface LabelInputProps {
   width?: DimensionValue | any;
   height?: DimensionValue | any;
 }
+
+export interface DropdownProps {
+  data: string[];
+  zIndex?: number;
+  onSelect: (value: string) => void;
+  style?: StyleProp<ViewStyle>;
+  containerStyle?: ViewStyle;
+  height?: number;
+  theme: MyTheme;
+}
