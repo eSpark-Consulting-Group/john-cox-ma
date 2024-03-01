@@ -1,6 +1,7 @@
 import React from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
-import {useTheme} from '@react-navigation/native';
+import {useNavigation, useTheme} from '@react-navigation/native';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
 
 import {
   GapView,
@@ -12,9 +13,14 @@ import {
   MyText,
 } from '../../components';
 import {MyTheme} from '../../types';
+import {RootStackParamsList} from '../../types/navigationParams';
+
+type LoginScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 
 export default function Login() {
   const theme = useTheme() as MyTheme;
+  const navigation = useNavigation<LoginScreenProps['navigation']>();
+
   return (
     <ScrollView
       contentContainerStyle={{
@@ -35,7 +41,14 @@ export default function Login() {
         <GapView length={20} />
         <LabelInput text="Password:" width={114} height={21} size={16} />
         <GapView length={30} />
-        <MyButton label="Sign In" style={styles({}).signin} />
+        <MyButton
+          label="Sign In"
+          style={styles({}).signin}
+          onPress={() => {
+            console.log('setup pe jayein');
+            navigation.navigate('Setup');
+          }}
+        />
         <GapView length={30} />
       </MyCard>
       <GapView length={120} />
