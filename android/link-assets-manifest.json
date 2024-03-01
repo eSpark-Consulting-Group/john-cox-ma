@@ -18,6 +18,18 @@
       "sha1": "61b3f0d113dcf62c7619aff1bae3a6646286720b"
     },
     {
+      "path": "src/assets/fonts/NotoSans-Bold.ttf",
+      "sha1": "e18f3ad767d6060b0c41d12eecd45aa152b28f45"
+    },
+    {
+      "path": "src/assets/fonts/NotoSans-BoldItalic.ttf",
+      "sha1": "eca88ec63d820673438a24a86c04f9c75a0a85f5"
+    },
+    {
+      "path": "src/assets/fonts/NotoSans-Regular.ttf",
+      "sha1": "692393fb9239fe61e47dff7232400c45770f162f"
+    },
+    {
       "path": "src/assets/fonts/NotoSerif-Bold.ttf",
       "sha1": "0c517e9769777aad8eb0ac5dccfbd7f737e83c13"
     },
