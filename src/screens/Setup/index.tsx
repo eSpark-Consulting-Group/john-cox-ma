@@ -1,5 +1,5 @@
 import React from 'react';
-import {ScrollView, StyleProp, StyleSheet, View, ViewStyle} from 'react-native';
+import {ScrollView, StyleSheet, View} from 'react-native';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 
@@ -11,12 +11,11 @@ import {
   MyFooter,
   MyHeader,
   MyText,
-  MyDropdown,
 } from '../../components';
 import {MyTheme} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
-import {Active, Inactive} from '../../assets';
 import {Engines, temp} from '../../constants';
+import LabelDropdown from '../../components/LabelDropdown';
 
 type SetupScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 
@@ -142,65 +141,6 @@ export default function Setup() {
       <GapView length={70} />
       <MyFooter />
     </ScrollView>
-  );
-}
-
-interface LabelDropdownProps {
-  text: string;
-  size?: number;
-  data: string[];
-  zIndex?: number;
-  onSelect: (value: string) => void;
-  style?: StyleProp<ViewStyle>;
-  containerStyle?: ViewStyle;
-  height?: number;
-  status?: boolean;
-  isActive?: boolean;
-  dropdnHeight?: number;
-}
-
-function LabelDropdown({
-  text,
-  size,
-  data,
-  zIndex,
-  onSelect,
-  style,
-  containerStyle,
-  height,
-  status,
-  isActive,
-  dropdnHeight,
-}: LabelDropdownProps) {
-  const theme = useTheme() as MyTheme;
-  return (
-    <View
-      style={{
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: '100%',
-        alignItems: 'center',
-      }}>
-      <MyText text={text} size={size} />
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: 15,
-        }}>
-        {status ? isActive ? <Active /> : <Inactive /> : null}
-        <MyDropdown
-          data={data}
-          onSelect={onSelect}
-          theme={theme}
-          zIndex={zIndex}
-          style={style}
-          containerStyle={containerStyle}
-          height={height}
-          dropdnHeight={dropdnHeight}
-        />
-      </View>
-    </View>
   );
 }
 

@@ -74,3 +74,17 @@ export interface DropdownProps {
   dropdnHeight?: number;
   theme: MyTheme;
 }
+
+export interface LabelDropdownProps {
+  text: string;
+  size?: number;
+  data: string[];
+  zIndex?: number;
+  onSelect: (value: string) => void;
+  style?: StyleProp<ViewStyle>;
+  containerStyle?: ViewStyle;
+  height?: number;
+  status?: boolean;
+  isActive?: boolean;
+  dropdnHeight?: number;
+}
