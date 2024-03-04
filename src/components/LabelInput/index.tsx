@@ -5,7 +5,15 @@ import MyInput from '../MyInput';
 import {memo} from 'react';
 import {Checkbox} from '../../assets';
 
-function LabelInput({text, size, checkbox, width, height}: LabelInputProps) {
+function LabelInput({
+  text,
+  size,
+  checkbox,
+  width,
+  height,
+  subText,
+  password,
+}: LabelInputProps) {
   return (
     <View
       style={{
@@ -13,9 +21,19 @@ function LabelInput({text, size, checkbox, width, height}: LabelInputProps) {
         justifyContent: 'space-between',
         width: '100%',
       }}>
-      <MyText text={text} size={size} />
-      <MyInput width={width} height={height} />
-      {checkbox && <Checkbox />}
+      <View style={{width: '30%'}}>
+        <MyText text={text} size={size} />
+        {subText && <MyText text={subText} fontFamily="AnonymousPro-Regular" />}
+      </View>
+      <View
+        style={{
+          flexDirection: 'row',
+          gap: 30,
+        }}>
+        {/* todo: add checkbox component */}
+        <MyInput width={width} height={height} password={password} />
+        {checkbox && <Checkbox />}
+      </View>
     </View>
   );
 }

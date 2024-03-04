@@ -19,13 +19,14 @@ export default function MyDropdown({
   containerStyle,
   height = 30,
   theme,
+  dropdnHeight,
 }: DropdownProps) {
   const [show, setShow] = useState(false);
   const [label, setLabel] = useState('Select');
   const [selectedItem, setSelectedItem] = useState<string | undefined>(
     undefined,
   );
-  const dropdownHeight = show ? data.length * height : height;
+  const dropdownHeight = show ? dropdnHeight || data.length * height : height;
 
   const handleSelection = (item: string) => {
     setSelectedItem(item);
@@ -68,7 +69,6 @@ export default function MyDropdown({
             {
               zIndex: zIndex + 5,
               top: height,
-
               height: dropdownHeight,
             },
           ]}>
@@ -135,8 +135,9 @@ const styles = (theme?: MyTheme) =>
       justifyContent: 'center',
     },
     item: {
-      height: 30,
+      height: 'auto',
       paddingLeft: '20%',
+      paddingVertical: '2%',
       zIndex: 50,
       justifyContent: 'center',
     },

@@ -10,12 +10,13 @@ import {
   MyCard,
   MyFooter,
   MyHeader,
-  MyInput,
   MyText,
   MyDropdown,
 } from '../../components';
 import {MyTheme} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
+import {Active, Inactive} from '../../assets';
+import {Engines, temp} from '../../constants';
 
 type SetupScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 
@@ -24,36 +25,100 @@ export default function Setup() {
   const navigation = useNavigation<SetupScreenProps['navigation']>();
 
   return (
-    <ScrollView
-      contentContainerStyle={{
-        alignItems: 'center',
-        justifyContent: 'center',
-        flex: 1,
-      }}>
+    <ScrollView contentContainerStyle={styles({}).screen}>
       <MyHeader />
+      <GapView length={90} />
       <MyText
         text="Setup"
         size={18}
         fontFamily="NotoSans-Bold"
-        style={{alignSelf: 'flex-start', paddingLeft: 18, paddingBottom: 20}}
+        style={styles({}).title}
       />
       <MyCard>
+        <GapView length={15} />
+        {temp.map((item, index) => (
+          <>
+            <LabelDropdown
+              key={index}
+              text={item.text}
+              data={item.options}
+              onSelect={() => {}}
+              zIndex={item.zindez}
+            />
+            <GapView length={index != 3 ? 20 : 15} />
+          </>
+        ))}
+      </MyCard>
+      <GapView length={15} />
+      <MyCard>
         <GapView length={10} />
+        <View style={styles({}).card2}>
+          {['Engines', 'Active', 'Position'].map((item, index) => (
+            <MyText key={index} text={item} fontFamily="NotoSans-BoldItalic" />
+          ))}
+        </View>
+        {Engines.map((item, index) => (
+          <>
+            <LabelDropdown
+              key={index}
+              text={item.text}
+              data={item.options}
+              onSelect={() => {}}
+              isActive={item.status}
+              zIndex={item.zindez}
+              status
+            />
+            <GapView length={index != 3 ? 20 : 15} />
+          </>
+        ))}
+      </MyCard>
+      <GapView length={15} />
 
+      <MyCard>
+        <GapView length={15} />
         <LabelDropdown
-          data={['US Gallons', 'Liters']}
+          data={[
+            'Opt:1 No Gen. Present',
+            'Opt:2 Genset fuel measured',
+            'Opt:3 Genset fuel flow estimated',
+          ]}
+          text="Generator Config"
           onSelect={() => {}}
-          text="Volume"
-          zIndex={50}
+          zIndex={54}
+          dropdnHeight={170}
         />
-        <GapView length={20} />
+        <GapView length={5} />
+        <View style={styles({}).fuelBurn}>
+          <MyText
+            text="Generator Fuel burn when in use "
+            style={{width: '50%'}}
+          />
+          {/* todo: component confusion** */}
+          <View
+            style={{width: 114, height: 20, backgroundColor: '#70726F73'}} //temp
+          />
+        </View>
         <LabelDropdown
-          data={['Kilometers', 'Statute Miles', 'Nautical Miles']}
+          data={['N2k SOG', 'N2k SOW', 'UI Device GPS']}
+          text="Speed Source"
           onSelect={() => {}}
-          text="Distance"
-          zIndex={48}
+          zIndex={52}
         />
-        <GapView length={30} />
+        <View style={{width: '100%'}}>
+          <MyText
+            text="Fuel Mgt Module Connection"
+            fontFamily="NotoSans-BoldItalic"
+          />
+          <LabelInput text="IP Address" subText="FMM #1" checkbox width={100} />
+          <GapView length={10} />
+          <LabelInput text="IP Address" subText="FMM #2" checkbox width={100} />
+          <GapView length={10} />
+          <MyText text="Wifi Setup" fontFamily="NotoSans-BoldItalic" />
+          <LabelInput text="Access Point Name" checkbox width={100} />
+          <GapView length={10} />
+          <LabelInput text="Password" checkbox width={100} password />
+          <GapView length={10} />
+        </View>
       </MyCard>
       <GapView length={30} />
       <MyButton
@@ -64,7 +129,7 @@ export default function Setup() {
           console.log('Fuel Mgt pe jayein');
         }}
       />
-      <GapView length={120} />
+      <GapView length={25} />
       <MyButton
         label="Back"
         style={styles({}).button}
@@ -74,6 +139,7 @@ export default function Setup() {
         }}
         gradient
       />
+      <GapView length={70} />
       <MyFooter />
     </ScrollView>
   );
@@ -88,6 +154,9 @@ interface LabelDropdownProps {
   style?: StyleProp<ViewStyle>;
   containerStyle?: ViewStyle;
   height?: number;
+  status?: boolean;
+  isActive?: boolean;
+  dropdnHeight?: number;
 }
 
 function LabelDropdown({
@@ -99,6 +168,9 @@ function LabelDropdown({
   style,
   containerStyle,
   height,
+  status,
+  isActive,
+  dropdnHeight,
 }: LabelDropdownProps) {
   const theme = useTheme() as MyTheme;
   return (
@@ -107,17 +179,27 @@ function LabelDropdown({
         flexDirection: 'row',
         justifyContent: 'space-between',
         width: '100%',
+        alignItems: 'center',
       }}>
-      <MyText text={text} size={size || 18} />
-      <MyDropdown
-        data={data}
-        onSelect={onSelect}
-        theme={theme}
-        zIndex={zIndex}
-        style={style}
-        containerStyle={containerStyle}
-        height={height}
-      />
+      <MyText text={text} size={size} />
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 15,
+        }}>
+        {status ? isActive ? <Active /> : <Inactive /> : null}
+        <MyDropdown
+          data={data}
+          onSelect={onSelect}
+          theme={theme}
+          zIndex={zIndex}
+          style={style}
+          containerStyle={containerStyle}
+          height={height}
+          dropdnHeight={dropdnHeight}
+        />
+      </View>
     </View>
   );
 }
@@ -127,13 +209,21 @@ const styles = (theme: {theme?: MyTheme}) =>
     container: {
       flex: 1,
     },
-    linearGradient: {
-      ...StyleSheet.absoluteFillObject,
-      height: '41%',
+    screen: {
+      alignItems: 'center',
+      justifyContent: 'center',
     },
-    lowerGradient: {
-      ...StyleSheet.absoluteFillObject,
-      marginBottom: -20,
+    title: {alignSelf: 'flex-start', paddingLeft: 18, paddingBottom: 20},
+    card2: {
+      flexDirection: 'row',
+      width: '100%',
+      justifyContent: 'space-between',
+      paddingHorizontal: 10,
+    },
+    fuelBurn: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      width: '100%',
     },
     signin: {width: 130, alignSelf: 'center', zIndex: -1},
     button: {width: 130, alignSelf: 'center'},

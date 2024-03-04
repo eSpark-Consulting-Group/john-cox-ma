@@ -5,7 +5,7 @@ import {LinearGradient} from 'expo-linear-gradient';
 
 import {MyInputProps, MyTheme} from '../../types';
 
-function MyInput({text, onChange, width, height}: MyInputProps) {
+function MyInput({text, onChange, width, height, password}: MyInputProps) {
   const theme = useTheme() as MyTheme;
   return (
     <View style={styles({width, height}).container}>
@@ -18,6 +18,7 @@ function MyInput({text, onChange, width, height}: MyInputProps) {
             color: theme.colors.primary,
           },
         ]}
+        secureTextEntry={password}
       />
       <LinearGradient
         colors={['#72e14d89', 'transparent']}

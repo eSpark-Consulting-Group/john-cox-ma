@@ -51,14 +51,17 @@ export interface MyInputProps {
   onChangeText?: (value: string) => void;
   width?: any;
   height?: any;
+  password?: boolean;
 }
 
 export interface LabelInputProps {
   text: string;
+  subText?: string;
   size?: number;
   checkbox?: boolean;
   width?: DimensionValue | any;
   height?: DimensionValue | any;
+  password?: boolean;
 }
 
 export interface DropdownProps {
@@ -68,5 +71,6 @@ export interface DropdownProps {
   style?: StyleProp<ViewStyle>;
   containerStyle?: ViewStyle;
   height?: number;
+  dropdnHeight?: number;
   theme: MyTheme;
 }
