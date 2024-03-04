@@ -17,6 +17,7 @@ export type MyTheme = Theme & {
 type Fonts =
   | 'AnonymousPro-Bold'
   | 'AnonymousPro-Regular'
+  | 'AnonymousPro-Italic'
   | 'CrimsonText-Bold'
   | 'CrimsonText-Regular'
   | 'NotoSerif-Bold'

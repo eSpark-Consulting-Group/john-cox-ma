@@ -23,7 +23,7 @@ function LabelInput({
       }}>
       <View style={{width: '30%'}}>
         <MyText text={text} size={size} />
-        {subText && <MyText text={subText} fontFamily="AnonymousPro-Regular" />}
+        {subText && <MyText text={subText} fontFamily="AnonymousPro-Italic" />}
       </View>
       <View
         style={{
