@@ -89,3 +89,10 @@ export interface LabelDropdownProps {
   isActive?: boolean;
   dropdnHeight?: number;
 }
+
+export type MyCheckboxProps = {
+  onChange?: (checked: boolean) => void;
+  style?: ViewStyle;
+  checkboxStyle?: ViewStyle;
+  width?: DimensionValue | any;
+};

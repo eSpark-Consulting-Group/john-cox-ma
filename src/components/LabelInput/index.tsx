@@ -4,6 +4,7 @@ import MyText from '../MyText';
 import MyInput from '../MyInput';
 import {memo} from 'react';
 import {Checkbox} from '../../assets';
+import MyCheckbox from '../MyCheckbox';
 
 function LabelInput({
   text,
@@ -29,10 +30,11 @@ function LabelInput({
         style={{
           flexDirection: 'row',
           gap: 30,
+          alignItems: 'center',
         }}>
         {/* todo: add checkbox component */}
         <MyInput width={width} height={height} password={password} />
-        {checkbox && <Checkbox />}
+        {checkbox && <MyCheckbox width={18} />}
       </View>
     </View>
   );
