@@ -14,7 +14,7 @@ export type MyTheme = Theme & {
   };
 };
 
-type Fonts =
+export type Fonts =
   | 'AnonymousPro-Bold'
   | 'AnonymousPro-Regular'
   | 'AnonymousPro-Italic'
