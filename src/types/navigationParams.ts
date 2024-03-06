@@ -4,4 +4,5 @@ export type RootStackParamsList = {
   Login: undefined;
   Setup: undefined;
   FMMSetup: undefined;
+  Main: undefined;
 };

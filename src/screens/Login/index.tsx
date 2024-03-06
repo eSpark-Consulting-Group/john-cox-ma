@@ -26,9 +26,11 @@ export default function Login() {
       contentContainerStyle={{
         alignItems: 'center',
         justifyContent: 'center',
-        flex: 1,
+        width: '100%',
+        height: '100%',
       }}>
       <MyHeader />
+      <GapView length={150} />
       <MyText
         text="Login"
         size={18}
@@ -52,7 +54,13 @@ export default function Login() {
         <GapView length={30} />
       </MyCard>
       <GapView length={120} />
-      <MyButton label="Back" style={styles({}).button} gradient />
+      <MyButton
+        label="Back"
+        style={styles({}).button}
+        gradient
+        onPress={() => navigation.navigate('Main')}
+      />
+      <GapView length={180} />
       <MyFooter />
     </ScrollView>
   );
@@ -60,9 +68,6 @@ export default function Login() {
 
 const styles = (theme: {theme?: MyTheme}) =>
   StyleSheet.create({
-    container: {
-      flex: 1,
-    },
     linearGradient: {
       ...StyleSheet.absoluteFillObject,
       height: '41%',

@@ -7,3 +7,5 @@ export {default as GapView} from './GapView';
 export {default as MyCard} from './MyCard';
 export {default as LabelInput} from './LabelInput';
 export {default as MyDropdown} from './MyDropdown';
+export {default as MySwitch} from './MySwitch';
+export {default as MyBox} from './MyBox';

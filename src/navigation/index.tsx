@@ -7,6 +7,7 @@ import {DarkTheme} from '../theme';
 import Setup from '../screens/Setup';
 import FMMSetup from '../screens/FMMSetup';
 import {RootStackParamsList} from '../types/navigationParams';
+import Main from '../screens/Main';
 
 const RootStack = createNativeStackNavigator<RootStackParamsList>();
 
@@ -31,6 +32,13 @@ export default function RootNav() {
         <RootStack.Screen
           name="FMMSetup"
           component={FMMSetup}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <RootStack.Screen
+          name="Main"
+          component={Main}
           options={{
             headerShown: false,
           }}
