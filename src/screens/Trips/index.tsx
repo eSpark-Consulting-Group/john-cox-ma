@@ -179,6 +179,7 @@ const styles = StyleSheet.create({
   },
   title: {
     alignSelf: 'flex-start',
+    paddingBottom: 10,
   },
   sectionContainer: {
     flexDirection: 'row',
