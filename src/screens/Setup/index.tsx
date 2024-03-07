@@ -153,7 +153,7 @@ export default function Setup() {
         label="Back"
         style={styles({}).button}
         onPress={() => {
-          navigation.navigate('Login');
+          navigation.goBack();
           console.log('Wapis jayein');
         }}
         gradient
