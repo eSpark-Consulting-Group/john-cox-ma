@@ -44,6 +44,8 @@ export interface MyButtonProps {
   key?: string;
   fontFamily?: Fonts;
   gradient?: boolean;
+  height?: any;
+  width?: any;
 }
 
 export interface MyInputProps {
@@ -95,4 +97,13 @@ export type MyCheckboxProps = {
   style?: ViewStyle;
   checkboxStyle?: ViewStyle;
   width?: DimensionValue | any;
+};
+
+export type DisplayBoxProps = {
+  value: string;
+  width?: number;
+  height?: number;
+  textColor?: string;
+  size?: number;
+  fontFamily?: Fonts;
 };

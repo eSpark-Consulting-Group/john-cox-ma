@@ -166,9 +166,6 @@ export default function Setup() {
 
 const styles = (theme: {theme?: MyTheme}) =>
   StyleSheet.create({
-    container: {
-      flex: 1,
-    },
     screen: {
       alignItems: 'center',
       justifyContent: 'center',

@@ -48,7 +48,7 @@ export default function Login() {
           style={styles({}).signin}
           onPress={() => {
             console.log('setup pe jayein');
-            navigation.navigate('Setup');
+            navigation.navigate('Main');
           }}
         />
         <GapView length={30} />
@@ -58,7 +58,7 @@ export default function Login() {
         label="Back"
         style={styles({}).button}
         gradient
-        onPress={() => navigation.navigate('Main')}
+        onPress={() => console.log('go back')}
       />
       <GapView length={180} />
       <MyFooter />

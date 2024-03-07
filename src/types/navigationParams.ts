@@ -5,4 +5,6 @@ export type RootStackParamsList = {
   Setup: undefined;
   FMMSetup: undefined;
   Main: undefined;
+  FuelTanks: undefined;
+  Trips: undefined;
 };

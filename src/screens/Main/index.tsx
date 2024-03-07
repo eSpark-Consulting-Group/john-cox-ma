@@ -9,7 +9,7 @@ import {
   MyHeader,
   MyText,
   MyBox,
-  MySwitch,
+  GapView,
 } from '../../components';
 import {MyTheme} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
@@ -29,57 +29,103 @@ export default function Main() {
         height: '100%',
       }}>
       <MyHeader />
-      <View style={{flexDirection: 'row', alignItems: 'center'}}>
+      <View style={{alignItems: 'center', width: '90%'}}>
+        <View
+          style={{flexDirection: 'row', alignItems: 'center', width: '100%'}}>
+          <MyBox
+            label="Efficiency"
+            text="Speed"
+            value={25.4}
+            unit="Knots"
+            width={'50%'}
+            height={75}
+          />
+          <MyBox
+            text="Total Fuel Burn"
+            value={102.1}
+            unit="gal/hr"
+            width={'50%'}
+            height={75}
+          />
+        </View>
         <MyBox
-          label="Efficiency"
-          text="Speed"
-          value={25.4}
-          unit="Knots"
-          width={128}
-          height={75}
-        />
-        <MyBox
-          text="Total Fuel Burn"
-          value={102.1}
-          unit="gal/hr"
-          width={128}
-          height={75}
-        />
-      </View>
-      <MyBox
-        text="Gallons per Nautical mile"
-        value={41.7}
-        width={186}
-        height={76}
-      />
-      <View style={{flexDirection: 'row', gap: 20}}>
-        <MyBox
-          label="Range"
-          text="Fuel Remaining"
+          text="Gallons per Nautical mile"
           value={41.7}
-          unit="gal"
-          width={121}
+          width={'80%'}
+          // width={186}
           height={76}
         />
         <View
           style={{
-            height: 96,
+            flexDirection: 'row',
+            width: '100%',
             justifyContent: 'space-between',
-            paddingTop: 20,
-            width: 100,
           }}>
-          <MyText text="Generator Running" textColor={theme.colors.secondary} />
-          <MyButton gradient label="Yes" />
+          <View style={{width: '50%'}}>
+            <MyBox
+              label="Range"
+              text="Fuel Remaining"
+              value={41.7}
+              unit="gal"
+              width={'100%'}
+              height={76}
+            />
+          </View>
+          <View style={{width: '40%'}}>
+            <View
+              style={{
+                height: 96,
+                justifyContent: 'space-between',
+                paddingTop: 20,
+                width: '100%',
+              }}>
+              <MyText
+                text="Generator Running"
+                textColor={theme.colors.secondary}
+              />
+              <MyButton gradient label="Yes" />
+            </View>
+          </View>
         </View>
+        <MyBox
+          text="Distance to Empty"
+          value={205}
+          width={'80%'}
+          height={76}
+          unit="N.Mile"
+        />
       </View>
-      <MyBox
-        text="Distance to Empty"
-        value={205}
-        width={186}
-        height={76}
-        unit="N.Mile"
-      />
-      <MySwitch label="1" />
+
+      <GapView length={20} />
+      <View
+        style={{
+          flexDirection: 'row',
+          width: '90%',
+          justifyContent: 'space-between',
+        }}>
+        <MyButton gradient label="Main" style={{width: '22%'}} height={43} />
+        <MyButton
+          gradient
+          label="Fuel Tanks"
+          style={{width: '22%'}}
+          height={43}
+          onPress={() => navigation.navigate('FuelTanks')}
+        />
+        <MyButton
+          gradient
+          label="Trips"
+          style={{width: '22%'}}
+          height={43}
+          onPress={() => navigation.navigate('Trips')}
+        />
+        <MyButton
+          gradient
+          label="Setup"
+          style={{width: '22%'}}
+          height={43}
+          onPress={() => navigation.navigate('Setup')}
+        />
+      </View>
       <MyFooter />
     </ScrollView>
   );

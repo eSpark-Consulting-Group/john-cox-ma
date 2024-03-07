@@ -22,6 +22,8 @@ function MyButton({
   labelStyle,
   fontFamily = 'CrimsonText-Bold',
   gradient,
+  height,
+  width,
 }: MyButtonProps) {
   const theme = useTheme() as MyTheme;
   const buttonStyle: ViewStyle = {
@@ -30,7 +32,7 @@ function MyButton({
     borderRadius: 2,
     alignItems: 'center',
     justifyContent: 'center',
-    width: '100%',
+    width: width ? width : '100%',
     height: 30,
     borderWidth: 1.01,
     borderColor: '#066DB8',
@@ -40,18 +42,21 @@ function MyButton({
   const buttonTextStyle: TextStyle = {
     textAlign: 'center',
     width: '100%',
+    padding: 5,
     ...labelStyle,
   };
 
   if (gradient) {
     return (
-      <View style={[styles.gradientButton, style]}>
+      <View style={[styles.gradientButton, style, {height: height | 30}]}>
         <LinearGradient
           colors={['#88B6D8', theme.colors.background]}
           start={[0, 1]}
           end={[0.9, 1]}
           style={{borderRadius: 10}}>
-          <TouchableOpacity style={styles.inner} onPress={onPress}>
+          <TouchableOpacity
+            style={[styles.inner, {height: height | 30}]}
+            onPress={onPress}>
             <LinearGradient
               colors={['#4d92e16f', '#090824']}
               style={[styles.gradient]}
@@ -89,7 +94,7 @@ export default memo(MyButton);
 const styles = StyleSheet.create({
   gradientButton: {
     width: '101%',
-    height: 30,
+
     marginBottom: 5,
   },
   gradient: {
@@ -99,7 +104,7 @@ const styles = StyleSheet.create({
   },
   inner: {
     width: '95%',
-    height: 30,
+
     margin: 1,
     borderRadius: 10,
     justifyContent: 'center',
