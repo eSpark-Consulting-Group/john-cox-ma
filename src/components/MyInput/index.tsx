@@ -80,6 +80,7 @@ const styles = ({
       ...StyleSheet.absoluteFillObject,
       alignItems: 'center',
       justifyContent: 'center',
+      width: '102%',
     },
     borderGradient: {
       width: width ? width : '97%',
@@ -87,7 +88,7 @@ const styles = ({
       alignItems: 'center',
     },
     innerGradient: {
-      width: width ? width - 9 : '100%',
+      width: width ? width - 7 : '96%',
       height: height ? height - 5 : 16,
       margin: 2,
     },
