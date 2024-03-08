@@ -76,7 +76,7 @@ const styles = (theme: {theme?: MyTheme}) =>
       ...StyleSheet.absoluteFillObject,
       marginBottom: -20,
     },
-    signin: {width: 79, alignSelf: 'center'},
+    signin: {alignSelf: 'center'},
     button: {width: 130, alignSelf: 'center'},
   });
 

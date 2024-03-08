@@ -14,6 +14,8 @@ function LabelInput({
   height,
   subText,
   password,
+  value,
+  onFocus,
 }: LabelInputProps) {
   return (
     <View
@@ -33,8 +35,13 @@ function LabelInput({
           alignItems: 'center',
         }}>
         {/* todo: add checkbox component */}
-        <MyInput width={width} height={height} password={password} />
-        {checkbox && <MyCheckbox width={18} />}
+        <MyInput
+          width={width}
+          height={height}
+          password={password}
+          onFocus={onFocus}
+        />
+        {checkbox && <MyCheckbox width={18} value={value} />}
       </View>
     </View>
   );

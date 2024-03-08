@@ -32,8 +32,9 @@ function MyButton({
     borderRadius: 2,
     alignItems: 'center',
     justifyContent: 'center',
-    width: width ? width : '100%',
-    height: 30,
+    paddingHorizontal: 20,
+    // width: width ? width : '100%',
+    // height: 30,
     borderWidth: 1.01,
     borderColor: '#066DB8',
     ...style,
@@ -41,7 +42,7 @@ function MyButton({
 
   const buttonTextStyle: TextStyle = {
     textAlign: 'center',
-    width: '100%',
+    // width: '100%',
     padding: 5,
     ...labelStyle,
   };

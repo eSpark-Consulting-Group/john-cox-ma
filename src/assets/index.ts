@@ -3,3 +3,5 @@ export {default as FooterBadge} from './vectors/FooterBadge.svg';
 export {default as Checkbox} from './vectors/Checkbox.svg';
 export {default as Active} from './vectors/Active.svg';
 export {default as Inactive} from './vectors/Inactive.svg';
+export {default as Wifi} from './vectors/wifi.svg';
+export {default as Connected} from './vectors/Connected.svg';

@@ -52,9 +52,10 @@ export interface MyInputProps {
   text?: string;
   onChange?: (val: string) => void;
   onChangeText?: (value: string) => void;
-  width?: any;
-  height?: any;
+  width?: DimensionValue | any;
+  height?: DimensionValue | any;
   password?: boolean;
+  onFocus?: () => void;
 }
 
 export interface LabelInputProps {
@@ -65,6 +66,8 @@ export interface LabelInputProps {
   width?: DimensionValue | any;
   height?: DimensionValue | any;
   password?: boolean;
+  value?: boolean;
+  onFocus?: () => void;
 }
 
 export interface DropdownProps {
@@ -97,6 +100,8 @@ export type MyCheckboxProps = {
   style?: ViewStyle;
   checkboxStyle?: ViewStyle;
   width?: DimensionValue | any;
+  value?: boolean;
+  disabled?: boolean;
 };
 
 export type DisplayBoxProps = {
