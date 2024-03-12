@@ -39,7 +39,7 @@ export default function FuelTanks() {
       <MyCard>
         <MyText
           text="Fuel Temperature"
-          size={18}
+          size={22}
           fontFamily="NotoSans-BoldItalic"
           style={{alignSelf: 'flex-start'}}
         />
@@ -72,24 +72,38 @@ function ColumnData({
 }) {
   const theme = useTheme() as MyTheme;
   return (
-    <View style={styles().column}>
+    <View
+      style={[styles().column, {alignItems: isEngine ? 'stretch' : 'center'}]}>
       <MyText
         text={title}
         fontFamily="NotoSans-Bold"
         style={{marginBottom: 15}}
         textColor={theme.colors.secondary}
+        size={16}
       />
-      {isEngine
-        ? data.map((item, index) => (
+      {isEngine ? (
+        <View>
+          {data.map((item, index) => (
             <MyText
               text={item}
               key={index}
-              style={{paddingBottom: 20, paddingTop: 2}}
+              style={{paddingBottom: 20, paddingTop: 8}}
+              size={16}
             />
-          ))
-        : data.map((item, index) => (
-            <DisplayBox value={item} key={index} fontFamily="NotoSans-Bold" />
           ))}
+        </View>
+      ) : (
+        <View style={{width: '80%'}}>
+          {data.map((item, index) => (
+            <DisplayBox
+              size={16}
+              value={item}
+              key={index}
+              fontFamily="NotoSans-Bold"
+            />
+          ))}
+        </View>
+      )}
     </View>
   );
 }
@@ -108,7 +122,8 @@ const styles = (theme?: MyTheme) =>
       justifyContent: 'space-between',
     },
     column: {
-      alignItems: 'center',
+      // alignItems: 'center',
+      width: '33.333333%',
     },
 
     button: {width: 130, alignSelf: 'center'},
