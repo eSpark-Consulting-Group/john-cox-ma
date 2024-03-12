@@ -2,7 +2,6 @@ import React from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {LinearGradient} from 'expo-linear-gradient';
 
 import {
   DisplayBox,
@@ -12,9 +11,11 @@ import {
   MyFooter,
   MyHeader,
   MyText,
+  ScaleTanks,
 } from '../../components';
-import {MyTheme, Fonts} from '../../types';
+import {MyTheme} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
+import {fuelData} from '../../constants';
 
 type FuelTanksScreenProps = NativeStackScreenProps<
   RootStackParamsList,
@@ -31,9 +32,27 @@ export default function FuelTanks() {
   return (
     <ScrollView contentContainerStyle={styles().container}>
       <MyHeader />
-      <MyText text="Fuel Management" size={18} fontFamily="NotoSans-Bold" />
+      <GapView length={90} />
+      <MyText
+        text="Fuel Management"
+        size={22}
+        fontFamily="NotoSans-Bold"
+        style={styles().heading}
+      />
       <MyCard>
-        <MyText>to be added</MyText>
+        <ScaleTanks fuelData={fuelData} />
+        <View style={{flexDirection: 'row', alignSelf: 'flex-start', gap: 10}}>
+          <MyText size={16}>Total Fuel:</MyText>
+          <DisplayBox
+            value={'1820'}
+            fontFamily="CrimsonText-Bold"
+            textColor={theme.colors.primary}
+            size={25}
+            paddingVertical={2}
+            paddingHorizontal={20}
+          />
+          <MyText>gal</MyText>
+        </View>
       </MyCard>
       <GapView length={20} />
       <MyCard>
@@ -113,8 +132,6 @@ const styles = (theme?: MyTheme) =>
     container: {
       alignItems: 'center',
       justifyContent: 'center',
-      width: '100%',
-      height: '100%',
     },
     row: {
       flexDirection: 'row',
@@ -125,6 +142,6 @@ const styles = (theme?: MyTheme) =>
       // alignItems: 'center',
       width: '33.333333%',
     },
-
+    heading: {alignSelf: 'flex-start', marginLeft: 18, paddingBottom: 10},
     button: {width: 130, alignSelf: 'center'},
   });

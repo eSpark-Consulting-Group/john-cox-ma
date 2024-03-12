@@ -34,3 +34,26 @@ export const Engines = [
     status: true,
   },
 ];
+
+export const fuelData = [
+  {
+    number: 1,
+    value: 1 / 2,
+    volume: 455,
+  },
+  {
+    number: 2,
+    value: 1 / 4,
+    volume: 455,
+  },
+  {
+    number: 3,
+    value: 5 / 8,
+    volume: 455,
+  },
+  {
+    number: 4,
+    value: 1,
+    volume: 455,
+  },
+];

@@ -9,15 +9,24 @@ import {DisplayBoxProps, Fonts, MyTheme} from '../../types';
 
 function DisplayBox({
   value,
-  // width = 58,
+  width,
   // height = 27,
   textColor = 'white',
   size,
   fontFamily,
+  paddingHorizontal,
+  paddingVertical,
 }: DisplayBoxProps) {
   const theme = useTheme() as MyTheme;
   return (
-    <View style={[styles(theme).displayBox, {}]}>
+    <View
+      style={[
+        styles(theme).displayBox,
+        {
+          paddingHorizontal: paddingHorizontal ? paddingHorizontal : 5,
+          paddingVertical: paddingVertical ? paddingVertical : 5,
+        },
+      ]}>
       <LinearGradient
         colors={['#4d92e16f', '#090824']}
         style={styles().gradient}
@@ -41,8 +50,6 @@ const styles = (theme?: MyTheme) =>
       alignItems: 'center',
       justifyContent: 'center',
       marginBottom: 10,
-      paddingVertical: 5,
-      paddingHorizontal: 5,
     },
     gradient: {
       justifyContent: 'center',

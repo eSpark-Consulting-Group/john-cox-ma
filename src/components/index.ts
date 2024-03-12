@@ -13,3 +13,4 @@ export {default as MyBox} from './MyBox';
 export {default as DisplayBox} from './DisplayBox';
 export {default as MyCheckbox} from './MyCheckbox';
 export {default as MyGauge} from './MyGauge';
+export {default as ScaleTanks} from './ScaleTanks';

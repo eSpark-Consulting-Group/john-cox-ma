@@ -107,6 +107,8 @@ export type MyCheckboxProps = {
 export type DisplayBoxProps = {
   value: string;
   width?: number;
+  paddingHorizontal?: number;
+  paddingVertical?: number;
   height?: number;
   textColor?: string;
   size?: number;
