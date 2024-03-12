@@ -41,7 +41,7 @@ export default function FuelTanks() {
       />
       <MyCard>
         <ScaleTanks fuelData={fuelData} />
-        <View style={{flexDirection: 'row', alignSelf: 'flex-start', gap: 10}}>
+        <View style={styles().total}>
           <MyText size={16}>Total Fuel:</MyText>
           <DisplayBox
             value={'1820'}
@@ -139,9 +139,9 @@ const styles = (theme?: MyTheme) =>
       justifyContent: 'space-between',
     },
     column: {
-      // alignItems: 'center',
       width: '33.333333%',
     },
     heading: {alignSelf: 'flex-start', marginLeft: 18, paddingBottom: 10},
     button: {width: 130, alignSelf: 'center'},
+    total: {flexDirection: 'row', alignSelf: 'flex-start', gap: 10},
   });
