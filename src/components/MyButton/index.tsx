@@ -23,7 +23,6 @@ function MyButton({
   fontFamily = 'CrimsonText-Bold',
   gradient,
   height,
-  width,
 }: MyButtonProps) {
   const theme = useTheme() as MyTheme;
   const buttonStyle: ViewStyle = {
@@ -33,8 +32,7 @@ function MyButton({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 20,
-    // width: width ? width : '100%',
-    // height: 30,
+    // paddingVertical: 5,
     borderWidth: 1.01,
     borderColor: '#066DB8',
     ...style,
@@ -42,22 +40,20 @@ function MyButton({
 
   const buttonTextStyle: TextStyle = {
     textAlign: 'center',
-    // width: '100%',
-    padding: 5,
+    paddingVertical: 10, // Adjust padding here
+    paddingHorizontal: 5,
     ...labelStyle,
   };
 
   if (gradient) {
     return (
-      <View style={[styles.gradientButton, style, {height: height | 30}]}>
+      <View style={[styles.gradientButton, style]}>
         <LinearGradient
           colors={['#88B6D8', theme.colors.background]}
           start={[0, 1]}
           end={[0.9, 1]}
           style={{borderRadius: 10}}>
-          <TouchableOpacity
-            style={[styles.inner, {height: height | 30}]}
-            onPress={onPress}>
+          <TouchableOpacity style={styles.inner} onPress={onPress}>
             <LinearGradient
               colors={['#4d92e16f', '#090824']}
               style={[styles.gradient]}
@@ -65,7 +61,7 @@ function MyButton({
               end={[0.5, 1]}
             />
             <MyText
-              style={[{paddingBottom: 4}, buttonTextStyle]}
+              style={[buttonTextStyle]}
               fontFamily={fontFamily}
               textColor={textColor || theme.colors.primary}
               size={15}>
@@ -95,19 +91,21 @@ export default memo(MyButton);
 const styles = StyleSheet.create({
   gradientButton: {
     width: '101%',
-
     marginBottom: 5,
+    // alignItems: 'center',
+    // paddingHorizontal: 20,
   },
   gradient: {
     borderRadius: 10,
     justifyContent: 'center',
+    alignItems: 'center',
     ...StyleSheet.absoluteFillObject,
   },
   inner: {
     width: '95%',
-
     margin: 1,
     borderRadius: 10,
     justifyContent: 'center',
+    alignItems: 'center',
   },
 });

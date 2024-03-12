@@ -5,3 +5,5 @@ declare module '*.gif';
 declare module '*.svg';
 
 declare module '*@env';
+
+declare module 'react-native-speedometer';

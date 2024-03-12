@@ -6,58 +6,78 @@ import {MyTheme} from '../../types';
 
 interface MyBoxProps {
   label?: string;
-  text?: string;
+  text?: string | number;
   unit?: string;
   value?: number;
-  width: DimensionValue | undefined;
-  height: number;
+  width?: DimensionValue;
+  gap?: number;
 }
+
 export default function MyBox({
   label,
   text,
   unit,
   value,
   width,
-  height,
+  gap,
 }: MyBoxProps) {
   const theme = useTheme() as MyTheme;
   return (
-    <View style={{width: width, height: height + 20}}>
-      <View style={{height: 17}}>
-        <MyText textColor={theme.colors.secondary} fontFamily="NotoSans-Bold">
+    <View style={{width: width ? width : '100%', paddingVertical: 4}}>
+      <View style={styles.labelContainer}>
+        <MyText
+          textColor={theme.colors.secondary}
+          fontFamily="NotoSans-Bold"
+          size={16}>
           {label}
         </MyText>
       </View>
 
-      <View style={[styles({theme}).box, {height: height}]}>
-        <MyText textColor={theme.colors.secondary} style={{height: 30}}>
+      <View style={[styles.box, {gap: gap ? gap : 15}]}>
+        <MyText
+          textColor={theme.colors.secondary}
+          style={styles.text}
+          size={20}>
           {text}
         </MyText>
-        {unit && (
-          <MyText style={styles({theme}).unit} fontFamily="NotoSans-Regular">
+        <View style={{flexDirection: 'row', alignSelf: 'center'}}>
+          <MyText fontFamily="NotoSans-Bold" style={styles.value} size={28}>
+            {value}
+          </MyText>
+          <MyText style={styles.unit} fontFamily="NotoSans-Regular" size={16}>
             {unit}
           </MyText>
-        )}
-        <MyText
-          fontFamily="NotoSans-Bold"
-          style={styles({theme}).val}
-          size={26}>
-          {value}
-        </MyText>
+        </View>
       </View>
     </View>
   );
 }
 
-const styles = (theme: {theme?: MyTheme}) =>
-  StyleSheet.create({
-    box: {
-      borderWidth: 2.22,
-      borderColor: '#41759B',
-      width: '100%',
-      paddingVertical: 4,
-      paddingHorizontal: 11,
-    },
-    unit: {alignSelf: 'flex-end', bottom: 10},
-    val: {alignSelf: 'center', position: 'absolute', bottom: -5},
-  });
+const styles = StyleSheet.create({
+  labelContainer: {
+    // height: 17,
+  },
+  box: {
+    borderWidth: 2.22,
+    borderColor: '#41759B',
+    width: '100%',
+    paddingHorizontal: 20,
+    // alignItems: 'center',
+    paddingVertical: 5,
+  },
+  text: {
+    // height: 30,
+  },
+  unit: {
+    // alignSelf: 'flex-end',
+    // left: 100,
+    top: 2,
+    marginTop: -10,
+    left: 5,
+  },
+  value: {
+    alignSelf: 'center',
+    // position: 'absolute',
+    // bottom: -2,
+  },
+});
