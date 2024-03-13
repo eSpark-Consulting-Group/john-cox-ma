@@ -28,7 +28,7 @@ function MyButton({
   const buttonStyle: ViewStyle = {
     backgroundColor: backgroundColor || '#B9F29E',
     flexDirection: 'row',
-    borderRadius: 2,
+    borderRadius: 4,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 20,

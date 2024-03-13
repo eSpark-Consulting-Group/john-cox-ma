@@ -68,13 +68,14 @@ export default function FuelTanks() {
           <ColumnData title="Return" data={returnData} />
         </View>
       </MyCard>
-      <GapView length={120} />
+      <GapView length={80} />
       <MyButton
         label="Back"
         style={styles().button}
         gradient
         onPress={() => navigation.goBack()}
       />
+      <GapView length={70} />
       <MyFooter />
     </ScrollView>
   );
