@@ -14,19 +14,20 @@ const MySwitch = ({label, value}: {label: string; value?: boolean}) => {
     <TouchableOpacity
       onPress={handlePress}
       style={[styles.button, {backgroundColor: isOn ? 'yellow' : '#396781'}]}>
-      <MyText text={label} />
+      <MyText text={label} size={16} />
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   button: {
-    width: 34,
-    height: 24,
+    paddingVertical: 6,
+    paddingHorizontal: 18,
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
+    borderColor: 'grey',
   },
 });
 

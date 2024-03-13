@@ -122,31 +122,20 @@ export default function Trips() {
               <TripSection label="Trip Start">
                 <View style={styles.inputContainer}>
                   <MyInput />
-                  <MyText text="Date" />
+                  <MyText text="Date" size={18} />
                   <MyInput />
-                  <MyText text="Time" />
+                  <MyText text="Time" size={18} />
                 </View>
               </TripSection>
             </MyCard>
             <GapView length={20} />
             <MyCard>
-              <View style={{flexDirection: 'row', width: '100%'}}>
-                <View
-                  style={{
-                    justifyContent: 'space-between',
-                    flexGrow: 1,
-                    height: 45,
-                  }}>
+              <View style={styles.card2}>
+                <View style={styles.innercard2}>
                   <MyText fontFamily="AnonymousPro-Regular">Engines</MyText>
                   <MyText>Fuel Used</MyText>
                 </View>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    flexGrow: 2,
-                    alignItems: 'center',
-                    justifyContent: 'flex-end',
-                  }}>
+                <View style={styles.boxes}>
                   <RenderColumn label={1} value={455} />
                   <RenderColumn label={2} value={455} />
                   <RenderColumn label={3} value={455} />
@@ -242,9 +231,9 @@ function RenderModal({visible, type, onClose}: RenderModalProps) {
 function RenderRow({title, unit}: {title: string; unit: string}) {
   return (
     <View style={styles.sectionContainer}>
-      <MyText>{title}</MyText>
-      <View>
-        <MyInput width={120} />
+      <MyText style={{width: '50%'}}>{title}</MyText>
+      <View style={{width: '50%', paddingHorizontal: 15}}>
+        <MyInput />
         <MyText text={unit} fontFamily="NotoSans-Regular" />
       </View>
     </View>
@@ -259,6 +248,7 @@ function RenderColumn({label, value}: {label: number | string; value: number}) {
         text={label.toString()}
         fontFamily="AnonymousPro-Regular"
         style={{paddingBottom: 5}}
+        size={15}
       />
       <DisplayBox
         value="455"
@@ -281,7 +271,7 @@ function TripSection({
 }) {
   return (
     <View style={styles.sectionContainer}>
-      <MyText>{label}</MyText>
+      <MyText size={18}>{label}</MyText>
       {children}
     </View>
   );
@@ -359,8 +349,19 @@ const styles = StyleSheet.create({
   rowButtons: {fontSize: 18, paddingHorizontal: 10},
   column: {
     alignItems: 'center',
-    height: 80,
     justifyContent: 'space-between',
     paddingRight: 5,
+  },
+  card2: {flexDirection: 'row', width: '100%'},
+  innercard2: {
+    justifyContent: 'space-between',
+    flexGrow: 1,
+    height: 50,
+  },
+  boxes: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    gap: 5,
   },
 });
