@@ -40,7 +40,7 @@ export default function Trips() {
     if (resetVisible) {
       const timer = setTimeout(() => {
         setResetVisible(false);
-        navigation.goBack();
+        setShowConfirmation(false);
       }, 2000);
 
       return () => clearTimeout(timer);
@@ -49,42 +49,8 @@ export default function Trips() {
 
   return (
     <>
-      <Modal visible={warningVisible} animationType="slide" transparent>
-        <View style={styles.modalContainer}>
-          <View
-            style={[
-              styles.modalContent,
-              {backgroundColor: theme.colors.background},
-            ]}>
-            <MyText size={24} textColor={'#B81106'}>
-              Warning:
-            </MyText>
-            <MyText
-              size={24}
-              textColor={theme.colors.secondary}
-              style={{textAlign: 'center'}}>
-              Trip ! Data will be reset!
-            </MyText>
-          </View>
-        </View>
-      </Modal>
-      <Modal visible={resetVisible} animationType="slide" transparent>
-        <View style={styles.modalContainer}>
-          <View
-            style={[
-              styles.modalContent,
-              {backgroundColor: theme.colors.background},
-            ]}>
-            <MyText
-              size={36}
-              textColor={theme.colors.primary}
-              style={{textAlign: 'center', lineHeight: 38}}>
-              Reset Successful!
-            </MyText>
-          </View>
-        </View>
-      </Modal>
-
+      <RenderModal visible={warningVisible} type="warning" />
+      <RenderModal visible={resetVisible} type="reset" />
       <ScrollView
         contentContainerStyle={[
           styles.screen,
@@ -243,6 +209,59 @@ export default function Trips() {
     </>
   );
 }
+
+interface RenderModalProps {
+  visible: boolean;
+  type: 'warning' | 'reset';
+  onClose?: () => void;
+}
+function RenderModal({visible, type, onClose}: RenderModalProps) {
+  const theme = useTheme() as MyTheme;
+
+  const renderContent = () => {
+    if (type === 'warning') {
+      return (
+        <View
+          style={[
+            styles.modalContent,
+            {backgroundColor: theme.colors.background},
+          ]}>
+          <MyText size={24} textColor={'#B81106'}>
+            Warning:
+          </MyText>
+          <MyText
+            size={24}
+            textColor={theme.colors.secondary}
+            style={{textAlign: 'center'}}>
+            Trip ! Data will be reset!
+          </MyText>
+        </View>
+      );
+    } else if (type === 'reset') {
+      return (
+        <View
+          style={[
+            styles.modalContent,
+            {backgroundColor: theme.colors.background},
+          ]}>
+          <MyText
+            size={36}
+            textColor={theme.colors.primary}
+            style={{textAlign: 'center', lineHeight: 38}}>
+            Reset Successful!
+          </MyText>
+        </View>
+      );
+    }
+  };
+
+  return (
+    <Modal visible={visible} animationType="slide" transparent>
+      <View style={styles.modalContainer}>{renderContent()}</View>
+    </Modal>
+  );
+}
+
 function RenderRow({title, unit}: {title: string; unit: string}) {
   return (
     <View
@@ -337,7 +356,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'transparent', // Semi-transparent black background
+    backgroundColor: 'transparent',
   },
   modalContent: {
     width: '100%',
