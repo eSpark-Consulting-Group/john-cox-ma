@@ -71,7 +71,11 @@ export default function Trips() {
                 Resetting will over-write prior date
               </MyText>
               <View style={styles.buttonRow}>
-                <MyButton label="NO" labelStyle={styles.rowButtons} />
+                <MyButton
+                  label="NO"
+                  labelStyle={styles.rowButtons}
+                  onPress={() => setShowConfirmation(false)}
+                />
                 <MyButton
                   label="YES"
                   textColor="#B81106"
@@ -80,18 +84,16 @@ export default function Trips() {
                 />
               </View>
             </View>
-            {!resetVisible ||
-              (warningVisible && (
-                <MyButton
-                  label="Back"
-                  style={[styles.button, {position: 'absolute', top: 350}]}
-                  onPress={() => {
-                    setShowConfirmation(false);
-                    console.log('Wapis jayein');
-                  }}
-                  gradient
-                />
-              ))}
+            {!resetVisible && !warningVisible ? (
+              <MyButton
+                label="Back"
+                style={[styles.button, {position: 'absolute', top: 350}]}
+                onPress={() => {
+                  setShowConfirmation(false);
+                }}
+                gradient
+              />
+            ) : null}
           </View>
         ) : (
           <>
@@ -333,6 +335,7 @@ const styles = StyleSheet.create({
   confirmation: {
     width: '100%',
     alignItems: 'center',
+    textAlign: 'center',
   },
   inner: {
     width: '70%',
