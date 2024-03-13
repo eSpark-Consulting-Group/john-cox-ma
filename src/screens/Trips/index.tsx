@@ -59,46 +59,23 @@ export default function Trips() {
         <MyHeader />
 
         {showConfirmation ? (
-          <View
-            style={{
-              width: '100%',
-              alignItems: 'center',
-            }}>
-            <View
-              style={{
-                width: '70%',
-                alignItems: 'center',
-                gap: 20,
-              }}>
-              <MyText
-                size={24}
-                style={{textAlign: 'center', paddingBottom: 5, lineHeight: 30}}>
+          <View style={styles.confirmation}>
+            <View style={styles.inner}>
+              <MyText size={24} style={styles.confirmationMessage}>
                 Are you sure you want to Reset Trip 1?
               </MyText>
               <MyText
                 textColor={theme.colors.secondary}
-                style={{
-                  width: '100%',
-                  textAlign: 'center',
-                }}
+                style={styles.confirmation}
                 size={18}>
                 Resetting will over-write prior date
               </MyText>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  width: '90%',
-                  alignItems: 'center',
-                  justifyContent: 'space-evenly',
-                }}>
-                <MyButton
-                  label="NO"
-                  labelStyle={{fontSize: 18, paddingHorizontal: 10}}
-                />
+              <View style={styles.buttonRow}>
+                <MyButton label="NO" labelStyle={styles.rowButtons} />
                 <MyButton
                   label="YES"
                   textColor="#B81106"
-                  labelStyle={{fontSize: 18, paddingHorizontal: 10}}
+                  labelStyle={styles.rowButtons}
                   onPress={() => setWarningVisible(true)}
                 />
               </View>
@@ -264,12 +241,7 @@ function RenderModal({visible, type, onClose}: RenderModalProps) {
 
 function RenderRow({title, unit}: {title: string; unit: string}) {
   return (
-    <View
-      style={{
-        flexDirection: 'row',
-        width: '100%',
-        justifyContent: 'space-between',
-      }}>
+    <View style={styles.sectionContainer}>
       <MyText>{title}</MyText>
       <View>
         <MyInput width={120} />
@@ -282,13 +254,7 @@ function RenderRow({title, unit}: {title: string; unit: string}) {
 function RenderColumn({label, value}: {label: number | string; value: number}) {
   const theme = useTheme() as MyTheme;
   return (
-    <View
-      style={{
-        alignItems: 'center',
-        height: 80,
-        justifyContent: 'space-between',
-        paddingRight: 5,
-      }}>
+    <View style={styles.column}>
       <MyText
         text={label.toString()}
         fontFamily="AnonymousPro-Regular"
@@ -373,5 +339,28 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     gap: 20,
     height: 40,
+  },
+  confirmation: {
+    width: '100%',
+    alignItems: 'center',
+  },
+  inner: {
+    width: '70%',
+    alignItems: 'center',
+    gap: 20,
+  },
+  confirmationMessage: {textAlign: 'center', paddingBottom: 5, lineHeight: 30},
+  buttonRow: {
+    flexDirection: 'row',
+    width: '90%',
+    alignItems: 'center',
+    justifyContent: 'space-evenly',
+  },
+  rowButtons: {fontSize: 18, paddingHorizontal: 10},
+  column: {
+    alignItems: 'center',
+    height: 80,
+    justifyContent: 'space-between',
+    paddingRight: 5,
   },
 });
