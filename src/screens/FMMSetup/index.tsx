@@ -93,7 +93,7 @@ export default function FMMSetup() {
       />
       <MyCard>
         {card1.map((item, index) => (
-          <>
+          <View key={index}>
             <MyText
               text={item.title}
               textColor={item.titleColor}
@@ -114,14 +114,14 @@ export default function FMMSetup() {
                   zIndex={dropdown.zIndex}
                 />
               ))}
-          </>
+          </View>
         ))}
       </MyCard>
       <GapView length={15} />
       <View style={{zIndex: -1}}>
         <MyCard>
           {card1.map((item, index) => (
-            <>
+            <View key={index}>
               <MyText
                 text={item.title}
                 textColor={item.titleColor}
@@ -142,7 +142,7 @@ export default function FMMSetup() {
                     zIndex={dropdown.zIndex}
                   />
                 ))}
-            </>
+            </View>
           ))}
         </MyCard>
       </View>

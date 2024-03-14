@@ -133,16 +133,15 @@ export default function Setup() {
                 <MyCard>
                   <GapView length={15} />
                   {temp.map((item, index) => (
-                    <>
+                    <View key={index}>
                       <LabelDropdown
-                        key={index}
                         text={item.text}
                         data={item.options}
                         onSelect={() => {}}
                         zIndex={item.zindez}
                       />
                       <GapView length={index != 3 ? 20 : 15} />
-                    </>
+                    </View>
                   ))}
                 </MyCard>
               </View>
@@ -160,9 +159,8 @@ export default function Setup() {
                     ))}
                   </View>
                   {Engines.map((item, index) => (
-                    <>
+                    <View key={index}>
                       <LabelDropdown
-                        key={index}
                         text={item.text}
                         data={item.options}
                         onSelect={() => {}}
@@ -171,7 +169,7 @@ export default function Setup() {
                         status
                       />
                       <GapView length={index != 3 ? 20 : 15} />
-                    </>
+                    </View>
                   ))}
                 </MyCard>
               </View>

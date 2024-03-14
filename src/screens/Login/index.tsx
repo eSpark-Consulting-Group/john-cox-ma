@@ -29,19 +29,19 @@ export default function Login() {
         justifyContent: 'center',
       }}>
       <LinearGradient
-        colors={['#024796c1', '#37ae3755', 'transparent', 'transparent']}
-        start={[0.0, -0.5]}
-        end={[0.4, 1.2]}
-        locations={[0.1, 0.5, 0.6, 1]}
+        colors={['#4D7EB7a6', '#37AE3700']}
+        start={{x: 0.85, y: -0.3}}
+        end={{x: 0.8, y: 0.9}}
+        // locations={[0, 1]}
         style={styles().linearGradient}
       />
-      <LinearGradient
+      {/* <LinearGradient
         colors={['#02479665', '#37ae3760', 'transparent']}
         start={{x: 0.1, y: 1.1}}
         end={{x: 0, y: 0.9}}
         locations={[0.1, 0.3, 0.8]}
         style={styles().lowerGradient}
-      />
+      /> */}
       <MyHeader />
       <GapView length={150} />
       <MyText
@@ -83,7 +83,7 @@ const styles = (theme?: MyTheme) =>
   StyleSheet.create({
     linearGradient: {
       ...StyleSheet.absoluteFillObject,
-      height: '41%',
+      height: 155,
     },
     lowerGradient: {
       ...StyleSheet.absoluteFillObject,

@@ -23,11 +23,11 @@ function MyFooter() {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
+    width: '100%',
     justifyContent: 'space-evenly',
+    alignSelf: 'center',
     alignItems: 'center',
-    gap: 10,
-    paddingTop: 15,
-    paddingBottom: 27,
+    paddingVertical: 20,
     bottom: 0,
     position: 'absolute',
   },
