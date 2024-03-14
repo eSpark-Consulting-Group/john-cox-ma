@@ -55,6 +55,10 @@
 		<string>CrimsonText-Regular.ttf</string>
 		<string>NotoSerif-Bold.ttf</string>
 		<string>NotoSerif-Regular.ttf</string>
+		<string>NotoSans-Bold.ttf</string>
+		<string>NotoSans-BoldItalic.ttf</string>
+		<string>NotoSans-Regular.ttf</string>
+		<string>AnonymousPro-Italic.ttf</string>
 	</array>
 </dict>
 </plist>

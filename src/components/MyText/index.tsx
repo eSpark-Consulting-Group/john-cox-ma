@@ -11,13 +11,13 @@ function MyText({
   size,
   style,
   numberOfLines,
-  fontFamily,
+  fontFamily = 'AnonymousPro-Bold',
 }: MyTextProps & TextProps) {
   const theme = useTheme();
 
   const textStyle: TextStyle = {
     color: textColor || theme.colors.text,
-    fontSize: size || 14,
+    fontSize: size || 18,
     fontFamily: fontFamily,
   };
 
