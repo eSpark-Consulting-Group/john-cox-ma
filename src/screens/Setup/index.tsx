@@ -65,6 +65,7 @@ export default function Setup() {
         contentContainerStyle={[styles().screen, {flex: showNetworks ? 1 : 0}]}>
         <KeyboardAvoidingView
           style={[styles().screen, {width: '100%', height: '100%'}]}>
+          <MyHeader />
           {showNetworks ? (
             enterPassword ? (
               <>

@@ -31,6 +31,7 @@ export default function FuelTanks() {
 
   return (
     <ScrollView contentContainerStyle={styles().container}>
+      <MyHeader />
       <GapView length={90} />
       <MyText
         text="Fuel Management"

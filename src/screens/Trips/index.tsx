@@ -56,6 +56,7 @@ export default function Trips() {
           styles.screen,
           {flex: showConfirmation ? 1 : 0},
         ]}>
+        <MyHeader />
         {showConfirmation ? (
           <View style={styles.confirmation}>
             <View style={styles.inner}>

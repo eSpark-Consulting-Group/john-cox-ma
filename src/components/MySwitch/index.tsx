@@ -1,10 +1,14 @@
 import React, {useState} from 'react';
 import {TouchableOpacity, StyleSheet} from 'react-native';
+import {useTheme} from '@react-navigation/native';
 
 import MyText from '../MyText';
+import {MyTheme} from '../../types';
+import {LinearGradient} from 'expo-linear-gradient';
 
 const MySwitch = ({label, value}: {label: string; value?: boolean}) => {
   const [isOn, setIsOn] = useState(value);
+  const theme = useTheme() as MyTheme;
 
   const handlePress = () => {
     setIsOn(!isOn);
@@ -13,8 +17,19 @@ const MySwitch = ({label, value}: {label: string; value?: boolean}) => {
   return (
     <TouchableOpacity
       onPress={handlePress}
-      style={[styles.button, {backgroundColor: isOn ? 'yellow' : '#396781'}]}>
-      <MyText text={label} size={16} />
+      style={[
+        styles.button,
+        {backgroundColor: isOn ? theme.colors.switch : 'transparent'},
+      ]}>
+      {!isOn && (
+        <LinearGradient
+          colors={[theme.colors.secondary, theme.colors.background]}
+          style={[styles.gradient]}
+          start={[0, 0.2]}
+          end={[1, 1.2]}
+        />
+      )}
+      <MyText text={label} size={18} />
     </TouchableOpacity>
   );
 };
@@ -28,6 +43,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: 'grey',
+  },
+  gradient: {
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...StyleSheet.absoluteFillObject,
   },
 });
 

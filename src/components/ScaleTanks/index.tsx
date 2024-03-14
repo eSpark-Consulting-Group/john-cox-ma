@@ -4,7 +4,6 @@ import {useTheme} from '@react-navigation/native';
 import {LinearGradient} from 'expo-linear-gradient';
 
 import MyText from '../MyText';
-import GapView from '../GapView';
 
 import {MyTheme} from '../../types';
 import DisplayBox from '../DisplayBox';
@@ -38,7 +37,7 @@ function ScaleTanks({fuelData}: ScaleTanksProps) {
   }
 
   return (
-    <View style={{width: '100%', flexDirection: 'row'}}>
+    <View style={styles().main}>
       <View style={{width: '20%'}}>
         <MyText
           text="Tank"
@@ -56,28 +55,16 @@ function ScaleTanks({fuelData}: ScaleTanksProps) {
         ))}
         <MyText text="Fuel Volume" size={16} style={{paddingBottom: 10}} />
       </View>
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          width: '80%',
-        }}>
+      <View style={styles().container}>
         {fuelData.map((item, index) => (
           <View>
             <MyText
               text={item.number.toString()}
               size={18}
               textColor={theme.colors.secondary}
-              style={{paddingBottom: 15, alignSelf: 'center'}}
+              style={styles(theme).number}
             />
-            <View
-              style={{
-                width: 45,
-                height: 300,
-                borderWidth: 1,
-                borderColor: theme.colors.secondary,
-              }}
-              key={index}>
+            <View style={styles(theme).tank} key={index}>
               <LinearGradient
                 colors={['#131313', '#4e4e4e', '#131313']}
                 start={[0, 1]}
@@ -87,26 +74,21 @@ function ScaleTanks({fuelData}: ScaleTanksProps) {
                 }}
               />
               <View
-                style={{
-                  width: '100%',
-                  height: calcHeight(item.value),
-                  position: 'absolute',
-                  bottom: 0,
-                }}>
+                style={[
+                  {
+                    height: calcHeight(item.value),
+                  },
+                  styles().innerTank,
+                ]}>
                 <LinearGradient
                   colors={['#23FBFB', '#1d1818']}
                   start={[1, 0]}
                   end={[1, 1]}
-                  style={{
-                    borderRadius: 15,
-                    borderWidth: 1,
-                    borderColor: theme.colors.secondary,
-                    ...StyleSheet.absoluteFillObject,
-                  }}
+                  style={styles(theme).innerGradient}
                 />
               </View>
             </View>
-            <View style={{alignItems: 'center', paddingVertical: 15}}>
+            <View style={styles().volumeCol}>
               <DisplayBox
                 value={item.volume.toString()}
                 fontFamily={'CrimsonText-Bold'}
@@ -124,5 +106,30 @@ function ScaleTanks({fuelData}: ScaleTanksProps) {
     </View>
   );
 }
+
+const styles = (theme?: MyTheme) =>
+  StyleSheet.create({
+    main: {width: '100%', flexDirection: 'row'},
+    container: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      width: '80%',
+    },
+    number: {paddingBottom: 15, alignSelf: 'center'},
+    tank: {
+      width: 45,
+      height: 300,
+      borderWidth: 1,
+      borderColor: theme?.colors.secondary,
+    },
+    innerTank: {width: '100%', position: 'absolute', bottom: 0},
+    innerGradient: {
+      borderRadius: 15,
+      borderWidth: 1,
+      borderColor: theme?.colors.secondary,
+      ...StyleSheet.absoluteFillObject,
+    },
+    volumeCol: {alignItems: 'center', paddingVertical: 15},
+  });
 
 export default ScaleTanks;

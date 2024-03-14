@@ -26,42 +26,41 @@ export default function RootNav() {
           component={Login}
           options={{
             headerShown: false,
-            header: props => <MyHeader />,
           }}
         />
         <RootStack.Screen
           name="Setup"
           component={Setup}
           options={{
-            header: props => <MyHeader />,
+            headerShown: false,
           }}
         />
         <RootStack.Screen
           name="FMMSetup"
           component={FMMSetup}
           options={{
-            header: props => <MyHeader />,
+            headerShown: false,
           }}
         />
         <RootStack.Screen
           name="Main"
           component={Main}
           options={{
-            header: props => <MyHeader />,
+            headerShown: false,
           }}
         />
         <RootStack.Screen
           name="FuelTanks"
           component={FuelTanks}
           options={{
-            header: props => <MyHeader />,
+            headerShown: false,
           }}
         />
         <RootStack.Screen
           name="Trips"
           component={Trips}
           options={{
-            header: props => <MyHeader />,
+            headerShown: false,
           }}
         />
       </RootStack.Navigator>

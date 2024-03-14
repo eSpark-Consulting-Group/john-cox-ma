@@ -10,7 +10,8 @@ import {Theme} from '@react-navigation/native';
 export type MyTheme = Theme & {
   colors: {
     placeholder?: string;
-    secondary?: string;
+    secondary: string;
+    switch?: string;
   };
 };
 

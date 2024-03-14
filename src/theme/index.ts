@@ -6,12 +6,14 @@ const colors = {
     secondary: '#0E3D5F',
     background: '#FFFFFF',
     text: '#4BDB07',
+    switch: '#ffff00',
   },
   dark: {
     primary: '#4BDB07',
     secondary: '#3CA9F9',
     background: '#090824',
     text: '#4BDB07',
+    switch: '#ffff00',
   },
 };
 
