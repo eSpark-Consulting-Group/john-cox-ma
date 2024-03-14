@@ -83,7 +83,6 @@ export default function FMMSetup() {
 
   return (
     <ScrollView contentContainerStyle={styles({}).screen}>
-      <MyHeader />
       <GapView length={90} />
       <MyText
         text="Fuel Mgt Module Setup"

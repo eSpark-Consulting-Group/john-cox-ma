@@ -46,7 +46,6 @@ export default function Main() {
 
   return (
     <ScrollView contentContainerStyle={styles().screen}>
-      <MyHeader />
       <GapView length={90} />
       <View
         style={{

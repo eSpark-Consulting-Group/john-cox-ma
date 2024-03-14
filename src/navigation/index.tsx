@@ -13,6 +13,7 @@ import FuelTanks from '../screens/FuelTanks';
 import Trips from '../screens/Trips';
 
 import {DarkTheme} from '../theme';
+import {MyHeader} from '../components';
 
 const RootStack = createNativeStackNavigator<RootStackParamsList>();
 
@@ -24,42 +25,42 @@ export default function RootNav() {
           name="Login"
           component={Login}
           options={{
-            headerShown: false,
+            header: props => <MyHeader />,
           }}
         />
         <RootStack.Screen
           name="Setup"
           component={Setup}
           options={{
-            headerShown: false,
+            header: props => <MyHeader />,
           }}
         />
         <RootStack.Screen
           name="FMMSetup"
           component={FMMSetup}
           options={{
-            headerShown: false,
+            header: props => <MyHeader />,
           }}
         />
         <RootStack.Screen
           name="Main"
           component={Main}
           options={{
-            headerShown: false,
+            header: props => <MyHeader />,
           }}
         />
         <RootStack.Screen
           name="FuelTanks"
           component={FuelTanks}
           options={{
-            headerShown: false,
+            header: props => <MyHeader />,
           }}
         />
         <RootStack.Screen
           name="Trips"
           component={Trips}
           options={{
-            headerShown: false,
+            header: props => <MyHeader />,
           }}
         />
       </RootStack.Navigator>

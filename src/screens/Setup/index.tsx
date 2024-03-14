@@ -62,8 +62,6 @@ export default function Setup() {
 
       <ScrollView
         contentContainerStyle={[styles().screen, {flex: showNetworks ? 1 : 0}]}>
-        <MyHeader />
-
         {showNetworks ? (
           enterPassword ? (
             <>

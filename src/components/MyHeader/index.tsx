@@ -8,13 +8,14 @@ import MyText from '../MyText';
 function MyHeader() {
   const theme = useTheme() as MyTheme;
   return (
-    <View style={styles.container}>
+    <View
+      style={[styles.container, {backgroundColor: theme.colors.background}]}>
       <HeaderLogo style={{}} />
       <MyText
         fontFamily={'NotoSerif-Bold'}
         text="Fuel Management"
         textColor={theme.colors.secondary}
-        size={20}
+        size={24}
       />
     </View>
   );

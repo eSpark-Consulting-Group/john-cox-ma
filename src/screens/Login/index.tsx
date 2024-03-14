@@ -29,7 +29,6 @@ export default function Login() {
         width: '100%',
         height: '100%',
       }}>
-      <MyHeader />
       <GapView length={150} />
       <MyText
         text="Login"
