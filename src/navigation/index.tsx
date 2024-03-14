@@ -25,6 +25,7 @@ export default function RootNav() {
           name="Login"
           component={Login}
           options={{
+            headerShown: false,
             header: props => <MyHeader />,
           }}
         />

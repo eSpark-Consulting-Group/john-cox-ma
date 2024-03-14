@@ -8,8 +8,7 @@ import MyText from '../MyText';
 function MyHeader() {
   const theme = useTheme() as MyTheme;
   return (
-    <View
-      style={[styles.container, {backgroundColor: theme.colors.background}]}>
+    <View style={[styles.container]}>
       <HeaderLogo style={{}} />
       <MyText
         fontFamily={'NotoSerif-Bold'}
@@ -31,6 +30,7 @@ const styles = StyleSheet.create({
     paddingTop: 15,
     top: 0,
     position: 'absolute',
+    // zIndex: -1,
   },
 });
 
