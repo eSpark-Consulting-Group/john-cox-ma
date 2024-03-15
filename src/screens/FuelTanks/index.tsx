@@ -7,6 +7,7 @@ import {
   DisplayBox,
   GapView,
   MyButton,
+  MyCanvas,
   MyCard,
   MyFooter,
   MyHeader,
@@ -30,54 +31,56 @@ export default function FuelTanks() {
   const returnData = ['31℃', '32.6℃', '30.9℃', '30.9℃'];
 
   return (
-    <ScrollView contentContainerStyle={styles().container}>
-      <MyHeader />
-      <GapView length={90} />
-      <MyText
-        text="Fuel Management"
-        size={22}
-        fontFamily="NotoSans-Bold"
-        style={styles().heading}
-      />
-      <MyCard>
-        <ScaleTanks fuelData={fuelData} />
-        <View style={styles().total}>
-          <MyText size={16}>Total Fuel:</MyText>
-          <DisplayBox
-            value={'1820'}
-            fontFamily="CrimsonText-Bold"
-            textColor={theme.colors.primary}
-            size={25}
-            paddingVertical={2}
-            paddingHorizontal={20}
-          />
-          <MyText>gal</MyText>
-        </View>
-      </MyCard>
-      <GapView length={20} />
-      <MyCard>
+    <MyCanvas>
+      <ScrollView contentContainerStyle={styles().container}>
+        <MyHeader />
+        <GapView length={90} />
         <MyText
-          text="Fuel Temperature"
+          text="Fuel Management"
           size={22}
-          fontFamily="NotoSans-BoldItalic"
-          style={{alignSelf: 'flex-start'}}
+          fontFamily="NotoSans-Bold"
+          style={styles().heading}
         />
-        <View style={styles().row}>
-          <ColumnData title="Engines" data={engines} isEngine />
-          <ColumnData title="Supply" data={supplyData} />
-          <ColumnData title="Return" data={returnData} />
-        </View>
-      </MyCard>
-      <GapView length={80} />
-      <MyButton
-        label="Back"
-        style={styles().button}
-        gradient
-        onPress={() => navigation.goBack()}
-      />
-      <GapView length={70} />
-      <MyFooter />
-    </ScrollView>
+        <MyCard>
+          <ScaleTanks fuelData={fuelData} />
+          <View style={styles().total}>
+            <MyText size={16}>Total Fuel:</MyText>
+            <DisplayBox
+              value={'1820'}
+              fontFamily="CrimsonText-Bold"
+              textColor={theme.colors.primary}
+              size={25}
+              paddingVertical={2}
+              paddingHorizontal={20}
+            />
+            <MyText>gal</MyText>
+          </View>
+        </MyCard>
+        <GapView length={20} />
+        <MyCard>
+          <MyText
+            text="Fuel Temperature"
+            size={22}
+            fontFamily="NotoSans-BoldItalic"
+            style={{alignSelf: 'flex-start'}}
+          />
+          <View style={styles().row}>
+            <ColumnData title="Engines" data={engines} isEngine />
+            <ColumnData title="Supply" data={supplyData} />
+            <ColumnData title="Return" data={returnData} />
+          </View>
+        </MyCard>
+        <GapView length={80} />
+        <MyButton
+          label="Back"
+          style={styles().button}
+          gradient
+          onPress={() => navigation.goBack()}
+        />
+        <GapView length={70} />
+        <MyFooter />
+      </ScrollView>
+    </MyCanvas>
   );
 }
 

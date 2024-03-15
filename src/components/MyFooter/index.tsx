@@ -13,7 +13,7 @@ function MyFooter() {
         fontFamily={'CrimsonText-Bold'}
         text="http://www.timbolier.com"
         textColor={theme.colors.secondary}
-        size={12}
+        size={16}
       />
       <FooterBadge />
     </View>

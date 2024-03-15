@@ -15,6 +15,7 @@ import {
   GapView,
   LabelInput,
   MyButton,
+  MyCanvas,
   MyCard,
   MyFooter,
   MyHeader,
@@ -39,7 +40,7 @@ export default function Setup() {
   const [isVisible, setIsVisible] = useState(false);
 
   return (
-    <>
+    <MyCanvas>
       <Modal visible={isVisible} animationType="slide" transparent>
         <View style={styles(theme).modalContainer}>
           <View style={styles(theme).modalContent}>
@@ -272,7 +273,7 @@ export default function Setup() {
           <MyFooter />
         </KeyboardAvoidingView>
       </ScrollView>
-    </>
+    </MyCanvas>
   );
 }
 

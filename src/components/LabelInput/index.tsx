@@ -1,10 +1,11 @@
-import {View} from 'react-native';
-import {LabelInputProps} from '../../types';
+import {memo} from 'react';
+import {StyleSheet, View} from 'react-native';
+
 import MyText from '../MyText';
 import MyInput from '../MyInput';
-import {memo} from 'react';
-import {Checkbox} from '../../assets';
 import MyCheckbox from '../MyCheckbox';
+
+import {LabelInputProps} from '../../types';
 
 function LabelInput({
   text,
@@ -18,23 +19,12 @@ function LabelInput({
   onFocus,
 }: LabelInputProps) {
   return (
-    <View
-      style={{
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: '100%',
-      }}>
+    <View style={styles.main}>
       <View style={{width: '30%'}}>
         <MyText text={text} size={size} />
         {subText && <MyText text={subText} fontFamily="AnonymousPro-Italic" />}
       </View>
-      <View
-        style={{
-          flexDirection: 'row',
-          gap: 30,
-          alignItems: 'center',
-        }}>
-        {/* todo: add checkbox component */}
+      <View style={styles.inner}>
         <MyInput
           width={width}
           height={height}
@@ -46,5 +36,18 @@ function LabelInput({
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  main: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  inner: {
+    flexDirection: 'row',
+    gap: 30,
+    alignItems: 'center',
+  },
+});
 
 export default memo(LabelInput);

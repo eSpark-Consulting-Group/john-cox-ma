@@ -7,6 +7,7 @@ import {
   DisplayBox,
   GapView,
   MyButton,
+  MyCanvas,
   MyCard,
   MyFooter,
   MyHeader,
@@ -48,7 +49,7 @@ export default function Trips() {
   }, [resetVisible]);
 
   return (
-    <>
+    <MyCanvas>
       <RenderModal visible={warningVisible} type="warning" />
       <RenderModal visible={resetVisible} type="reset" />
       <ScrollView
@@ -173,7 +174,7 @@ export default function Trips() {
           </>
         )}
       </ScrollView>
-    </>
+    </MyCanvas>
   );
 }
 

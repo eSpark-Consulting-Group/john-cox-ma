@@ -39,7 +39,7 @@ export default function MyDropdown({
     <View style={[styles(theme).container, {zIndex: zIndex}, style, {height}]}>
       <Pressable
         style={[
-          styles().header,
+          styles(theme).header,
           {
             zIndex: zIndex - 2,
             ...containerStyle,
@@ -51,21 +51,21 @@ export default function MyDropdown({
         <MyText
           text={label}
           size={16}
-          textColor={'#066DB8'}
+          textColor={theme.colors.semiSecondary}
           fontFamily="CrimsonText-Bold"
         />
         <Entypo
           name={!show ? 'chevron-down' : 'chevron-up'}
-          color={'#066DB8'}
+          color={theme.colors.semiSecondary}
           size={16}
         />
       </Pressable>
       {show && (
         <ScrollView
           showsVerticalScrollIndicator={false}
-          style={styles().scroll}
+          style={styles(theme).scroll}
           contentContainerStyle={[
-            styles().list,
+            styles(theme).list,
             {
               zIndex: zIndex + 5,
               top: height,
@@ -84,7 +84,7 @@ export default function MyDropdown({
                   borderBottomLeftRadius: index == data.length - 1 ? 6 : 0,
                   borderBottomRightRadius: index == data.length - 1 ? 6 : 0,
                   backgroundColor:
-                    selectedItem === item ? '#FAFF11' : undefined,
+                    selectedItem === item ? theme.colors.highlight : undefined,
                 },
               ]}
               onPress={() => {
@@ -92,7 +92,7 @@ export default function MyDropdown({
               }}>
               <MyText
                 text={item}
-                textColor={'#066DB8'}
+                textColor={theme.colors.semiSecondary}
                 fontFamily="CrimsonText-Bold"
                 size={16}
               />
@@ -110,8 +110,8 @@ const styles = (theme?: MyTheme) =>
       width: 150,
       borderWidth: 3,
       borderRadius: 5,
-      borderColor: '#88B6D8',
-      backgroundColor: '#B9F29E',
+      borderColor: theme?.colors.paleBorder,
+      backgroundColor: theme?.colors.pale,
       alignItems: 'center',
     },
     header: {
@@ -128,8 +128,8 @@ const styles = (theme?: MyTheme) =>
     },
     list: {
       marginBottom: 30,
-      backgroundColor: '#B9F29E',
-      borderColor: '#88B6D8',
+      backgroundColor: theme?.colors.pale,
+      borderColor: theme?.colors.paleBorder,
       borderWidth: 3,
       borderRadius: 6,
       justifyContent: 'center',
