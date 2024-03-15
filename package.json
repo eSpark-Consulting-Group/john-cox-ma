@@ -7,7 +7,8 @@
     "ios": "react-native run-ios",
     "lint": "eslint .",
     "start": "react-native start",
-    "test": "jest"
+    "test": "jest",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@react-navigation/native": "^6.1.12",
@@ -16,6 +17,8 @@
     "@types/react-native-vector-icons": "^6.4.18",
     "expo": ">=50.0.0-0 <51.0.0",
     "expo-linear-gradient": "~12.7.2",
+    "patch-package": "^8.0.0",
+    "postinstall-postinstall": "^2.1.0",
     "react": "18.2.0",
     "react-d3-speedometer": "^2.2.1",
     "react-native": "0.73.5",

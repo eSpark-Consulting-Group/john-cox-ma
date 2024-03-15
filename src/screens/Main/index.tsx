@@ -54,7 +54,7 @@ export default function Main() {
           alignItems: 'center',
           justifyContent: 'space-between',
         }}>
-        <MyGauge value={50} name="Engine1" />
+        <MyGauge value={0} name="Engine1" />
         <MyGauge value={300} name="Engine2" />
       </View>
       <GapView length={20} />
