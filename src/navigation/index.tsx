@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet} from 'react-native';
+import {ImageBackground, StyleSheet, View} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
@@ -13,7 +13,6 @@ import FuelTanks from '../screens/FuelTanks';
 import Trips from '../screens/Trips';
 
 import {DarkTheme} from '../theme';
-import {MyHeader} from '../components';
 
 const RootStack = createNativeStackNavigator<RootStackParamsList>();
 

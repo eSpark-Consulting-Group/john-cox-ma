@@ -26,21 +26,20 @@ function MyButton({
 }: MyButtonProps) {
   const theme = useTheme() as MyTheme;
   const buttonStyle: ViewStyle = {
-    backgroundColor: backgroundColor || '#B9F29E',
+    backgroundColor: backgroundColor || theme.colors.pale,
     flexDirection: 'row',
     borderRadius: 4,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 20,
-    // paddingVertical: 5,
     borderWidth: 1.01,
-    borderColor: '#066DB8',
+    borderColor: theme.colors.semiSecondary,
     ...style,
   };
 
   const buttonTextStyle: TextStyle = {
     textAlign: 'center',
-    paddingVertical: 10, // Adjust padding here
+    paddingVertical: 10,
     paddingHorizontal: 5,
     ...labelStyle,
   };
@@ -78,7 +77,7 @@ function MyButton({
       <MyText
         style={buttonTextStyle}
         fontFamily={fontFamily}
-        textColor={textColor || '#066DB8'}
+        textColor={textColor || theme.colors.semiSecondary}
         size={12}>
         {label}
       </MyText>
@@ -92,8 +91,6 @@ const styles = StyleSheet.create({
   gradientButton: {
     width: '101%',
     marginBottom: 5,
-    // alignItems: 'center',
-    // paddingHorizontal: 20,
   },
   gradient: {
     borderRadius: 10,

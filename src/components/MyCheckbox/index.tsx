@@ -34,9 +34,8 @@ const MyCheckbox = ({
         style={[
           styles.checkbox,
           checkboxStyle,
-          checked && styles.checked,
           {
-            backgroundColor: theme.dark ? '#70726F73' : '#f3f4f6',
+            backgroundColor: theme.colors.checkbox,
             width: width,
             height: width,
           },
@@ -61,9 +60,6 @@ const styles = StyleSheet.create({
     marginRight: 5,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  checked: {
-    backgroundColor: '#136FA9',
   },
 });
 

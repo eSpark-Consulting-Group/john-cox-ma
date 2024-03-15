@@ -1,5 +1,5 @@
 import {memo} from 'react';
-import {View} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 
 import MyText from '../MyText';
@@ -23,20 +23,9 @@ function LabelDropdown({
 }: LabelDropdownProps) {
   const theme = useTheme() as MyTheme;
   return (
-    <View
-      style={{
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: '100%',
-        alignItems: 'center',
-      }}>
+    <View style={styles.main}>
       <MyText text={text} size={size} />
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: 15,
-        }}>
+      <View style={styles.inner}>
         {status ? isActive ? <Active /> : <Inactive /> : null}
         <MyDropdown
           data={data}
@@ -52,5 +41,19 @@ function LabelDropdown({
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  inner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 15,
+  },
+  main: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    alignItems: 'center',
+  },
+});
 
 export default memo(LabelDropdown);

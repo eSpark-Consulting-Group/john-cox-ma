@@ -7,6 +7,7 @@ import {
   GapView,
   LabelInput,
   MyButton,
+  MyCanvas,
   MyCard,
   MyFooter,
   MyHeader,
@@ -82,43 +83,16 @@ export default function FMMSetup() {
   ];
 
   return (
-    <ScrollView contentContainerStyle={styles({}).screen}>
-      <MyHeader />
-      <GapView length={90} />
-      <MyText
-        text="Fuel Mgt Module Setup"
-        size={18}
-        fontFamily="NotoSans-Bold"
-        style={{alignSelf: 'flex-start', paddingLeft: 18, paddingBottom: 20}}
-      />
-      <MyCard>
-        {card1.map((item, index) => (
-          <>
-            <MyText
-              text={item.title}
-              textColor={item.titleColor}
-              style={{alignSelf: 'flex-start'}}
-              fontFamily={item.font}
-            />
-            {item.labelInput &&
-              item.labelInput.map((label, index) => (
-                <LabelInput key={index} text={label} width={140} />
-              ))}
-            {item.labelDropdown &&
-              item.labelDropdown.map((dropdown, index) => (
-                <LabelDropdown
-                  key={index}
-                  text={dropdown.label}
-                  data={dropdown.options}
-                  onSelect={() => {}}
-                  zIndex={dropdown.zIndex}
-                />
-              ))}
-          </>
-        ))}
-      </MyCard>
-      <GapView length={15} />
-      <View style={{zIndex: -1}}>
+    <MyCanvas>
+      <ScrollView contentContainerStyle={styles({}).screen}>
+        <MyHeader />
+        <GapView length={90} />
+        <MyText
+          text="Fuel Mgt Module Setup"
+          size={18}
+          fontFamily="NotoSans-Bold"
+          style={{alignSelf: 'flex-start', paddingLeft: 18, paddingBottom: 20}}
+        />
         <MyCard>
           {card1.map((item, index) => (
             <>
@@ -145,21 +119,50 @@ export default function FMMSetup() {
             </>
           ))}
         </MyCard>
-      </View>
+        <GapView length={15} />
+        <View style={{zIndex: -1}}>
+          <MyCard>
+            {card1.map((item, index) => (
+              <>
+                <MyText
+                  text={item.title}
+                  textColor={item.titleColor}
+                  style={{alignSelf: 'flex-start'}}
+                  fontFamily={item.font}
+                />
+                {item.labelInput &&
+                  item.labelInput.map((label, index) => (
+                    <LabelInput key={index} text={label} width={140} />
+                  ))}
+                {item.labelDropdown &&
+                  item.labelDropdown.map((dropdown, index) => (
+                    <LabelDropdown
+                      key={index}
+                      text={dropdown.label}
+                      data={dropdown.options}
+                      onSelect={() => {}}
+                      zIndex={dropdown.zIndex}
+                    />
+                  ))}
+              </>
+            ))}
+          </MyCard>
+        </View>
 
-      <GapView length={25} />
-      <MyButton
-        label="Back"
-        style={styles({}).button}
-        gradient
-        onPress={() => {
-          navigation.navigate('Setup');
-          console.log('Wapis jayein');
-        }}
-      />
-      <GapView length={70} />
-      <MyFooter />
-    </ScrollView>
+        <GapView length={25} />
+        <MyButton
+          label="Back"
+          style={styles({}).button}
+          gradient
+          onPress={() => {
+            navigation.navigate('Setup');
+            console.log('Wapis jayein');
+          }}
+        />
+        <GapView length={70} />
+        <MyFooter />
+      </ScrollView>
+    </MyCanvas>
   );
 }
 

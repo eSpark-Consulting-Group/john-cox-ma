@@ -12,6 +12,12 @@ export type MyTheme = Theme & {
     placeholder?: string;
     secondary: string;
     switch?: string;
+    semiSecondary?: string;
+    pale: string;
+    paleBorder?: string;
+    highlight?: string;
+    checkbox?: string;
+    box?: string;
   };
 };
 

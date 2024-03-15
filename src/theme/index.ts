@@ -7,6 +7,12 @@ const colors = {
     background: '#FFFFFF',
     text: '#4BDB07',
     switch: '#ffff00',
+    semiSecondary: '#066DB8',
+    pale: '#B9F29E',
+    paleBorder: '#88B6D8',
+    highlight: '#FAFF11',
+    checkbox: '#f3f4f6',
+    box: '#41759B',
   },
   dark: {
     primary: '#4BDB07',
@@ -14,6 +20,12 @@ const colors = {
     background: '#090824',
     text: '#4BDB07',
     switch: '#ffff00',
+    semiSecondary: '#066DB8',
+    pale: '#B9F29E',
+    paleBorder: '#88B6D8',
+    highlight: '#FAFF11',
+    checkbox: '#70726F73',
+    box: '#41759B',
   },
 };
 

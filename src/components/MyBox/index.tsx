@@ -24,7 +24,7 @@ export default function MyBox({
   const theme = useTheme() as MyTheme;
   return (
     <View style={{width: width ? width : '100%', paddingVertical: 4}}>
-      <View style={styles.labelContainer}>
+      <View>
         <MyText
           textColor={theme.colors.secondary}
           fontFamily="NotoSans-Bold"
@@ -33,14 +33,15 @@ export default function MyBox({
         </MyText>
       </View>
 
-      <View style={[styles.box, {gap: gap ? gap : 15}]}>
-        <MyText
-          textColor={theme.colors.secondary}
-          style={styles.text}
-          size={20}>
+      <View
+        style={[
+          styles.box,
+          {gap: gap ? gap : 15, borderColor: theme.colors.box},
+        ]}>
+        <MyText textColor={theme.colors.secondary} size={20}>
           {text}
         </MyText>
-        <View style={{flexDirection: 'row', alignSelf: 'center'}}>
+        <View style={styles.valueContainer}>
           <MyText fontFamily="NotoSans-Bold" style={styles.value} size={28}>
             {value}
           </MyText>
@@ -54,30 +55,19 @@ export default function MyBox({
 }
 
 const styles = StyleSheet.create({
-  labelContainer: {
-    // height: 17,
-  },
   box: {
     borderWidth: 2.22,
-    borderColor: '#41759B',
     width: '100%',
     paddingHorizontal: 20,
-    // alignItems: 'center',
     paddingVertical: 5,
   },
-  text: {
-    // height: 30,
-  },
   unit: {
-    // alignSelf: 'flex-end',
-    // left: 100,
     top: 2,
     marginTop: -10,
     left: 5,
   },
+  valueContainer: {flexDirection: 'row', alignSelf: 'center'},
   value: {
     alignSelf: 'center',
-    // position: 'absolute',
-    // bottom: -2,
   },
 });
