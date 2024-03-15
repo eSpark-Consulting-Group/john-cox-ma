@@ -57,7 +57,7 @@ function ScaleTanks({fuelData}: ScaleTanksProps) {
       </View>
       <View style={styles().container}>
         {fuelData.map((item, index) => (
-          <View>
+          <View key={index}>
             <MyText
               text={item.number.toString()}
               size={18}
