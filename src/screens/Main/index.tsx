@@ -11,6 +11,7 @@ import {
   MyBox,
   GapView,
   MyGauge,
+  MyCanvas,
 } from '../../components';
 import {MyTheme} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
@@ -45,89 +46,96 @@ export default function Main() {
   ];
 
   return (
-    <ScrollView contentContainerStyle={styles().screen}>
-      <MyHeader />
-      <GapView length={90} />
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}>
-        <MyGauge value={0} name="Engine1" />
-        <MyGauge value={300} name="Engine2" />
-      </View>
-      <GapView length={20} />
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}>
-        <MyGauge value={150} name="Engine3" />
-        <MyGauge value={250} name="Engine4" />
-      </View>
-      <GapView length={20} />
-      <View style={styles().container}>
-        <View style={styles().row}>
-          <MyBox
-            label="Efficiency"
-            text="Speed"
-            value={25.4}
-            unit="Knots"
-            width={'50%'}
-            gap={22}
-          />
-          <View style={styles().fuelBurn}>
-            <MyBox
-              text="Total Fuel Burn"
-              value={102.1}
-              unit="gal/hr"
-              width={'100%'}
-              gap={1}
-            />
-          </View>
+    <MyCanvas>
+      <ScrollView contentContainerStyle={styles().screen}>
+        <MyHeader />
+        <GapView length={90} />
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}>
+          <MyGauge value={0} name="Engine1" />
+          <MyGauge value={300} name="Engine2" />
         </View>
-        <MyBox text="Gallons per Nautical mile" value={4.17} width={'70%'} />
-        <View style={styles().range}>
-          <View style={{width: '50%'}}>
-            <MyBox label="Range" text="Fuel Remaining" value={854} unit="gal" />
-          </View>
-          <View style={{width: '40%'}}>
-            <View style={styles().box}>
-              <MyText
-                text="Generator Running"
-                textColor={theme.colors.secondary}
-                size={18}
+        <GapView length={20} />
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}>
+          <MyGauge value={150} name="Engine3" />
+          <MyGauge value={250} name="Engine4" />
+        </View>
+        <GapView length={20} />
+        <View style={styles().container}>
+          <View style={styles().row}>
+            <MyBox
+              label="Efficiency"
+              text="Speed"
+              value={25.4}
+              unit="Knots"
+              width={'50%'}
+              gap={22}
+            />
+            <View style={styles().fuelBurn}>
+              <MyBox
+                text="Total Fuel Burn"
+                value={102.1}
+                unit="gal/hr"
+                width={'100%'}
+                gap={1}
               />
-              <MyButton gradient label="Yes" labelStyle={{fontSize: 20}} />
             </View>
           </View>
-        </View>
-        <MyBox
-          text="Distance to Empty"
-          value={205}
-          unit="N.Mile"
-          width={'70%'}
-        />
-      </View>
-
-      <GapView length={20} />
-      <View style={styles().buttons}>
-        {buttonsData.map((item, index) => (
-          <MyButton
-            key={index.toString()}
-            gradient
-            style={{width: '22%'}}
-            label={item.label}
-            labelStyle={item.labelStyle}
-            onPress={item.onPress}
+          <MyBox text="Gallons per Nautical mile" value={4.17} width={'70%'} />
+          <View style={styles().range}>
+            <View style={{width: '50%'}}>
+              <MyBox
+                label="Range"
+                text="Fuel Remaining"
+                value={854}
+                unit="gal"
+              />
+            </View>
+            <View style={{width: '40%'}}>
+              <View style={styles().box}>
+                <MyText
+                  text="Generator Running"
+                  textColor={theme.colors.secondary}
+                  size={18}
+                />
+                <MyButton gradient label="Yes" labelStyle={{fontSize: 20}} />
+              </View>
+            </View>
+          </View>
+          <MyBox
+            text="Distance to Empty"
+            value={205}
+            unit="N.Mile"
+            width={'70%'}
           />
-        ))}
-      </View>
-      <GapView length={70} />
-      <MyFooter />
-    </ScrollView>
+        </View>
+
+        <GapView length={20} />
+        <View style={styles().buttons}>
+          {buttonsData.map((item, index) => (
+            <MyButton
+              key={index.toString()}
+              gradient
+              style={{width: '22%'}}
+              label={item.label}
+              labelStyle={item.labelStyle}
+              onPress={item.onPress}
+            />
+          ))}
+        </View>
+        <GapView length={70} />
+        <MyFooter />
+      </ScrollView>
+    </MyCanvas>
   );
 }
 
