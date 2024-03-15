@@ -5,12 +5,10 @@ import {useTheme} from '@react-navigation/native';
 
 import MyText from '../MyText';
 
-import {DisplayBoxProps, Fonts, MyTheme} from '../../types';
+import {DisplayBoxProps, MyTheme} from '../../types';
 
 function DisplayBox({
   value,
-  width,
-  // height = 27,
   textColor = 'white',
   size,
   fontFamily,
@@ -45,8 +43,8 @@ export default memo(DisplayBox);
 const styles = (theme?: MyTheme) =>
   StyleSheet.create({
     displayBox: {
-      borderWidth: 1,
-      borderColor: theme?.colors.secondary,
+      borderWidth: 2,
+      borderColor: theme?.colors.paleBorder,
       alignItems: 'center',
       justifyContent: 'center',
       marginBottom: 10,
