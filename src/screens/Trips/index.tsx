@@ -135,7 +135,7 @@ export default function Trips() {
               <View style={styles.card2}>
                 <View style={styles.innercard2}>
                   <MyText fontFamily="AnonymousPro-Regular">Engines</MyText>
-                  <MyText>Fuel Used</MyText>
+                  <MyText size={16}>Fuel Used</MyText>
                 </View>
                 <View style={styles.boxes}>
                   <RenderColumn label={1} value={455} />
@@ -254,8 +254,6 @@ function RenderColumn({label, value}: {label: number | string; value: number}) {
       />
       <DisplayBox
         value="455"
-        width={34}
-        height={18}
         textColor={theme.colors.primary}
         fontFamily="CrimsonText-Bold"
       />
@@ -318,7 +316,8 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     width: '100%',
-    height: '60%',
+    marginTop: 25,
+    height: '48%',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 15,
@@ -353,7 +352,6 @@ const styles = StyleSheet.create({
   column: {
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingRight: 5,
   },
   card2: {flexDirection: 'row', width: '100%'},
   innercard2: {
