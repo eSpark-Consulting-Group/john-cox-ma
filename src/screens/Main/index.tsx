@@ -41,7 +41,7 @@ export default function Main() {
     {
       label: 'Setup',
       labelStyle: {paddingVertical: 20, fontSize: 16},
-      onPress: () => navigation.navigate('Setup'),
+      onPress: () => navigation.navigate('Login'),
     },
   ];
 

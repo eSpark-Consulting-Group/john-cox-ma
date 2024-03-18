@@ -21,8 +21,8 @@ export default function RootNav() {
     <NavigationContainer theme={DarkTheme}>
       <RootStack.Navigator>
         <RootStack.Screen
-          name="Login"
-          component={Login}
+          name="Main"
+          component={Main}
           options={{
             headerShown: false,
           }}
@@ -35,19 +35,20 @@ export default function RootNav() {
           }}
         />
         <RootStack.Screen
+          name="Login"
+          component={Login}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <RootStack.Screen
           name="FMMSetup"
           component={FMMSetup}
           options={{
             headerShown: false,
           }}
         />
-        <RootStack.Screen
-          name="Main"
-          component={Main}
-          options={{
-            headerShown: false,
-          }}
-        />
+
         <RootStack.Screen
           name="FuelTanks"
           component={FuelTanks}
