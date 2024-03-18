@@ -14,6 +14,7 @@ import Trips from '../screens/Trips';
 
 import {DarkTheme} from '../theme';
 import SplashScreen from 'react-native-splash-screen';
+import Splash from '../screens/Splash';
 
 const RootStack = createNativeStackNavigator<RootStackParamsList>();
 
@@ -25,6 +26,13 @@ export default function RootNav() {
   return (
     <NavigationContainer theme={DarkTheme}>
       <RootStack.Navigator>
+        <RootStack.Screen
+          name="Splash"
+          component={Splash}
+          options={{
+            headerShown: false,
+          }}
+        />
         <RootStack.Screen
           name="Main"
           component={Main}
