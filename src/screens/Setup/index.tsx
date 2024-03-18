@@ -63,7 +63,8 @@ export default function Setup() {
       </Modal>
 
       <ScrollView
-        contentContainerStyle={[styles().screen, {flex: showNetworks ? 1 : 0}]}>
+        contentContainerStyle={[styles().screen, {flex: showNetworks ? 1 : 0}]}
+        showsVerticalScrollIndicator={false}>
         <KeyboardAvoidingView
           style={[styles().screen, {width: '100%', height: '100%'}]}>
           <MyHeader />

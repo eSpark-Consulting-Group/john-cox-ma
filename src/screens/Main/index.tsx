@@ -47,7 +47,9 @@ export default function Main() {
 
   return (
     <MyCanvas>
-      <ScrollView contentContainerStyle={styles().screen}>
+      <ScrollView
+        contentContainerStyle={styles().screen}
+        showsVerticalScrollIndicator={false}>
         <MyHeader />
         <GapView length={90} />
         <View

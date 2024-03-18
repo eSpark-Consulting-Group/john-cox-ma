@@ -56,7 +56,8 @@ export default function Trips() {
         contentContainerStyle={[
           styles.screen,
           {flex: showConfirmation ? 1 : 0},
-        ]}>
+        ]}
+        showsVerticalScrollIndicator={false}>
         <MyHeader />
         {showConfirmation ? (
           <View style={styles.confirmation}>
