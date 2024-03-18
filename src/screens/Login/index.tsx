@@ -79,7 +79,7 @@ const styles = (theme?: MyTheme) =>
   StyleSheet.create({
     linearGradient: {
       ...StyleSheet.absoluteFillObject,
-      height: '41%',
+      height: 155,
     },
     lowerGradient: {
       ...StyleSheet.absoluteFillObject,

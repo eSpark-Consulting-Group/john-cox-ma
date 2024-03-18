@@ -38,6 +38,7 @@ function MyGauge({value = 0, name}: MyGaugeProps) {
           style={{position: 'absolute', bottom: 45, right: 47}}
         />
         <RNSpeedometer
+          key={name}
           value={value}
           size={170}
           minValue={0}
