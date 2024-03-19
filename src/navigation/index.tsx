@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {ImageBackground, Platform, StyleSheet, View} from 'react-native';
+import {Platform, StyleSheet} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
@@ -15,7 +15,6 @@ import Trips from '../screens/Trips';
 import {DarkTheme} from '../theme';
 import SplashScreen from 'react-native-splash-screen';
 import Splash from '../screens/Splash';
-// import Splash from '../screens/Splash';
 
 const RootStack = createNativeStackNavigator<RootStackParamsList>();
 

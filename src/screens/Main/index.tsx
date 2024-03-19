@@ -52,22 +52,12 @@ export default function Main() {
         showsVerticalScrollIndicator={false}>
         <MyHeader />
         <GapView length={90} />
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}>
+        <View style={styles().GaugeRow}>
           <MyGauge value={0} name="Engine1" />
           <MyGauge value={300} name="Engine2" />
         </View>
         <GapView length={20} />
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}>
+        <View style={styles().GaugeRow}>
           <MyGauge value={150} name="Engine3" />
           <MyGauge value={250} name="Engine4" />
         </View>
@@ -171,5 +161,10 @@ const styles = (theme?: MyTheme) =>
       width: '90%',
       justifyContent: 'space-between',
       paddingBottom: 10,
+    },
+    GaugeRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
     },
   });
