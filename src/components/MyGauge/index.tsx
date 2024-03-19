@@ -6,7 +6,7 @@ import RNSpeedometer from 'react-native-speedometer';
 import MyText from '../MyText';
 
 import {MyTheme} from '../../types';
-import {Abcd} from '../../assets';
+import {Gauge} from '../../assets';
 
 interface MyGaugeProps {
   value?: number;
@@ -29,7 +29,7 @@ function MyGauge({value = 0, name}: MyGaugeProps) {
           justifyContent: 'center',
         }}>
         <View style={{position: 'absolute', top: -23, right: -18}}>
-          <Abcd />
+          <Gauge />
         </View>
         <MyText
           text={name}

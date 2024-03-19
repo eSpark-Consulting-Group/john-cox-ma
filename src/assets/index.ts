@@ -5,8 +5,9 @@ export {default as Active} from './vectors/Active.svg';
 export {default as Inactive} from './vectors/Inactive.svg';
 export {default as Wifi} from './vectors/wifi.svg';
 export {default as Connected} from './vectors/Connected.svg';
-export {default as Abcd} from './vectors/abcd.svg';
+export {default as Gauge} from './vectors/Gauge.svg';
 export {default as Bg} from './vectors/bg.svg';
 export {default as BgPage} from './vectors/bg-page.svg';
 
-export {default as Icon} from './images/icon.png';
+//images
+export {default as SplashIcon} from './images/SplashIcon.png';
