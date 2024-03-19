@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {memo} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import {LinearGradient} from 'expo-linear-gradient';
@@ -132,4 +132,4 @@ const styles = (theme?: MyTheme) =>
     volumeCol: {alignItems: 'center', paddingVertical: 15},
   });
 
-export default ScaleTanks;
+export default memo(ScaleTanks);

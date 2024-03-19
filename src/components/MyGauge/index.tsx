@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {memo} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import RNSpeedometer from 'react-native-speedometer';
@@ -83,4 +83,4 @@ const styles = (theme?: MyTheme) =>
     },
   });
 
-export default MyGauge;
+export default memo(MyGauge);

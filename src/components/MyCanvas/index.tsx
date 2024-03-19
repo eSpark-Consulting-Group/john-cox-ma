@@ -1,7 +1,7 @@
-import React from 'react';
+import React, {memo} from 'react';
 import {ImageBackground, StyleSheet} from 'react-native';
 
-export default function MyCanvas({children}: {children: React.ReactNode}) {
+function MyCanvas({children}: {children: React.ReactNode}) {
   return (
     <ImageBackground
       style={{flex: 1}}
@@ -12,4 +12,4 @@ export default function MyCanvas({children}: {children: React.ReactNode}) {
   );
 }
 
-const styles = StyleSheet.create({});
+export default memo(MyCanvas);

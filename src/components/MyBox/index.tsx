@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {memo} from 'react';
 import {DimensionValue, StyleSheet, View} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 
@@ -15,14 +15,7 @@ interface MyBoxProps {
   gap?: number;
 }
 
-export default function MyBox({
-  label,
-  text,
-  unit,
-  value,
-  width,
-  gap,
-}: MyBoxProps) {
+function MyBox({label, text, unit, value, width, gap}: MyBoxProps) {
   const theme = useTheme() as MyTheme;
   return (
     <View style={{width: width ? width : '100%', paddingVertical: 4}}>
@@ -55,6 +48,8 @@ export default function MyBox({
     </View>
   );
 }
+
+export default memo(MyBox);
 
 const styles = StyleSheet.create({
   box: {
