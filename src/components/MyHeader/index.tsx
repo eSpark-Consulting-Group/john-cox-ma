@@ -1,9 +1,11 @@
 import React, {memo} from 'react';
-import {useTheme} from '@react-navigation/native';
-import {MyTheme} from '../../types';
 import {StyleSheet, View} from 'react-native';
-import {HeaderLogo} from '../../assets';
+import {useTheme} from '@react-navigation/native';
+
 import MyText from '../MyText';
+
+import {MyTheme} from '../../types';
+import {HeaderLogo} from '../../assets';
 
 function MyHeader() {
   const theme = useTheme() as MyTheme;

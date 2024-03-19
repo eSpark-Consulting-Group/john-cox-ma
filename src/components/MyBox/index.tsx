@@ -1,7 +1,9 @@
 import React from 'react';
 import {DimensionValue, StyleSheet, View} from 'react-native';
-import MyText from '../MyText';
 import {useTheme} from '@react-navigation/native';
+
+import MyText from '../MyText';
+
 import {MyTheme} from '../../types';
 
 interface MyBoxProps {

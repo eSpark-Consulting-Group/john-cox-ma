@@ -4,9 +4,9 @@ import {useTheme} from '@react-navigation/native';
 import {LinearGradient} from 'expo-linear-gradient';
 
 import MyText from '../MyText';
+import DisplayBox from '../DisplayBox';
 
 import {MyTheme} from '../../types';
-import DisplayBox from '../DisplayBox';
 
 interface FuelData {
   number: number;

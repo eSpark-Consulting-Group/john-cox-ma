@@ -1,10 +1,11 @@
 import React, {useState} from 'react';
 import {TouchableOpacity, StyleSheet} from 'react-native';
 import {useTheme} from '@react-navigation/native';
+import {LinearGradient} from 'expo-linear-gradient';
 
 import MyText from '../MyText';
+
 import {MyTheme} from '../../types';
-import {LinearGradient} from 'expo-linear-gradient';
 
 const MySwitch = ({label, value}: {label: string; value?: boolean}) => {
   const [isOn, setIsOn] = useState(value);
