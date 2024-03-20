@@ -7,4 +7,4 @@ import App from './App';
 import Root from './src/navigation/index';
 import {name as appName} from './app.json';
 
-AppRegistry.registerComponent(appName, () => Root);
+AppRegistry.registerComponent(appName, () => App);
