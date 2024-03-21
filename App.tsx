@@ -26,7 +26,7 @@ export default function App() {
       timeoutInterval: 10000, // milliseconds
       // your certificates array (needed only in android) ios will pick it automatically
       sslPinning: {
-        certs: ['cacert'], // your certificates name (without extension), for example cert1.cer, cert2.cer
+        certs: ['cacert_pem'], // your certificates name (without extension), for example cert1.cer, cert2.cer
       },
       headers: {
         Accept: 'application/json; charset=utf-8',
