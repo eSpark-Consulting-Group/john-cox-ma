@@ -64,13 +64,12 @@ const styles = (theme?: MyTheme) =>
     main: {
       alignItems: 'center',
       paddingTop: 10,
-      marginRight: -5,
     },
     container: {
       alignItems: 'center',
       justifyContent: 'center',
     },
-    name: {position: 'absolute', bottom: 45, right: 47},
+    name: {position: 'absolute', bottom: 49, right: 45},
     textBox: {
       flexDirection: 'row',
       justifyContent: 'center',
@@ -79,7 +78,7 @@ const styles = (theme?: MyTheme) =>
       borderColor: theme?.colors.paleBorder,
       paddingHorizontal: 1,
       paddingVertical: 5,
-      width: '80%',
+      width: 175,
     },
   });
 

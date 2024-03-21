@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -21,6 +21,11 @@ type MainScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 export default function Main() {
   const theme = useTheme() as MyTheme;
   const navigation = useNavigation<MainScreenProps['navigation']>();
+  const [generatorRunning, setGeneratorRunning] = useState<'Yes' | 'No'>('Yes');
+
+  const toggleGeneratorRunning = () => {
+    setGeneratorRunning(generatorRunning === 'Yes' ? 'No' : 'Yes');
+  };
 
   const buttonsData = [
     {
@@ -99,7 +104,12 @@ export default function Main() {
                   textColor={theme.colors.secondary}
                   size={18}
                 />
-                <MyButton gradient label="Yes" labelStyle={{fontSize: 20}} />
+                <MyButton
+                  gradient
+                  label={generatorRunning}
+                  onPress={toggleGeneratorRunning}
+                  labelStyle={{fontSize: 20}}
+                />
               </View>
             </View>
           </View>
