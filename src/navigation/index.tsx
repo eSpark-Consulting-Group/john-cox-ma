@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {ImageBackground, StyleSheet, View} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
@@ -17,6 +17,7 @@ import {DarkTheme} from '../theme';
 const RootStack = createNativeStackNavigator<RootStackParamsList>();
 
 export default function RootNav() {
+  useEffect(() => {}, []);
   return (
     <NavigationContainer theme={DarkTheme}>
       <RootStack.Navigator>
