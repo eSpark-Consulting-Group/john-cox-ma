@@ -117,18 +117,18 @@ export default function Trips() {
                 <View style={styles.switchContainer}>
                   <MySwitch
                     label="1"
-                    isActive={selectedSwitch === 0}
-                    onPress={() => handleSwitchPress(0)}
-                  />
-                  <MySwitch
-                    label="2"
                     isActive={selectedSwitch === 1}
                     onPress={() => handleSwitchPress(1)}
                   />
                   <MySwitch
-                    label="3"
+                    label="2"
                     isActive={selectedSwitch === 2}
                     onPress={() => handleSwitchPress(2)}
+                  />
+                  <MySwitch
+                    label="3"
+                    isActive={selectedSwitch === 3}
+                    onPress={() => handleSwitchPress(3)}
                   />
                 </View>
               </TripSection>
