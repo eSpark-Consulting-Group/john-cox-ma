@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {memo, useState} from 'react';
 import {
   Pressable,
   ScrollView,
@@ -11,7 +11,7 @@ import {Entypo} from '@expo/vector-icons';
 import MyText from '../MyText';
 import {DropdownProps, MyTheme} from '../../types';
 
-export default function MyDropdown({
+function MyDropdown({
   data,
   onSelect,
   zIndex = 10,
@@ -103,6 +103,8 @@ export default function MyDropdown({
     </View>
   );
 }
+
+export default memo(MyDropdown);
 
 const styles = (theme?: MyTheme) =>
   StyleSheet.create({

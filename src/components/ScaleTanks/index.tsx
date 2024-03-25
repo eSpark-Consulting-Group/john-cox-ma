@@ -1,12 +1,12 @@
-import React from 'react';
+import React, {memo} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import {LinearGradient} from 'expo-linear-gradient';
 
 import MyText from '../MyText';
+import DisplayBox from '../DisplayBox';
 
 import {MyTheme} from '../../types';
-import DisplayBox from '../DisplayBox';
 
 interface FuelData {
   number: number;
@@ -132,4 +132,4 @@ const styles = (theme?: MyTheme) =>
     volumeCol: {alignItems: 'center', paddingVertical: 15},
   });
 
-export default ScaleTanks;
+export default memo(ScaleTanks);
