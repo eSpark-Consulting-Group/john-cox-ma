@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {ImageBackground, StyleSheet, View} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
@@ -13,13 +13,29 @@ import FuelTanks from '../screens/FuelTanks';
 import Trips from '../screens/Trips';
 
 import {DarkTheme} from '../theme';
+import Splash from '../screens/Splash';
 
 const RootStack = createNativeStackNavigator<RootStackParamsList>();
 
 export default function RootNav() {
+  useEffect(() => {}, []);
   return (
     <NavigationContainer theme={DarkTheme}>
-      <RootStack.Navigator>
+      <RootStack.Navigator initialRouteName="Main">
+        <RootStack.Screen
+          name="Splash"
+          component={Splash}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <RootStack.Screen
+          name="Main"
+          component={Main}
+          options={{
+            headerShown: false,
+          }}
+        />
         <RootStack.Screen
           name="Login"
           component={Login}
@@ -37,13 +53,6 @@ export default function RootNav() {
         <RootStack.Screen
           name="FMMSetup"
           component={FMMSetup}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <RootStack.Screen
-          name="Main"
-          component={Main}
           options={{
             headerShown: false,
           }}

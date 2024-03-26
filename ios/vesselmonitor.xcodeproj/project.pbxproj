@@ -24,6 +24,7 @@
 		326DBAE6A98B46FEAF9FBF74 /* NotoSans-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 19F148A12D54485AAC049EB9 /* NotoSans-BoldItalic.ttf */; };
 		F12F2EAAE3B94A2C883E2DC3 /* NotoSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F5F920A3BCA642D6916D5B7A /* NotoSans-Regular.ttf */; };
 		F794024CD23848FD8C94F0C3 /* AnonymousPro-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1A56B249865E45A984FC6A81 /* AnonymousPro-Italic.ttf */; };
+		5331DAF2EC8340B598F6CDC8 /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 05E1C2DFE52749EBBCF4E33E /* BootSplash.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -64,6 +65,7 @@
 		19F148A12D54485AAC049EB9 /* NotoSans-BoldItalic.ttf */ = {isa = PBXFileReference; name = "NotoSans-BoldItalic.ttf"; path = "../src/assets/fonts/NotoSans-BoldItalic.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		F5F920A3BCA642D6916D5B7A /* NotoSans-Regular.ttf */ = {isa = PBXFileReference; name = "NotoSans-Regular.ttf"; path = "../src/assets/fonts/NotoSans-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		1A56B249865E45A984FC6A81 /* AnonymousPro-Italic.ttf */ = {isa = PBXFileReference; name = "AnonymousPro-Italic.ttf"; path = "../src/assets/fonts/AnonymousPro-Italic.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		05E1C2DFE52749EBBCF4E33E /* BootSplash.storyboard */ = {isa = PBXFileReference; name = "BootSplash.storyboard"; path = "vesselmonitor/BootSplash.storyboard"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -112,6 +114,7 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB71A68108700A75B9A /* main.m */,
+				05E1C2DFE52749EBBCF4E33E /* BootSplash.storyboard */,
 			);
 			name = vesselmonitor;
 			sourceTree = "<group>";
@@ -292,6 +295,7 @@
 				326DBAE6A98B46FEAF9FBF74 /* NotoSans-BoldItalic.ttf in Resources */,
 				F12F2EAAE3B94A2C883E2DC3 /* NotoSans-Regular.ttf in Resources */,
 				F794024CD23848FD8C94F0C3 /* AnonymousPro-Italic.ttf in Resources */,
+				5331DAF2EC8340B598F6CDC8 /* BootSplash.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

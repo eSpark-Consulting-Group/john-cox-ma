@@ -7,11 +7,10 @@ import {
   ViewStyle,
 } from 'react-native';
 import {useTheme} from '@react-navigation/native';
-import Feather from 'react-native-vector-icons/Feather';
+import {LinearGradient} from 'expo-linear-gradient';
 
 import {MyButtonProps, MyTheme} from '../../types';
 import MyText from '../MyText';
-import {LinearGradient} from 'expo-linear-gradient';
 
 function MyButton({
   label,

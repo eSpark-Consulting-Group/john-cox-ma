@@ -32,7 +32,9 @@ export default function FuelTanks() {
 
   return (
     <MyCanvas>
-      <ScrollView contentContainerStyle={styles().container}>
+      <ScrollView
+        contentContainerStyle={styles().container}
+        showsVerticalScrollIndicator={false}>
         <MyHeader />
         <GapView length={90} />
         <MyText
