@@ -8,3 +8,5 @@ export {default as Connected} from './vectors/Connected.svg';
 export {default as Gauge} from './vectors/Gauge.svg';
 export {default as Bg} from './vectors/bg.svg';
 export {default as BgPage} from './vectors/bg-page.svg';
+
+export {default as SplashIcon} from './vectors/SplashIcon.png';
