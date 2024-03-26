@@ -1,0 +1,24 @@
+diff --git a/node_modules/@espark-consultants/react-native-esp-idf-provisioning/android/build.gradle b/node_modules/@espark-consultants/react-native-esp-idf-provisioning/android/build.gradle
+index c041fe2..fe25da0 100644
+--- a/node_modules/@espark-consultants/react-native-esp-idf-provisioning/android/build.gradle
++++ b/node_modules/@espark-consultants/react-native-esp-idf-provisioning/android/build.gradle
+@@ -1,5 +1,5 @@
+-apply plugin: "kotlin-android"
+ apply plugin: "com.android.library"
++apply plugin: "kotlin-android"
+ 
+ buildscript {
+   repositories {
+diff --git a/node_modules/@espark-consultants/react-native-esp-idf-provisioning/android/src/main/java/com/espidfprovisioning/EspIdfProvisioningModule.kt b/node_modules/@espark-consultants/react-native-esp-idf-provisioning/android/src/main/java/com/espidfprovisioning/EspIdfProvisioningModule.kt
+index 97f8586..c8149d1 100644
+--- a/node_modules/@espark-consultants/react-native-esp-idf-provisioning/android/src/main/java/com/espidfprovisioning/EspIdfProvisioningModule.kt
++++ b/node_modules/@espark-consultants/react-native-esp-idf-provisioning/android/src/main/java/com/espidfprovisioning/EspIdfProvisioningModule.kt
+@@ -120,7 +120,7 @@ class EspIdfProvisioningModule internal constructor(context: ReactApplicationCon
+             val resultMap = Arguments.createMap()
+             resultMap.putString("name", item.wifiName)
+             resultMap.putString("transport", transport)
+-            resultMap.putInt("security", item.se)
++            resultMap.putInt("security", item.security)
+             resultArray.pushMap(resultMap)
+           }
+           promise?.resolve(resultArray)
