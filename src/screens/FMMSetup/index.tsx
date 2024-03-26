@@ -81,10 +81,60 @@ export default function FMMSetup() {
       ],
     },
   ];
+  const card2: CardItem[] = [
+    {
+      title: 'FMM #2',
+      labelInput: ['IP Address'],
+      font: 'NotoSans-BoldItalic',
+    },
+    {
+      title: 'Wifi Setup',
+      font: 'NotoSans-BoldItalic',
+      labelInput: ['Access Point Name', 'Password'],
+    },
+    {
+      title: 'Engine3',
+      titleColor: theme.colors.secondary,
+      font: 'NotoSans-Bold',
+      labelInput: ['Volume per cycle'],
+      labelDropdown: [
+        {
+          label: 'Fuel Type',
+          options: ['Gasoline', 'Diesel', 'Biodiesel'],
+          zIndex: 56,
+        },
+        {
+          label: 'Engine Type',
+          options: ['drive engine', 'generator'],
+          zIndex: 54,
+        },
+      ],
+    },
+    {
+      title: 'Engine4',
+      titleColor: theme.colors.secondary,
+      font: 'NotoSans-Bold',
+      labelInput: ['Volume per cycle'],
+      labelDropdown: [
+        {
+          label: 'Fuel Type',
+          options: ['Gasoline', 'Diesel', 'Biodiesel'],
+          zIndex: 52,
+        },
+        {
+          label: 'Engine Type',
+          options: ['drive engine', 'generator'],
+          zIndex: 50,
+        },
+      ],
+    },
+  ];
 
   return (
     <MyCanvas>
-      <ScrollView contentContainerStyle={styles({}).screen}>
+      <ScrollView
+        contentContainerStyle={styles({}).screen}
+        showsVerticalScrollIndicator={false}>
         <MyHeader />
         <GapView length={90} />
         <MyText
@@ -95,7 +145,7 @@ export default function FMMSetup() {
         />
         <MyCard>
           {card1.map((item, index) => (
-            <View key={index}>
+            <>
               <MyText
                 text={item.title}
                 textColor={item.titleColor}
@@ -116,13 +166,13 @@ export default function FMMSetup() {
                     zIndex={dropdown.zIndex}
                   />
                 ))}
-            </View>
+            </>
           ))}
         </MyCard>
         <GapView length={15} />
         <View style={{zIndex: -1}}>
           <MyCard>
-            {card1.map((item, index) => (
+            {card2.map((item, index) => (
               <>
                 <MyText
                   text={item.title}

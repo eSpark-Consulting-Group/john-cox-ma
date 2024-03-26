@@ -1,7 +1,7 @@
-import {useTheme} from '@react-navigation/native';
-import {LinearGradient} from 'expo-linear-gradient';
 import {memo} from 'react';
 import {StyleSheet} from 'react-native';
+import {useTheme} from '@react-navigation/native';
+import {LinearGradient} from 'expo-linear-gradient';
 
 interface MyCardProps {
   children: React.ReactNode;

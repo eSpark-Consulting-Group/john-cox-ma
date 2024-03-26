@@ -7,4 +7,5 @@ export type RootStackParamsList = {
   Main: undefined;
   FuelTanks: undefined;
   Trips: undefined;
+  Splash: undefined;
 };

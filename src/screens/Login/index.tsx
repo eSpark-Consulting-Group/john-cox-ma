@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  ImageBackground,
-  KeyboardAvoidingView,
-  ScrollView,
-  StyleSheet,
-  View,
-} from 'react-native';
+import {KeyboardAvoidingView, StyleSheet} from 'react-native';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 
@@ -21,8 +15,6 @@ import {
 } from '../../components';
 import {MyTheme} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
-import {LinearGradient} from 'expo-linear-gradient';
-import {Bg} from '../../assets';
 
 type LoginScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 
@@ -56,7 +48,7 @@ export default function Login() {
             style={styles().signin}
             onPress={() => {
               console.log('setup pe jayein');
-              navigation.navigate('Main');
+              navigation.navigate('Setup');
             }}
           />
           <GapView length={30} />
@@ -66,7 +58,7 @@ export default function Login() {
           label="Back"
           style={styles().button}
           gradient
-          onPress={() => console.log('go back')}
+          onPress={() => navigation.navigate('Main')}
         />
         <GapView length={160} />
         <MyFooter />

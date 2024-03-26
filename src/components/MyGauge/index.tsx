@@ -1,12 +1,12 @@
-import React, {useState} from 'react';
-import {View} from 'react-native';
+import React, {memo} from 'react';
+import {StyleSheet, View} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import RNSpeedometer from 'react-native-speedometer';
 
 import MyText from '../MyText';
 
 import {MyTheme} from '../../types';
-import {Abcd} from '../../assets';
+import {Gauge} from '../../assets';
 
 interface MyGaugeProps {
   value?: number;
@@ -17,25 +17,16 @@ function MyGauge({value = 0, name}: MyGaugeProps) {
   const theme = useTheme() as MyTheme;
 
   return (
-    <View
-      style={{
-        alignItems: 'center',
-        paddingTop: 10,
-        marginRight: -5,
-      }}>
-      <View
-        style={{
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
+    <View style={styles().main}>
+      <View style={styles().container}>
         <View style={{position: 'absolute', top: -23, right: -18}}>
-          <Abcd />
+          <Gauge />
         </View>
         <MyText
           text={name}
           fontFamily="CrimsonText-Bold"
           size={18}
-          style={{position: 'absolute', bottom: 45, right: 47}}
+          style={styles().name}
         />
         <RNSpeedometer
           key={name}
@@ -57,17 +48,7 @@ function MyGauge({value = 0, name}: MyGaugeProps) {
           wrapperBackground={'transparent'}
         />
       </View>
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'center',
-          gap: 5,
-          borderWidth: 2,
-          borderColor: theme.colors.secondary,
-          paddingHorizontal: 1,
-          paddingVertical: 5,
-          width: '80%',
-        }}>
+      <View style={styles(theme).textBox}>
         <MyText fontFamily="NotoSans-Bold" size={30}>
           {value.toString()}
         </MyText>
@@ -78,5 +59,27 @@ function MyGauge({value = 0, name}: MyGaugeProps) {
     </View>
   );
 }
+const styles = (theme?: MyTheme) =>
+  StyleSheet.create({
+    main: {
+      alignItems: 'center',
+      paddingTop: 10,
+    },
+    container: {
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    name: {position: 'absolute', bottom: 49, right: 45},
+    textBox: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      gap: 5,
+      borderWidth: 2,
+      borderColor: theme?.colors.paleBorder,
+      paddingHorizontal: 1,
+      paddingVertical: 5,
+      width: 175,
+    },
+  });
 
-export default MyGauge;
+export default memo(MyGauge);
