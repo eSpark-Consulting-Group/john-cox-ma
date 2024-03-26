@@ -1,5 +1,5 @@
 import React, {memo} from 'react';
-import {ImageBackground, StyleSheet} from 'react-native';
+import {ImageBackground} from 'react-native';
 
 function MyCanvas({children}: {children: React.ReactNode}) {
   return (

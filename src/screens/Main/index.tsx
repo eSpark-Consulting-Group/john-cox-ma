@@ -172,9 +172,4 @@ const styles = (theme?: MyTheme) =>
       justifyContent: 'space-between',
       paddingBottom: 10,
     },
-    GaugeRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-    },
   });

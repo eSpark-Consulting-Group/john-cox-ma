@@ -32,7 +32,6 @@ const styles = StyleSheet.create({
     paddingTop: 15,
     top: 0,
     position: 'absolute',
-    // zIndex: -1,
   },
 });
 

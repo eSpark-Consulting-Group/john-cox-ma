@@ -1,4 +1,4 @@
-import React, {memo, useState} from 'react';
+import React, {memo} from 'react';
 import {TouchableOpacity, StyleSheet} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import {LinearGradient} from 'expo-linear-gradient';
@@ -7,22 +7,25 @@ import MyText from '../MyText';
 
 import {MyTheme} from '../../types';
 
-const MySwitch = ({label, value}: {label: string; value?: boolean}) => {
-  const [isOn, setIsOn] = useState(value);
+const MySwitch = ({
+  label,
+  isActive,
+  onPress,
+}: {
+  label: string;
+  isActive?: boolean;
+  onPress?: () => void;
+}) => {
   const theme = useTheme() as MyTheme;
-
-  const handlePress = () => {
-    setIsOn(!isOn);
-  };
 
   return (
     <TouchableOpacity
-      onPress={handlePress}
+      onPress={onPress}
       style={[
         styles.button,
-        {backgroundColor: isOn ? theme.colors.switch : 'transparent'},
+        {backgroundColor: isActive ? theme.colors.switch : 'transparent'},
       ]}>
-      {!isOn && (
+      {!isActive && (
         <LinearGradient
           colors={[theme.colors.secondary, theme.colors.background]}
           style={[styles.gradient]}

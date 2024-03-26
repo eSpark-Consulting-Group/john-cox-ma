@@ -26,6 +26,11 @@ export default function Trips() {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [warningVisible, setWarningVisible] = useState(false);
   const [resetVisible, setResetVisible] = useState(false);
+  const [selectedSwitch, setSelectedSwitch] = useState<number>(0); // Stores the currently selected switch index
+
+  const handleSwitchPress = (index: number) => {
+    setSelectedSwitch(index === selectedSwitch ? 0 : index); // Toggle selection or deselect
+  };
 
   useEffect(() => {
     if (warningVisible) {
@@ -110,9 +115,21 @@ export default function Trips() {
             <MyCard>
               <TripSection label="Trip Select">
                 <View style={styles.switchContainer}>
-                  <MySwitch label="1" />
-                  <MySwitch label="2" />
-                  <MySwitch label="3" />
+                  <MySwitch
+                    label="1"
+                    isActive={selectedSwitch === 1}
+                    onPress={() => handleSwitchPress(1)}
+                  />
+                  <MySwitch
+                    label="2"
+                    isActive={selectedSwitch === 2}
+                    onPress={() => handleSwitchPress(2)}
+                  />
+                  <MySwitch
+                    label="3"
+                    isActive={selectedSwitch === 3}
+                    onPress={() => handleSwitchPress(3)}
+                  />
                 </View>
               </TripSection>
               <GapView length={5} />
