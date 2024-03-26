@@ -13,10 +13,12 @@ import FuelTanks from '../screens/FuelTanks';
 import Trips from '../screens/Trips';
 
 import {DarkTheme} from '../theme';
+import Splash from '../screens/Splash';
 
 const RootStack = createNativeStackNavigator<RootStackParamsList>();
 
 export default function RootNav() {
+  useEffect(() => {}, []);
   return (
     <NavigationContainer theme={DarkTheme}>
       <RootStack.Navigator initialRouteName="Main">
@@ -35,15 +37,8 @@ export default function RootNav() {
           }}
         />
         <RootStack.Screen
-          name="Splash"
-          component={Splash}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <RootStack.Screen
-          name="Main"
-          component={Main}
+          name="Login"
+          component={Login}
           options={{
             headerShown: false,
           }}
@@ -56,15 +51,8 @@ export default function RootNav() {
           }}
         />
         <RootStack.Screen
-          name="Login"
-          component={Login}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <RootStack.Screen
-          name="Main"
-          component={Main}
+          name="FMMSetup"
+          component={FMMSetup}
           options={{
             headerShown: false,
           }}
