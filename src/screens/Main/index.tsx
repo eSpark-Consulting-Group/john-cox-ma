@@ -175,6 +175,7 @@ const styles = (theme?: MyTheme) =>
     GaugeRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'space-between',
+      justifyContent: 'space-evenly',
+      width: '100%',
     },
   });
