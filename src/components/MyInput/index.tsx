@@ -12,6 +12,7 @@ function MyInput({
   height,
   password,
   onFocus,
+  size,
 }: MyInputProps) {
   const theme = useTheme() as MyTheme;
   return (
@@ -23,6 +24,7 @@ function MyInput({
           styles({width, height}).InputStyle,
           {
             color: theme.colors.primary,
+            fontSize: size,
           },
         ]}
         secureTextEntry={password}
@@ -74,7 +76,7 @@ const styles = ({
       fontSize: 12,
       zIndex: 20,
       paddingVertical: 0,
-      paddingHorizontal: 10,
+      paddingHorizontal: 20,
     },
     outerGradient: {
       ...StyleSheet.absoluteFillObject,

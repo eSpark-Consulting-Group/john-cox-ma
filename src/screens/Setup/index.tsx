@@ -29,7 +29,7 @@ import LabelDropdown from '../../components/LabelDropdown';
 import {Connected, Wifi} from '../../assets';
 import MyCheckbox from '../../components/MyCheckbox';
 
-type SetupScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
+type SetupScreenProps = NativeStackScreenProps<RootStackParamsList, 'Setup'>;
 
 export default function Setup() {
   const theme = useTheme() as MyTheme;

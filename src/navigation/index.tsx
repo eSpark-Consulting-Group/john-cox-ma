@@ -14,6 +14,7 @@ import Trips from '../screens/Trips';
 
 import {DarkTheme} from '../theme';
 import Splash from '../screens/Splash';
+import DeviceSetup from '../screens/DeviceSetup';
 
 const RootStack = createNativeStackNavigator<RootStackParamsList>();
 
@@ -21,10 +22,17 @@ export default function RootNav() {
   useEffect(() => {}, []);
   return (
     <NavigationContainer theme={DarkTheme}>
-      <RootStack.Navigator initialRouteName="Main">
+      <RootStack.Navigator initialRouteName="DeviceSetup">
         <RootStack.Screen
           name="Splash"
           component={Splash}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <RootStack.Screen
+          name="DeviceSetup"
+          component={DeviceSetup}
           options={{
             headerShown: false,
           }}

@@ -63,6 +63,7 @@ export interface MyInputProps {
   height?: DimensionValue | any;
   password?: boolean;
   onFocus?: () => void;
+  size?: number;
 }
 
 export interface LabelInputProps {
