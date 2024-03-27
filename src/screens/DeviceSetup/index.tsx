@@ -1,11 +1,12 @@
 import {
   FlatList,
   KeyboardAvoidingView,
+  Modal,
   Pressable,
   StyleSheet,
   View,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {RootStackParamsList} from '../../types/navigationParams';
 import {useNavigation, useTheme} from '@react-navigation/native';
@@ -21,7 +22,7 @@ import {
   MyText,
 } from '../../components';
 import {MyTheme} from '../../types';
-import {Connected} from '../../assets';
+import {Connected, Wifi} from '../../assets';
 
 type DeviceSetupScreenProps = NativeStackScreenProps<
   RootStackParamsList,
@@ -31,15 +32,61 @@ type DeviceSetupScreenProps = NativeStackScreenProps<
 export default function DeviceSetup() {
   const navigation = useNavigation<DeviceSetupScreenProps['navigation']>();
   const theme = useTheme() as MyTheme;
+  const [step, setStep] = useState(0);
   const [selectedPrefix, setSelectedPrefix] = useState<string>('');
   const [prefix, setPrefix] = useState<string>('');
   const [selectedDevice, setSelectedDevice] = useState<string>('');
   const [device, setDevice] = useState<string>('');
   const [network, setNetwork] = useState<string>('');
-  const [enterPassword, setEnterPassword] = useState(false);
+  const [connecting, setConnecting] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [animationIndex, setAnimationIndex] = useState(0);
+  const [animationInterval, setAnimationInterval] = useState<NodeJS.Timeout>();
+  const [isVisible, setIsVisible] = useState(false);
+
   const prefixes = ['TIMESP', 'ABCSP1', 'XYZSP1', 'MNOSP1'];
   const devices = [' ', '1', '2', '3', '4'];
   const networks = ['Network1', 'Network2', 'Network3', 'Network4'];
+
+  useEffect(() => {
+    if (isLoading) {
+      const interval = setInterval(() => {
+        setAnimationIndex(prevIndex => (prevIndex + 1) % 4); // Change 4 to the number of animations you want to cycle through
+      }, 500); // Adjust the interval duration as needed
+      setAnimationInterval(interval);
+    } else {
+      clearInterval(animationInterval);
+    }
+    return () => clearInterval(animationInterval);
+  }, [isLoading]);
+
+  useEffect(() => {
+    if (isVisible) {
+      const timeout = setTimeout(() => {
+        setIsVisible(false);
+        setStep(5);
+      }, 2000); // Set the duration in milliseconds (2 seconds)
+
+      return () => clearTimeout(timeout);
+    }
+  }, [isVisible]);
+
+  const startLoadingAnimation = () => {
+    setIsLoading(true);
+    // Set a timeout to stop the animation after a certain duration
+    setTimeout(() => {
+      setIsLoading(false);
+      setIsVisible(true);
+    }, 5000); // Adjust the duration as needed
+  };
+
+  const renderConnectedTags = () => {
+    const connectedTags = [];
+    for (let i = 0; i < animationIndex; i++) {
+      connectedTags.push(<Connected key={i} />);
+    }
+    return connectedTags;
+  };
 
   const renderDevice = ({item}: {item: string}) => (
     <Pressable
@@ -61,6 +108,7 @@ export default function DeviceSetup() {
       )}
     </Pressable>
   );
+
   const renderNetwork = ({item}: {item: string}) => (
     <Pressable
       style={({pressed}) => [
@@ -71,11 +119,15 @@ export default function DeviceSetup() {
         styles.item,
       ]}
       onPress={() => {
-        setEnterPassword(true);
+        setStep(4);
         setNetwork(item);
       }}>
       <MyText size={25}>{item}</MyText>
-      {network == item && <Connected />}
+      {network == item && isLoading && (
+        <View style={{flexDirection: 'row', gap: 3, alignItems: 'center'}}>
+          {renderConnectedTags()}
+        </View>
+      )}
     </Pressable>
   );
 
@@ -98,124 +150,238 @@ export default function DeviceSetup() {
     </Pressable>
   );
 
-  return (
-    <MyCanvas>
-      <KeyboardAvoidingView style={styles.main} behavior="padding">
-        <MyHeader />
-        <GapView length={150} />
-        <>
-          <MyText
-            text="Avaialble Networks"
-            size={24}
-            fontFamily="NotoSans-Bold"
-            style={styles.title}
-          />
-          <MyCard>
-            <FlatList
-              data={networks}
-              renderItem={renderNetwork}
-              keyExtractor={(item, index) => index.toString()}
-              style={{height: 240, width: '100%'}}
-              showsVerticalScrollIndicator={false}
-            />
-          </MyCard>
-          <GapView length={20} />
-          <MyButton
-            label="Back"
-            labelStyle={{fontSize: 18}}
-            onPress={() => setDevice(selectedDevice)}
-            gradient
-            style={{width: 150}}
-          />
-        </>
-        {/* <>
-          <MyText
-            text="Enter Possession Proof"
-            size={24}
-            fontFamily="NotoSans-Bold"
-            style={styles.title}
-          />
-          <View style={styles.inputContainer}>
-            <MyInput height={45} size={16} />
+  function renderStep() {
+    switch (step) {
+      case 0:
+        return (
+          <>
             <MyText
-              text={'Enter Pin for ' + 'TIMESP'}
-              size={26}
-              style={styles.caption}
-            />
-          </View>
-          <GapView length={100} />
-          <MyButton
-            label="Next"
-            style={{paddingHorizontal: 45}}
-            labelStyle={{fontSize: 18}}
-            onPress={() => setDevice(selectedDevice)}
-          />
-          <GapView length={20} />
-          <MyButton
-            label="Back"
-            labelStyle={{fontSize: 18}}
-            onPress={() => setDevice(selectedDevice)}
-            gradient
-            style={{width: 150}}
-          />
-        </> */}
-        {/* <>
-          <View style={{flexDirection: 'row', width: '100%'}}>
-            <MyText
-              text="Device Prefix:  "
+              text="Select Device Prefix"
               size={24}
               fontFamily="NotoSans-Bold"
               style={styles.title}
             />
-            <MyText text={prefix + '_'} size={30} />
+            <MyCard>
+              <FlatList
+                data={prefixes}
+                renderItem={renderPrefix}
+                keyExtractor={(item, index) => index.toString()}
+                style={{height: 240, width: '100%'}}
+                showsVerticalScrollIndicator={false}
+              />
+            </MyCard>
+            <GapView length={120} />
+            <MyButton
+              label="Select"
+              style={{paddingHorizontal: 45}}
+              labelStyle={{fontSize: 18}}
+              onPress={() => {
+                setPrefix(selectedPrefix);
+                setStep(1);
+              }}
+            />
+          </>
+        );
+      case 1:
+        return (
+          <>
+            <View style={{flexDirection: 'row', width: '100%'}}>
+              <MyText
+                text="Device Prefix:  "
+                size={24}
+                fontFamily="NotoSans-Bold"
+                style={styles.title}
+              />
+              <MyText text={prefix + '_'} size={30} />
+            </View>
+            <MyText
+              text="Select Device"
+              size={24}
+              fontFamily="NotoSans-Bold"
+              style={styles.title}
+            />
+            <MyCard>
+              <FlatList
+                data={devices}
+                renderItem={renderDevice}
+                keyExtractor={(item, index) => index.toString()}
+                style={{height: 240, width: '100%'}}
+                showsVerticalScrollIndicator={false}
+              />
+            </MyCard>
+            <GapView length={120} />
+            <MyButton
+              label="Select"
+              style={{paddingHorizontal: 45}}
+              labelStyle={{fontSize: 18}}
+              onPress={() => {
+                setDevice(selectedDevice);
+                setStep(2);
+              }}
+            />
+          </>
+        );
+      case 2:
+        return (
+          <>
+            <MyText
+              text="Enter Possession Proof"
+              size={24}
+              fontFamily="NotoSans-Bold"
+              style={styles.title}
+            />
+            <View style={styles.inputContainer}>
+              <MyInput height={45} size={16} />
+              <MyText
+                text={'Enter Pin for ' + prefix}
+                size={26}
+                style={styles.caption}
+              />
+            </View>
+            <GapView length={100} />
+            <MyButton
+              label="Next"
+              style={{paddingHorizontal: 45}}
+              labelStyle={{fontSize: 18}}
+              onPress={() => {
+                setDevice(selectedDevice);
+                setStep(3);
+              }}
+            />
+            <GapView length={20} />
+            <MyButton
+              label="Back"
+              labelStyle={{fontSize: 18}}
+              onPress={() => setStep(1)}
+              gradient
+              style={{width: 150}}
+            />
+          </>
+        );
+      case 3:
+        return (
+          <>
+            <MyText
+              text="Available Networks"
+              size={24}
+              fontFamily="NotoSans-Bold"
+              style={styles.title}
+            />
+            <MyCard>
+              <FlatList
+                data={networks}
+                renderItem={renderNetwork}
+                keyExtractor={(item, index) => index.toString()}
+                style={{height: 240, width: '100%'}}
+                showsVerticalScrollIndicator={false}
+              />
+            </MyCard>
+            <GapView length={20} />
+            <MyButton
+              label="Back"
+              labelStyle={{fontSize: 18}}
+              onPress={() => setStep(2)}
+              gradient
+              style={{width: 150}}
+            />
+          </>
+        );
+      case 4:
+        return (
+          <>
+            <MyText
+              text="Enter Password"
+              size={24}
+              fontFamily="NotoSans-Bold"
+              style={styles.title}
+            />
+            <MyCard>
+              <View style={styles.wifiRow}>
+                <Wifi />
+                <MyText size={24}>{network}</MyText>
+              </View>
+              <View style={{width: '95%', paddingTop: 15}}>
+                <MyInput height={45} />
+              </View>
+              <GapView length={60} />
+              <MyButton
+                label="Connect"
+                width={120}
+                labelStyle={{fontSize: 20}}
+                onPress={() => {
+                  setConnecting(true);
+                  startLoadingAnimation();
+                  setStep(3);
+                }}
+              />
+              <GapView length={20} />
+            </MyCard>
+          </>
+        );
+      case 5:
+        return (
+          <>
+            <MyText
+              text="Do you want another network?"
+              size={26}
+              style={styles.caption}
+            />
+            <GapView length={85} />
+            <View
+              style={{
+                width: '43%',
+                justifyContent: 'space-between',
+                flexDirection: 'row',
+              }}>
+              <MyButton
+                label="NO"
+                labelStyle={{fontSize: 20}}
+                onPress={() => {
+                  navigation.navigate('Main');
+                }}
+              />
+              <MyButton
+                label="Yes"
+                labelStyle={{fontSize: 20}}
+                textColor={'red'}
+                onPress={() => {
+                  setStep(3);
+                }}
+              />
+            </View>
+          </>
+        );
+
+      // Add cases for other steps as needed
+      default:
+        return null;
+    }
+  }
+
+  return (
+    <MyCanvas>
+      <Modal visible={isVisible} animationType="slide" transparent>
+        <MyCanvas>
+          <View style={[styles.modalContent]}>
+            <MyText text="Connected" size={34} fontFamily="NotoSans-Bold" />
+            <GapView length={100} />
+            <MyCard>
+              <View style={styles.wifiRow}>
+                <Wifi />
+                <MyText size={19} style={{width: '70%'}}>
+                  {network}
+                </MyText>
+                <MyCheckbox value={true} width={32} disabled />
+              </View>
+            </MyCard>
+            <GapView length={100} />
           </View>
-          <MyText
-            text="Select Device"
-            size={24}
-            fontFamily="NotoSans-Bold"
-            style={styles.title}
-          />
-          <MyCard>
-            <FlatList
-              data={devices}
-              renderItem={renderDevice}
-              keyExtractor={(item, index) => index.toString()}
-              style={{height: 240, width: '100%'}}
-              showsVerticalScrollIndicator={false}
-            />
-          </MyCard>
-          <GapView length={120} />
-          <MyButton
-            label="Select"
-            style={{paddingHorizontal: 45}}
-            labelStyle={{fontSize: 18}}
-            onPress={() => setDevice(selectedDevice)}
-          />
-        </> */}
-        {/* <>
-          <MyText
-            text="Select Device Prefix"
-            size={24}
-            fontFamily="NotoSans-Bold"
-            style={styles.title}
-          />
-          <MyCard>
-            <FlatList
-              data={prefixes}
-              renderItem={renderPrefix}
-              keyExtractor={(item, index) => index.toString()}
-              style={{height: 240, width: '100%'}}
-              showsVerticalScrollIndicator={false}
-            />
-          </MyCard>
-          <GapView length={120} />
-          <MyButton
-            label="Select"
-            style={{paddingHorizontal: 45}}
-            labelStyle={{fontSize: 18}}
-            onPress={() => setPrefix(selectedPrefix)}
-          />
-        </> */}
+        </MyCanvas>
+      </Modal>
+      <KeyboardAvoidingView style={styles.main} behavior="padding">
+        <MyHeader />
+        <GapView length={120} />
+        {renderStep()}
         <GapView length={120} />
         <MyFooter />
       </KeyboardAvoidingView>
@@ -242,5 +408,25 @@ const styles = StyleSheet.create({
     lineHeight: 30,
     width: '60%',
     textAlign: 'center',
+  },
+  wifiRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    paddingHorizontal: 10,
+    gap: 20,
+    height: 40,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent black background
+  },
+  modalContent: {
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
