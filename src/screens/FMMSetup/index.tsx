@@ -123,7 +123,7 @@ export default function FMMSetup() {
   return (
     <MyCanvas>
       <ScrollView
-        contentContainerStyle={styles({}).screen}
+        contentContainerStyle={styles().screen}
         showsVerticalScrollIndicator={false}>
         <MyHeader />
         <GapView length={90} />
@@ -206,7 +206,6 @@ export default function FMMSetup() {
           <MyButton
             label="Done"
             labelStyle={{fontSize: 20}}
-            // style={s}
             onPress={() => {
               navigation.navigate('Main');
               console.log('Main pe jayein');
@@ -215,7 +214,6 @@ export default function FMMSetup() {
           <GapView length={25} />
           <MyButton
             label="Back"
-            // style={styles({}).button}
             gradient
             labelStyle={{fontSize: 20}}
             onPress={() => {
@@ -231,23 +229,10 @@ export default function FMMSetup() {
   );
 }
 
-const styles = (theme: {theme?: MyTheme}) =>
+const styles = () =>
   StyleSheet.create({
     screen: {
       alignItems: 'center',
       justifyContent: 'center',
     },
-    container: {
-      flex: 1,
-    },
-    linearGradient: {
-      ...StyleSheet.absoluteFillObject,
-      height: '41%',
-    },
-    lowerGradient: {
-      ...StyleSheet.absoluteFillObject,
-      marginBottom: -20,
-    },
-    signin: {width: 79, alignSelf: 'center'},
-    button: {width: 130, alignSelf: 'center', zIndex: -2},
   });

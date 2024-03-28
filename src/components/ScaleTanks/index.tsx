@@ -39,12 +39,7 @@ function ScaleTanks({fuelData}: ScaleTanksProps) {
   return (
     <View style={styles().main}>
       <View style={{width: '20%'}}>
-        <MyText
-          text="Tank"
-          size={18}
-          textColor={theme.colors.secondary}
-          style={{paddingBottom: 15}}
-        />
+        <View style={{width: 35, height: 35}} />
         {marks.map((item, index) => (
           <MyText
             text={item}
@@ -59,7 +54,7 @@ function ScaleTanks({fuelData}: ScaleTanksProps) {
         {fuelData.map((item, index) => (
           <View key={index}>
             <MyText
-              text={item.number.toString()}
+              text={'Tank' + item.number.toString()}
               size={18}
               textColor={theme.colors.secondary}
               style={styles(theme).number}
