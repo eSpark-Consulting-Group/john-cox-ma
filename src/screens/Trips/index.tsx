@@ -335,14 +335,6 @@ const styles = StyleSheet.create({
     gap: 15,
     paddingHorizontal: 40,
   },
-  wifiRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '100%',
-    paddingHorizontal: 10,
-    gap: 20,
-    height: 40,
-  },
   confirmation: {
     width: '100%',
     alignItems: 'center',

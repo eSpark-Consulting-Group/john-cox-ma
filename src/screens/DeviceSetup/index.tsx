@@ -8,8 +8,8 @@ import {
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {RootStackParamsList} from '../../types/navigationParams';
 import {useNavigation, useTheme} from '@react-navigation/native';
+
 import {
   GapView,
   MyButton,
@@ -23,6 +23,7 @@ import {
 } from '../../components';
 import {MyTheme} from '../../types';
 import {Connected, Wifi} from '../../assets';
+import {RootStackParamsList} from '../../types/navigationParams';
 
 type DeviceSetupScreenProps = NativeStackScreenProps<
   RootStackParamsList,
@@ -136,9 +137,7 @@ export default function DeviceSetup() {
       }}>
       <MyText size={25}>{item}</MyText>
       {network == item && isLoading && (
-        <View style={{flexDirection: 'row', gap: 3, alignItems: 'center'}}>
-          {renderConnectedTags()}
-        </View>
+        <View style={styles.network}>{renderConnectedTags()}</View>
       )}
     </Pressable>
   );
@@ -178,7 +177,7 @@ export default function DeviceSetup() {
                 data={prefixes}
                 renderItem={renderPrefix}
                 keyExtractor={(item, index) => index.toString()}
-                style={{height: 240, width: '100%'}}
+                style={styles.flatlist}
                 showsVerticalScrollIndicator={false}
               />
             </MyCard>
@@ -217,7 +216,7 @@ export default function DeviceSetup() {
                 data={devices}
                 renderItem={renderDevice}
                 keyExtractor={(item, index) => index.toString()}
-                style={{height: 240, width: '100%'}}
+                style={styles.flatlist}
                 showsVerticalScrollIndicator={false}
               />
             </MyCard>
@@ -284,7 +283,7 @@ export default function DeviceSetup() {
                 data={networks}
                 renderItem={renderNetwork}
                 keyExtractor={(item, index) => index.toString()}
-                style={{height: 240, width: '100%'}}
+                style={styles.flatlist}
                 showsVerticalScrollIndicator={false}
               />
             </MyCard>
@@ -365,7 +364,6 @@ export default function DeviceSetup() {
           </>
         );
 
-      // Add cases for other steps as needed
       default:
         return null;
     }
@@ -406,6 +404,7 @@ export default function DeviceSetup() {
 const styles = StyleSheet.create({
   main: {flex: 1, justifyContent: 'center', alignItems: 'center'},
   title: {alignSelf: 'flex-start', paddingLeft: 18, paddingBottom: 20},
+  network: {flexDirection: 'row', gap: 3, alignItems: 'center'},
   item: {
     width: '100%',
     alignItems: 'center',
@@ -415,6 +414,7 @@ const styles = StyleSheet.create({
     gap: 15,
   },
   cb: {width: 20, height: 20},
+  flatlist: {height: 240, width: '100%'},
   inputContainer: {width: '85%', paddingTop: 10},
   caption: {
     alignSelf: 'center',

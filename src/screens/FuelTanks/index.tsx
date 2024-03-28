@@ -1,16 +1,9 @@
 import React, {useState} from 'react';
-import {
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {Pressable, ScrollView, StyleSheet, View} from 'react-native';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 
 import {
-  DisplayBox,
   GapView,
   MyBox,
   MyButton,
@@ -25,7 +18,7 @@ import {
 import {MyTheme} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
 import {fuelData} from '../../constants';
-import {Active, Empty, Full, Inactive} from '../../assets';
+import {Empty, Full} from '../../assets';
 
 type FuelTanksScreenProps = NativeStackScreenProps<
   RootStackParamsList,
@@ -35,9 +28,6 @@ type FuelTanksScreenProps = NativeStackScreenProps<
 export default function FuelTanks() {
   const theme = useTheme() as MyTheme;
   const navigation = useNavigation<FuelTanksScreenProps['navigation']>();
-  const engines = ['Engine1', 'Engine2', 'Engine3', 'Engine4'];
-  const supplyData = ['22℃', '22℃', '22℃', '22℃'];
-  const returnData = ['31℃', '32.6℃', '30.9℃', '30.9℃'];
   const [isTankFull, setTankFull] = useState(true);
 
   return (
@@ -54,12 +44,7 @@ export default function FuelTanks() {
           style={styles().heading}
         />
         <MyCard>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              width: '100%',
-            }}>
+          <View style={styles().row}>
             <MyText text="Available Fuel" textColor={theme.colors.secondary} />
             <MyButton label="Update" labelStyle={{fontSize: 14}} />
           </View>
@@ -71,7 +56,7 @@ export default function FuelTanks() {
             textSize={26}
             unitSize={20}
           />
-          <View style={{flexDirection: 'row', width: '100%', marginTop: '-8%'}}>
+          <View style={styles().lowerBoxes}>
             <MyBox
               text={'Date'}
               value={'05/01/23'}
@@ -88,12 +73,10 @@ export default function FuelTanks() {
           </View>
         </MyCard>
         <GapView length={20} />
-        <MyText
-          textColor={theme.colors.secondary}
-          style={{alignSelf: 'flex-start', marginLeft: 18}}>
+        <MyText textColor={theme.colors.secondary} style={styles().heading}>
           Update Options
         </MyText>
-        <GapView length={20} />
+        <GapView length={10} />
         <CollapsableCard title={'Option 1'}>
           <MyCard>
             <ScaleTanks fuelData={fuelData} />
@@ -108,25 +91,13 @@ export default function FuelTanks() {
               style={{alignSelf: 'flex-start'}}>
               Fuel Purchased
             </MyText>
-            <View
-              style={{
-                width: '100%',
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}>
-              <View
-                style={{
-                  width: '55%',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                }}>
-                <View style={{width: '45%', alignItems: 'center'}}>
+            <View style={styles().row}>
+              <View style={styles().inputs}>
+                <View style={styles().inputBox}>
                   <MyInput placeholder="Enter" height={26} />
                   <MyText text="Date" size={14} />
                 </View>
-                <View style={{width: '45%', alignItems: 'center'}}>
+                <View style={styles().inputBox}>
                   <MyInput placeholder="Enter" height={26} />
                   <MyText text="Gallons" size={14} />
                 </View>
@@ -138,13 +109,7 @@ export default function FuelTanks() {
         <GapView length={20} />
         <CollapsableCard title={'Option 3'}>
           <MyCard>
-            <View
-              style={{
-                flexDirection: 'row',
-                width: '60%',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}>
+            <View style={styles().inputs}>
               <MyButton
                 label="Tank Full"
                 labelStyle={{fontSize: 16}}
@@ -183,71 +148,14 @@ function CollapsableCard({title, children}: CollapsableCardProps) {
   };
   return (
     <>
-      <View
-        style={{
-          width: '90%',
-          justifyContent: 'space-between',
-          flexDirection: 'row',
-          borderBottomWidth: 1,
-          borderColor: theme.colors.primary,
-          paddingBottom: 5,
-          marginBottom: 5,
-        }}>
+      <View style={styles(theme).collapsable}>
         <MyText size={20}>{title}</MyText>
         <Pressable onPress={handlePress}>
           <MyText size={25}>{visible ? '-' : '+'}</MyText>
         </Pressable>
       </View>
-
       {visible && children}
     </>
-  );
-}
-
-function ColumnData({
-  title,
-  data,
-  isEngine,
-}: {
-  title: string;
-  data: string[];
-  isEngine?: boolean;
-}) {
-  const theme = useTheme() as MyTheme;
-  return (
-    <View
-      style={[styles().column, {alignItems: isEngine ? 'stretch' : 'center'}]}>
-      <MyText
-        text={title}
-        fontFamily="NotoSans-Bold"
-        style={{marginBottom: 15}}
-        textColor={theme.colors.secondary}
-        size={16}
-      />
-      {isEngine ? (
-        <View>
-          {data.map((item, index) => (
-            <MyText
-              text={item}
-              key={index}
-              style={{paddingBottom: 20, paddingTop: 8}}
-              size={16}
-            />
-          ))}
-        </View>
-      ) : (
-        <View style={{width: '80%'}}>
-          {data.map((item, index) => (
-            <DisplayBox
-              size={16}
-              value={item}
-              key={index}
-              fontFamily="NotoSans-Bold"
-            />
-          ))}
-        </View>
-      )}
-    </View>
   );
 }
 
@@ -261,11 +169,26 @@ const styles = (theme?: MyTheme) =>
       flexDirection: 'row',
       width: '100%',
       justifyContent: 'space-between',
+      alignItems: 'center',
     },
-    column: {
-      width: '33.333333%',
-    },
+    lowerBoxes: {flexDirection: 'row', width: '100%', marginTop: '-8%'},
     heading: {alignSelf: 'flex-start', marginLeft: 18, paddingBottom: 10},
     button: {width: 130, alignSelf: 'center'},
     total: {flexDirection: 'row', alignSelf: 'flex-start', gap: 10},
+    inputs: {
+      width: '55%',
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    inputBox: {width: '45%', alignItems: 'center'},
+    collapsable: {
+      width: '90%',
+      justifyContent: 'space-between',
+      flexDirection: 'row',
+      borderBottomWidth: 1,
+      borderColor: theme?.colors.primary,
+      paddingBottom: 5,
+      marginBottom: 5,
+    },
   });
