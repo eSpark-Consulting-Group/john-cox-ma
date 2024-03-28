@@ -64,10 +64,12 @@ export interface MyInputProps {
   password?: boolean;
   onFocus?: () => void;
   size?: number;
+  placeholder?: string;
 }
 
 export interface LabelInputProps {
   text: string;
+  placeholder?: string;
   subText?: string;
   size?: number;
   checkbox?: boolean;

@@ -36,14 +36,10 @@ export default function FMMSetup() {
   const card1: CardItem[] = [
     {
       title: 'FMM #1',
-      labelInput: ['IP Address'],
-      font: 'NotoSans-BoldItalic',
+
+      font: 'NotoSans-Bold',
     },
-    {
-      title: 'Wifi Setup',
-      font: 'NotoSans-BoldItalic',
-      labelInput: ['Access Point Name', 'Password'],
-    },
+
     {
       title: 'Engine1',
       titleColor: theme.colors.secondary,
@@ -84,13 +80,7 @@ export default function FMMSetup() {
   const card2: CardItem[] = [
     {
       title: 'FMM #2',
-      labelInput: ['IP Address'],
-      font: 'NotoSans-BoldItalic',
-    },
-    {
-      title: 'Wifi Setup',
-      font: 'NotoSans-BoldItalic',
-      labelInput: ['Access Point Name', 'Password'],
+      font: 'NotoSans-Bold',
     },
     {
       title: 'Engine3',
@@ -154,7 +144,13 @@ export default function FMMSetup() {
               />
               {item.labelInput &&
                 item.labelInput.map((label, index) => (
-                  <LabelInput key={index} text={label} width={140} />
+                  <LabelInput
+                    key={index}
+                    text={label}
+                    width={150}
+                    height={30}
+                    placeholder="Enter here"
+                  />
                 ))}
               {item.labelDropdown &&
                 item.labelDropdown.map((dropdown, index) => (
@@ -182,7 +178,13 @@ export default function FMMSetup() {
                 />
                 {item.labelInput &&
                   item.labelInput.map((label, index) => (
-                    <LabelInput key={index} text={label} width={140} />
+                    <LabelInput
+                      key={index}
+                      text={label}
+                      width={150}
+                      height={30}
+                      placeholder="Enter here"
+                    />
                   ))}
                 {item.labelDropdown &&
                   item.labelDropdown.map((dropdown, index) => (
@@ -200,15 +202,28 @@ export default function FMMSetup() {
         </View>
 
         <GapView length={25} />
-        <MyButton
-          label="Back"
-          style={styles({}).button}
-          gradient
-          onPress={() => {
-            navigation.navigate('Setup');
-            console.log('Wapis jayein');
-          }}
-        />
+        <View style={{width: '30%'}}>
+          <MyButton
+            label="Done"
+            labelStyle={{fontSize: 20}}
+            // style={s}
+            onPress={() => {
+              navigation.navigate('Main');
+              console.log('Main pe jayein');
+            }}
+          />
+          <GapView length={25} />
+          <MyButton
+            label="Back"
+            // style={styles({}).button}
+            gradient
+            labelStyle={{fontSize: 20}}
+            onPress={() => {
+              navigation.navigate('Setup');
+              console.log('Wapis jayein');
+            }}
+          />
+        </View>
         <GapView length={70} />
         <MyFooter />
       </ScrollView>

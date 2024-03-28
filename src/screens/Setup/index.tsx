@@ -34,220 +34,127 @@ type SetupScreenProps = NativeStackScreenProps<RootStackParamsList, 'Setup'>;
 export default function Setup() {
   const theme = useTheme() as MyTheme;
   const navigation = useNavigation<SetupScreenProps['navigation']>();
-  const [wifiIndex, setWifiIndex] = useState(0);
-  const [showNetworks, setShowNetworks] = useState(false);
-  const [enterPassword, setEnterPassword] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
 
   return (
     <MyCanvas>
       <ScrollView
-        contentContainerStyle={[styles().screen, {flex: showNetworks ? 1 : 0}]}
+        contentContainerStyle={[styles().screen]}
         showsVerticalScrollIndicator={false}>
         <KeyboardAvoidingView
           style={[styles().screen, {width: '100%', height: '100%'}]}>
           <MyHeader />
-          {showNetworks ? (
-            enterPassword ? (
-              <>
-                <MyText
-                  text="Enter Password"
-                  size={18}
-                  fontFamily="NotoSans-Bold"
-                  style={styles().title}
-                />
-                <MyCard>
-                  <View style={styles().wifiRow}>
-                    <Wifi />
-                    <MyText size={19}>Network{wifiIndex}</MyText>
-                  </View>
-                  <MyInput height={40} width={250} />
-                  <GapView length={60} />
-                  <MyButton
-                    label="Connect"
-                    width={120}
-                    labelStyle={{fontSize: 20}}
-                    onPress={() => {
-                      setWifiIndex(wifiIndex);
-                      setEnterPassword(false);
-                      setIsVisible(true);
-                    }}
-                  />
-                  <GapView length={20} />
-                </MyCard>
-              </>
-            ) : (
-              <>
-                <MyText
-                  text="Avaialble Networks"
-                  size={18}
-                  fontFamily="NotoSans-Bold"
-                  style={styles().title}
-                />
-                <MyCard>
-                  {[1, 2, 3, 4].map((item, index) => (
-                    <TouchableOpacity
-                      key={index} // Add key prop here with unique value
-                      style={styles().wifiRow}
-                      onPress={() => {
-                        setEnterPassword(true);
-                        setWifiIndex(index + 1);
-                      }}>
-                      <Wifi />
-                      <MyText size={19}>Network{item}</MyText>
-                      {wifiIndex - 1 == index && <Connected />}
-                    </TouchableOpacity>
-                  ))}
-                </MyCard>
-              </>
-            )
-          ) : (
-            <>
-              <GapView length={90} />
-              <MyText
-                text="Setup"
-                size={18}
-                fontFamily="NotoSans-Bold"
-                style={styles().title}
-              />
-              <View style={{zIndex: 7}}>
-                <MyCard>
-                  <GapView length={15} />
-                  {temp.map((item, index) => (
-                    <View key={index}>
-                      <LabelDropdown
-                        text={item.text}
-                        data={item.options}
-                        onSelect={() => {}}
-                        zIndex={item.zindez}
-                      />
-                      <GapView length={index != 3 ? 20 : 15} />
-                    </View>
-                  ))}
-                </MyCard>
-              </View>
+          <GapView length={90} />
+          <MyText
+            text="Setup"
+            size={18}
+            fontFamily="NotoSans-Bold"
+            style={styles().title}
+          />
+          <View style={{zIndex: 7}}>
+            <MyCard>
               <GapView length={15} />
-              <View style={{zIndex: 6}}>
-                <MyCard>
-                  <GapView length={10} />
-                  <View style={styles().card2}>
-                    {['Engines', 'Active', 'Position'].map((item, index) => (
-                      <MyText
-                        key={index}
-                        text={item}
-                        fontFamily="NotoSans-BoldItalic"
-                      />
-                    ))}
-                  </View>
-                  {Engines.map((item, index) => (
-                    <View key={index}>
-                      <LabelDropdown
-                        text={item.text}
-                        data={item.options}
-                        onSelect={() => {}}
-                        isActive={item.status}
-                        zIndex={item.zindez}
-                        status
-                      />
-                      <GapView length={index != 3 ? 20 : 15} />
-                    </View>
-                  ))}
-                </MyCard>
+              {temp.map((item, index) => (
+                <View key={index}>
+                  <LabelDropdown
+                    text={item.text}
+                    data={item.options}
+                    onSelect={() => {}}
+                    zIndex={item.zindez}
+                  />
+                  <GapView length={index != 3 ? 20 : 15} />
+                </View>
+              ))}
+            </MyCard>
+          </View>
+          <GapView length={15} />
+          <View style={{zIndex: 6}}>
+            <MyCard>
+              <GapView length={10} />
+              <View style={styles().card2}>
+                {['Engines', 'Active', 'Position'].map((item, index) => (
+                  <MyText
+                    key={index}
+                    text={item}
+                    fontFamily="NotoSans-BoldItalic"
+                  />
+                ))}
               </View>
+              {Engines.map((item, index) => (
+                <View key={index}>
+                  <LabelDropdown
+                    text={item.text}
+                    data={item.options}
+                    onSelect={() => {}}
+                    isActive={item.status}
+                    zIndex={item.zindez}
+                    status
+                  />
+                  <GapView length={index != 3 ? 20 : 15} />
+                </View>
+              ))}
+            </MyCard>
+          </View>
+          <GapView length={15} />
+
+          <View style={{zIndex: 5}}>
+            <MyCard>
               <GapView length={15} />
-
-              <View style={{zIndex: 5}}>
-                <MyCard>
-                  <GapView length={15} />
-                  <LabelDropdown
-                    data={[
-                      'Opt:1 No Gen. Present',
-                      'Opt:2 Genset fuel measured',
-                      'Opt:3 Genset fuel flow estimated',
-                    ]}
-                    text="Generator Config"
-                    onSelect={() => {}}
-                    zIndex={54}
-                    dropdnHeight={170}
-                  />
-                  <GapView length={5} />
-                  <View style={styles().fuelBurn}>
-                    <MyText
-                      text="Generator Fuel burn when in use "
-                      style={{width: '50%'}}
-                    />
-                    {/* todo: component confusion** */}
-                    <View
-                      style={{
-                        width: 114,
-                        height: 20,
-                        backgroundColor: '#70726F73',
-                      }} //temp
-                    />
-                  </View>
-                  <LabelDropdown
-                    data={['N2k SOG', 'N2k SOW', 'UI Device GPS']}
-                    text="Speed Source"
-                    onSelect={() => {}}
-                    zIndex={52}
-                  />
-                  <View style={{width: '100%'}}>
-                    <MyText
-                      text="Fuel Mgt Module Connection"
-                      fontFamily="NotoSans-BoldItalic"
-                    />
-                    <LabelInput
-                      text="IP Address"
-                      subText="FMM #1"
-                      checkbox
-                      width={100}
-                    />
-                    <GapView length={10} />
-                    <LabelInput
-                      text="IP Address"
-                      subText="FMM #2"
-                      checkbox
-                      width={100}
-                    />
-                    <GapView length={10} />
-                    <MyText
-                      text="Wifi Setup"
-                      fontFamily="NotoSans-BoldItalic"
-                    />
-                    <LabelInput
-                      text="Access Point Name"
-                      checkbox
-                      width={100}
-                      onFocus={() => setShowNetworks(true)}
-                    />
-                    <GapView length={10} />
-                    <LabelInput text="Password" checkbox width={100} password />
-                    <GapView length={10} />
-                  </View>
-                </MyCard>
+              <LabelDropdown
+                data={[
+                  'Opt:1 No Gen. Present',
+                  'Opt:2 Genset fuel measured',
+                  'Opt:3 Genset fuel flow estimated',
+                ]}
+                text="Generator Config"
+                onSelect={() => {}}
+                zIndex={54}
+                dropdnHeight={170}
+              />
+              <GapView length={5} />
+              <View style={styles().fuelBurn}>
+                <MyText
+                  text="Generator Fuel burn when in use "
+                  style={{width: '50%'}}
+                />
+                {/* todo: component confusion** */}
+                <View
+                  style={{
+                    width: 114,
+                    height: 20,
+                    backgroundColor: '#70726F73',
+                  }} //temp
+                />
               </View>
-              <GapView length={30} />
-              <MyButton
-                label="Fuel Mgt Module Setup"
-                style={styles().signin}
-                onPress={() => {
-                  navigation.navigate('FMMSetup');
-                  console.log('Fuel Mgt pe jayein');
-                }}
+              <LabelDropdown
+                data={['N2k SOG', 'N2k SOW', 'UI Device GPS']}
+                text="Speed Source"
+                onSelect={() => {}}
+                zIndex={52}
               />
-              <GapView length={25} />
+            </MyCard>
+          </View>
+          <GapView length={30} />
+          <MyButton
+            label="Next"
+            labelStyle={{fontSize: 20}}
+            style={styles().signin}
+            onPress={() => {
+              navigation.navigate('FMMSetup');
+              console.log('Fuel Mgt pe jayein');
+            }}
+          />
+          <GapView length={25} />
 
-              <MyButton
-                label="Back"
-                style={styles().button}
-                onPress={() => {
-                  navigation.navigate('Main');
-                  console.log('Wapis jayein');
-                }}
-                gradient
-              />
-            </>
-          )}
+          <MyButton
+            label="Back"
+            style={styles().button}
+            labelStyle={{fontSize: 20}}
+            onPress={() => {
+              navigation.navigate('Main');
+              console.log('Wapis jayein');
+            }}
+            gradient
+          />
 
           <GapView length={70} />
           <MyFooter />

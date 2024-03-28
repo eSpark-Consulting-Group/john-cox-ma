@@ -13,6 +13,7 @@ function MyInput({
   password,
   onFocus,
   size,
+  placeholder,
 }: MyInputProps) {
   const theme = useTheme() as MyTheme;
   return (
@@ -29,6 +30,8 @@ function MyInput({
         ]}
         secureTextEntry={password}
         onFocus={onFocus}
+        placeholder={placeholder}
+        placeholderTextColor={theme.colors.primary}
       />
       <LinearGradient
         colors={['#72e14d89', 'transparent']}
