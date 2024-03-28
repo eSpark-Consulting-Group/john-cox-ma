@@ -27,7 +27,7 @@ function MyButton({
   const buttonStyle: ViewStyle = {
     backgroundColor: backgroundColor || theme.colors.pale,
     flexDirection: 'row',
-    borderRadius: 4,
+    borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 20,
@@ -38,7 +38,7 @@ function MyButton({
 
   const buttonTextStyle: TextStyle = {
     textAlign: 'center',
-    paddingVertical: 10,
+    paddingVertical: 8,
     paddingHorizontal: 5,
     ...labelStyle,
   };
@@ -62,7 +62,7 @@ function MyButton({
               style={[buttonTextStyle]}
               fontFamily={fontFamily}
               textColor={textColor || theme.colors.primary}
-              size={15}>
+              size={18}>
               {label}
             </MyText>
           </TouchableOpacity>
@@ -77,7 +77,7 @@ function MyButton({
         style={buttonTextStyle}
         fontFamily={fontFamily}
         textColor={textColor || theme.colors.semiSecondary}
-        size={12}>
+        size={18}>
         {label}
       </MyText>
     </TouchableOpacity>

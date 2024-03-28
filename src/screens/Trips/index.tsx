@@ -135,18 +135,12 @@ export default function Trips() {
               <GapView length={5} />
               <TripSection label="Trip Name">
                 <View style={styles.inputContainer}>
-                  <MyInput />
+                  <MyInput placeholder="Ente Trip Name" />
                 </View>
               </TripSection>
               <GapView length={5} />
-              <TripSection label="Trip Start">
-                <View style={styles.inputContainer}>
-                  <MyInput />
-                  <MyText text="Date" size={18} />
-                  <MyInput />
-                  <MyText text="Time" size={18} />
-                </View>
-              </TripSection>
+              <RenderRow title="Trip Start" unit="Date" />
+              <RenderRow title="" unit="Time" />
             </MyCard>
             <GapView length={20} />
             <MyCard>
