@@ -134,7 +134,8 @@ export default function DeviceSetup() {
       onPress={() => {
         setStep(4);
         setNetwork(item);
-      }}>
+      }}
+      disabled={isLoading}>
       <MyText size={25}>{item}</MyText>
       {network == item && isLoading && (
         <View style={styles.network}>{renderConnectedTags()}</View>
