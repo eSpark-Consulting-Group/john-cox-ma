@@ -41,12 +41,17 @@ export default function DeviceSetup() {
   const [connecting, setConnecting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [animationIndex, setAnimationIndex] = useState(0);
-  const [animationInterval, setAnimationInterval] = useState<NodeJS.Timeout>();
   const [isVisible, setIsVisible] = useState(false);
+  const [animationInterval, setAnimationInterval] = useState<NodeJS.Timeout>();
+  const [count, setCount] = useState(0);
 
   const prefixes = ['TIMESP', 'ABCSP1', 'XYZSP1', 'MNOSP1'];
   const devices = [' ', '1', '2', '3', '4'];
   const networks = ['Network1', 'Network2', 'Network3', 'Network4'];
+
+  useEffect(() => setCount(0), []);
+  useEffect(() => console.log('step: ', step), [step]);
+  useEffect(() => console.log('count: ', count), [count]);
 
   useEffect(() => {
     if (isLoading) {
@@ -63,9 +68,16 @@ export default function DeviceSetup() {
   useEffect(() => {
     if (isVisible) {
       const timeout = setTimeout(() => {
-        setIsVisible(false);
-        setStep(5);
-      }, 2000); // Set the duration in milliseconds (2 seconds)
+        setCount(count + 1);
+        if (count % 2 != 0) {
+          navigation.navigate('Main');
+          setIsVisible(false);
+          setStep(1);
+        } else {
+          setIsVisible(false);
+          setStep(5);
+        }
+      }, 2000);
 
       return () => clearTimeout(timeout);
     }
@@ -77,7 +89,7 @@ export default function DeviceSetup() {
     setTimeout(() => {
       setIsLoading(false);
       setIsVisible(true);
-    }, 5000); // Adjust the duration as needed
+    }, 3000); // Adjust the duration as needed
   };
 
   const renderConnectedTags = () => {
@@ -338,14 +350,15 @@ export default function DeviceSetup() {
                 labelStyle={{fontSize: 20}}
                 onPress={() => {
                   navigation.navigate('Main');
+                  setStep(1);
                 }}
               />
               <MyButton
-                label="Yes"
+                label="YES"
                 labelStyle={{fontSize: 20}}
                 textColor={'red'}
                 onPress={() => {
-                  setStep(3);
+                  setStep(1);
                 }}
               />
             </View>
@@ -378,6 +391,7 @@ export default function DeviceSetup() {
           </View>
         </MyCanvas>
       </Modal>
+
       <KeyboardAvoidingView style={styles.main} behavior="padding">
         <MyHeader />
         <GapView length={120} />

@@ -41,27 +41,6 @@ export default function Setup() {
 
   return (
     <MyCanvas>
-      <Modal visible={isVisible} animationType="slide" transparent>
-        <View style={styles(theme).modalContainer}>
-          <View style={styles(theme).modalContent}>
-            <MyText text="Connected" size={34} fontFamily="NotoSans-Bold" />
-            <GapView length={100} />
-            <MyCard>
-              <Pressable
-                style={styles().wifiRow}
-                onPress={() => setIsVisible(false)}>
-                <Wifi />
-                <MyText size={19} style={{width: '70%'}}>
-                  Network{wifiIndex}
-                </MyText>
-                <MyCheckbox value={true} width={32} disabled />
-              </Pressable>
-            </MyCard>
-            <GapView length={100} />
-          </View>
-        </View>
-      </Modal>
-
       <ScrollView
         contentContainerStyle={[styles().screen, {flex: showNetworks ? 1 : 0}]}
         showsVerticalScrollIndicator={false}>
