@@ -9,6 +9,13 @@ import {
 import React, {useEffect, useState} from 'react';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useNavigation, useTheme} from '@react-navigation/native';
+import {
+  ESPProvisionManager,
+  ESPDevice,
+  ESPTransport,
+  ESPSecurity,
+  ESPWifiList,
+} from '@espark-consultants/react-native-esp-idf-provisioning';
 
 import {
   GapView,
@@ -36,9 +43,9 @@ export default function DeviceSetup() {
   const [step, setStep] = useState(0);
   const [selectedPrefix, setSelectedPrefix] = useState<string>('');
   const [prefix, setPrefix] = useState<string>('');
-  const [selectedDevice, setSelectedDevice] = useState<string>('');
-  const [device, setDevice] = useState<string>('');
-  const [network, setNetwork] = useState<string>('');
+  const [selectedDevice, setSelectedDevice] = useState<ESPDevice>();
+  const [device, setDevice] = useState<ESPDevice>();
+  const [network, setNetwork] = useState<ESPWifiList>();
   const [connecting, setConnecting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [animationIndex, setAnimationIndex] = useState(0);
@@ -47,8 +54,14 @@ export default function DeviceSetup() {
   const [count, setCount] = useState(0);
 
   const prefixes = ['TIMESP', 'ABCSP1', 'XYZSP1', 'MNOSP1'];
-  const devices = [' ', '1', '2', '3', '4'];
-  const networks = ['Network1', 'Network2', 'Network3', 'Network4'];
+  // const devices = [' ', '1', '2', '3', '4'];
+  // const networks = ['Network1', 'Network2', 'Network3', 'Network4'];
+
+  const [devices, setDevices] = useState<ESPDevice[]>();
+  const [pop, setPop] = useState('');
+  const [password, setPassword] = useState('');
+  const [networks, setNetworks] = useState<ESPWifiList[]>();
+  const [data, setData] = useState<string>();
 
   useEffect(() => setCount(0), []);
   useEffect(() => console.log('step: ', step), [step]);
@@ -84,14 +97,9 @@ export default function DeviceSetup() {
     }
   }, [isVisible]);
 
-  const startLoadingAnimation = () => {
-    setIsLoading(true);
-    // Set a timeout to stop the animation after a certain duration
-    setTimeout(() => {
-      setIsLoading(false);
-      setIsVisible(true);
-    }, 3000); // Adjust the duration as needed
-  };
+  // const startLoadingAnimation = () => {
+
+  // };
 
   const renderConnectedTags = () => {
     const connectedTags = [];
@@ -101,7 +109,7 @@ export default function DeviceSetup() {
     return connectedTags;
   };
 
-  const renderDevice = ({item}: {item: string}) => (
+  const renderDevice = ({item}: {item: ESPDevice}) => (
     <Pressable
       style={({pressed}) => [
         {
@@ -111,9 +119,7 @@ export default function DeviceSetup() {
         styles.item,
       ]}
       onPress={() => setSelectedDevice(item)}>
-      <MyText size={25}>
-        {prefix}_{item}
-      </MyText>
+      <MyText size={25} text={prefix + '_' + item} />
       {selectedDevice === item ? (
         <MyCheckbox width={30} disabled value={true} />
       ) : (
@@ -122,7 +128,7 @@ export default function DeviceSetup() {
     </Pressable>
   );
 
-  const renderNetwork = ({item}: {item: string}) => (
+  const renderNetwork = ({item}: {item: ESPWifiList}) => (
     <Pressable
       style={({pressed}) => [
         {
@@ -136,8 +142,8 @@ export default function DeviceSetup() {
         setNetwork(item);
       }}
       disabled={isLoading}>
-      <MyText size={25}>{item}</MyText>
-      {network == item && isLoading && (
+      <MyText size={25}>{item.ssid}</MyText>
+      {network?.ssid == item.ssid && isLoading && (
         <View style={styles.network}>{renderConnectedTags()}</View>
       )}
     </Pressable>
@@ -161,6 +167,59 @@ export default function DeviceSetup() {
       )}
     </Pressable>
   );
+
+  const scanDevices = async () => {
+    try {
+      const myDevices = await ESPProvisionManager.searchESPDevices(
+        selectedPrefix,
+        ESPTransport.softap,
+        ESPSecurity.secure,
+      );
+      setDevices(myDevices);
+    } catch (error) {
+      console.error('Error scanning devices:', error);
+    }
+  };
+
+  const connectDevice = () => {
+    device?.connect(pop);
+    console.log('connected:', device?.connected);
+    if (device?.connected) {
+      scanWifiList();
+    }
+  };
+
+  const connectNetwork = async () => {
+    setIsLoading(true);
+    try {
+      if (network?.ssid) {
+        const ssid = network.ssid;
+        const passphrase = password;
+        await device?.provision(ssid, passphrase);
+        const data = JSON.stringify(device?.sendData('', ''));
+        setData(data);
+
+        setIsLoading(false);
+        setIsVisible(true);
+      } else {
+        console.error('Network SSID is undefined');
+      }
+      setIsLoading(false);
+    } catch (error) {
+      console.error('Error during network provisioning:', error);
+      setIsLoading(false);
+    }
+  };
+
+  const scanWifiList = async () => {
+    try {
+      const wifiList = await device?.scanWifiList();
+      console.log('wifi List: ', wifiList);
+      setNetworks(wifiList);
+    } catch (error) {
+      console.error('Error scanning WiFi list:', error);
+    }
+  };
 
   function renderStep() {
     switch (step) {
@@ -197,6 +256,7 @@ export default function DeviceSetup() {
       case 1:
         return (
           <>
+            {scanDevices()}
             <View style={{flexDirection: 'row', width: '100%'}}>
               <MyText
                 text="Device Prefix:  "
@@ -214,7 +274,7 @@ export default function DeviceSetup() {
             />
             <MyCard>
               <FlatList
-                data={devices}
+                data={devices} //devices
                 renderItem={renderDevice}
                 keyExtractor={(item, index) => index.toString()}
                 style={styles.flatlist}
@@ -243,7 +303,7 @@ export default function DeviceSetup() {
               style={styles.title}
             />
             <View style={styles.inputContainer}>
-              <MyInput height={45} size={16} />
+              <MyInput height={45} size={16} onChange={text => setPop(text)} />
               <MyText
                 text={'Enter Pin for ' + prefix}
                 size={26}
@@ -257,6 +317,7 @@ export default function DeviceSetup() {
               labelStyle={{fontSize: 18}}
               onPress={() => {
                 setDevice(selectedDevice);
+                connectDevice();
                 setStep(3);
               }}
             />
@@ -310,10 +371,10 @@ export default function DeviceSetup() {
             <MyCard>
               <View style={styles.wifiRow}>
                 <Wifi />
-                <MyText size={24}>{network}</MyText>
+                <MyText size={24}>{network?.ssid}</MyText>
               </View>
               <View style={{width: '95%', paddingTop: 15}}>
-                <MyInput height={45} />
+                <MyInput height={45} onChange={text => setPassword(text)} />
               </View>
               <GapView length={60} />
               <MyButton
@@ -322,7 +383,7 @@ export default function DeviceSetup() {
                 labelStyle={{fontSize: 20}}
                 onPress={() => {
                   setConnecting(true);
-                  startLoadingAnimation();
+                  connectNetwork();
                   setStep(3);
                 }}
               />
@@ -381,7 +442,7 @@ export default function DeviceSetup() {
               <View style={styles.wifiRow}>
                 <Wifi />
                 <MyText size={19} style={{width: '70%'}}>
-                  {network}
+                  {network?.ssid}
                 </MyText>
                 <MyCheckbox value={true} width={32} disabled />
               </View>
