@@ -9,6 +9,6 @@ export {default as Gauge} from './vectors/Gauge.svg';
 export {default as Bg} from './vectors/bg.svg';
 export {default as BgPage} from './vectors/bg-page.svg';
 export {default as Full} from './vectors/Full.svg';
-export {default as Empty} from './vectors/empty.svg';
+export {default as Empty} from './vectors/Empty.svg';
 
 export {default as SplashIcon} from './vectors/SplashIcon.png';
