@@ -5,7 +5,6 @@ import {
   Pressable,
   StyleSheet,
   View,
-  PermissionsAndroid,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -17,6 +16,11 @@ import {
   ESPSecurity,
   ESPWifiList,
 } from '@espark-consultants/react-native-esp-idf-provisioning';
+import {
+  PERMISSIONS,
+  requestMultiple,
+  checkMultiple,
+} from 'react-native-permissions';
 
 import {
   GapView,
@@ -64,33 +68,22 @@ export default function DeviceSetup() {
   const [data, setData] = useState<string>();
   const [granted, setGranted] = useState(false);
 
-  const permissions = [
-    PermissionsAndroid.PERMISSIONS.BLUETOOTH,
-    PermissionsAndroid.PERMISSIONS.BLUETOOTH_ADMIN,
-    PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
-    PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
-    PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-  ];
   async function requestPermissions() {
     try {
-      const grantedPermissions = await PermissionsAndroid.requestMultiple(
-        permissions,
-      );
+      const status = await requestMultiple([
+        PERMISSIONS.ANDROID.BLUETOOTH_SCAN,
+        PERMISSIONS.ANDROID.BLUETOOTH_CONNECT,
+        PERMISSIONS.ANDROID.BLUETOOTH_ADVERTISE,
+        PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
+      ]);
 
-      console.log('Granted permissions:', grantedPermissions);
+      console.log('Granted permissions:', status);
 
       if (
-        grantedPermissions[
-          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
-        ] === PermissionsAndroid.RESULTS.GRANTED &&
-        grantedPermissions[PermissionsAndroid.PERMISSIONS.BLUETOOTH] ===
-          PermissionsAndroid.RESULTS.GRANTED &&
-        grantedPermissions[PermissionsAndroid.PERMISSIONS.BLUETOOTH_ADMIN] ===
-          PermissionsAndroid.RESULTS.GRANTED &&
-        grantedPermissions[PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN] ===
-          PermissionsAndroid.RESULTS.GRANTED &&
-        grantedPermissions[PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT] ===
-          PermissionsAndroid.RESULTS.GRANTED
+        status[PERMISSIONS.ANDROID.BLUETOOTH_SCAN] &&
+        status[PERMISSIONS.ANDROID.BLUETOOTH_CONNECT] &&
+        status[PERMISSIONS.ANDROID.BLUETOOTH_ADVERTISE] &&
+        status[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION]
       ) {
         console.log('All permissions granted.');
         return true;
@@ -104,6 +97,35 @@ export default function DeviceSetup() {
     }
   }
 
+  async function checkPermissions() {
+    try {
+      const status = await checkMultiple([
+        PERMISSIONS.ANDROID.BLUETOOTH_SCAN,
+        PERMISSIONS.ANDROID.BLUETOOTH_CONNECT,
+        PERMISSIONS.ANDROID.BLUETOOTH_ADVERTISE,
+        PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
+      ]);
+      console.log('check Granted permissions:', status);
+
+      if (
+        status[PERMISSIONS.ANDROID.BLUETOOTH_SCAN] &&
+        status[PERMISSIONS.ANDROID.BLUETOOTH_CONNECT] &&
+        status[PERMISSIONS.ANDROID.BLUETOOTH_ADVERTISE] &&
+        status[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION]
+      ) {
+        console.log('check All permissions granted.');
+        return true;
+      } else {
+        console.log('check Some permissions are not granted.');
+        const res = await requestPermissions();
+        return res;
+      }
+    } catch (err) {
+      console.error('check Error requesting permissions:', err);
+      return false;
+    }
+  }
+
   // - Scan using prefix
   // - Allow user to select a device
   // - Take pop from user
@@ -113,19 +135,17 @@ export default function DeviceSetup() {
   // - Connected screen
 
   useEffect(() => {
-    const fetchPermissions = async () => {
+    (async () => {
       try {
-        const grantedPermissions = await requestPermissions();
+        const grantedPermissions = await checkPermissions();
         setGranted(grantedPermissions);
-        console.log('Permission granted: ', granted ? 'yes' : 'no');
+        console.log('Permission granted: ', grantedPermissions ? 'yes' : 'no');
 
         setCount(0);
       } catch (error) {
         console.error('Error fetching permissions:', error);
       }
-    };
-
-    fetchPermissions();
+    })();
   }, [count]);
   useEffect(() => console.log('step: ', step), [step]);
   useEffect(() => console.log('count: ', count), [count]);
@@ -178,83 +198,6 @@ export default function DeviceSetup() {
       )}
     </Pressable>
   );
-
-  //old
-
-  // const scanDevices = async () => {
-  //   try {
-  //     const myDevices = await ESPProvisionManager.searchESPDevices(
-  //       selectedPrefix,
-  //       ESPTransport.softap,
-  //       ESPSecurity.secure,
-  //     );
-  //     setDevices(myDevices);
-  //     console.log('Available Devices: ', myDevices);
-  //   } catch (error) {
-  //     console.error('Error scanning devices:', error);
-  //   }
-  // };
-
-  // const requestPermissions = async () => {
-  //   try {
-  //     const grantedLocation = await PermissionsAndroid.request(
-  //       PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-  //       {
-  //         title: 'Location Access',
-  //         message: 'App needs your location to proceed.',
-  //         buttonNegative: 'Cancel',
-  //         buttonPositive: 'OK',
-  //       },
-  //     );
-  //     const grantedBluetoothConnect = await PermissionsAndroid.request(
-  //       PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
-  //       {
-  //         title: 'Bluetooth Connect Access',
-  //         message: 'App needs Bluetooth Connect access to proceed.',
-  //         buttonNegative: 'Cancel',
-  //         buttonPositive: 'OK',
-  //       },
-  //     );
-  //     const grantedBluetooth = await PermissionsAndroid.request(
-  //       PermissionsAndroid.PERMISSIONS.BLUETOOTH,
-  //       {
-  //         title: 'Bluetooth Access',
-  //         message: 'App needs Bluetooth access to proceed.',
-  //         buttonNegative: 'Cancel',
-  //         buttonPositive: 'OK',
-  //       },
-  //     );
-  //     const grantedBluetoothAdmin = await PermissionsAndroid.request(
-  //       PermissionsAndroid.PERMISSIONS.BLUETOOTH_ADMIN,
-  //       {
-  //         title: 'Bluetooth Admin Access',
-  //         message: 'App needs Bluetooth admin access to proceed.',
-  //         buttonNegative: 'Cancel',
-  //         buttonPositive: 'OK',
-  //       },
-  //     );
-  //     const grantedBluetoothScan = await PermissionsAndroid.request(
-  //       PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
-  //       {
-  //         title: 'Bluetooth Scan Access',
-  //         message: 'App needs Bluetooth Scan access to proceed.',
-  //         buttonNegative: 'Cancel',
-  //         buttonPositive: 'OK',
-  //       },
-  //     );
-
-  //     return (
-  //       grantedLocation &&
-  //       grantedBluetooth &&
-  //       grantedBluetoothAdmin &&
-  //       grantedBluetoothScan &&
-  //       grantedBluetoothConnect === PermissionsAndroid.RESULTS.GRANTED
-  //     );
-  //   } catch (error) {
-  //     console.error('Error requesting permissions:', error);
-  //     return false;
-  //   }
-  // };
 
   const scanDevices = async () => {
     try {
