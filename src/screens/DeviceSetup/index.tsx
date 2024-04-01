@@ -5,6 +5,7 @@ import {
   Pressable,
   StyleSheet,
   View,
+  PermissionsAndroid,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -46,7 +47,6 @@ export default function DeviceSetup() {
   const [selectedDevice, setSelectedDevice] = useState<ESPDevice>();
   const [device, setDevice] = useState<ESPDevice>();
   const [network, setNetwork] = useState<ESPWifiList>();
-  const [connecting, setConnecting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [animationIndex, setAnimationIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
@@ -62,8 +62,71 @@ export default function DeviceSetup() {
   const [password, setPassword] = useState('');
   const [networks, setNetworks] = useState<ESPWifiList[]>();
   const [data, setData] = useState<string>();
+  const [granted, setGranted] = useState(false);
 
-  useEffect(() => setCount(0), []);
+  const permissions = [
+    PermissionsAndroid.PERMISSIONS.BLUETOOTH,
+    PermissionsAndroid.PERMISSIONS.BLUETOOTH_ADMIN,
+    PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
+    PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
+    PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+  ];
+  async function requestPermissions() {
+    try {
+      const grantedPermissions = await PermissionsAndroid.requestMultiple(
+        permissions,
+      );
+
+      console.log('Granted permissions:', grantedPermissions);
+
+      if (
+        grantedPermissions[
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+        ] === PermissionsAndroid.RESULTS.GRANTED &&
+        grantedPermissions[PermissionsAndroid.PERMISSIONS.BLUETOOTH] ===
+          PermissionsAndroid.RESULTS.GRANTED &&
+        grantedPermissions[PermissionsAndroid.PERMISSIONS.BLUETOOTH_ADMIN] ===
+          PermissionsAndroid.RESULTS.GRANTED &&
+        grantedPermissions[PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN] ===
+          PermissionsAndroid.RESULTS.GRANTED &&
+        grantedPermissions[PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT] ===
+          PermissionsAndroid.RESULTS.GRANTED
+      ) {
+        console.log('All permissions granted.');
+        return true;
+      } else {
+        console.log('Some permissions are not granted.');
+        return false;
+      }
+    } catch (err) {
+      console.error('Error requesting permissions:', err);
+      return false;
+    }
+  }
+
+  // - Scan using prefix
+  // - Allow user to select a device
+  // - Take pop from user
+  // - Scan wifi list from device
+  // - Allow user to select a wifi and take password.. Then provision
+  // - Data= json.stringifiy(Device.senddata)
+  // - Connected screen
+
+  useEffect(() => {
+    const fetchPermissions = async () => {
+      try {
+        const grantedPermissions = await requestPermissions();
+        setGranted(grantedPermissions);
+        console.log('Permission granted: ', granted ? 'yes' : 'no');
+
+        setCount(0);
+      } catch (error) {
+        console.error('Error fetching permissions:', error);
+      }
+    };
+
+    fetchPermissions();
+  }, [count]);
   useEffect(() => console.log('step: ', step), [step]);
   useEffect(() => console.log('count: ', count), [count]);
 
@@ -97,58 +160,6 @@ export default function DeviceSetup() {
     }
   }, [isVisible]);
 
-  // const startLoadingAnimation = () => {
-
-  // };
-
-  const renderConnectedTags = () => {
-    const connectedTags = [];
-    for (let i = 0; i < animationIndex; i++) {
-      connectedTags.push(<Connected key={i} />);
-    }
-    return connectedTags;
-  };
-
-  const renderDevice = ({item}: {item: ESPDevice}) => (
-    <Pressable
-      style={({pressed}) => [
-        {
-          borderWidth: pressed ? 1 : 0,
-          borderColor: theme.colors.primary,
-        },
-        styles.item,
-      ]}
-      onPress={() => setSelectedDevice(item)}>
-      <MyText size={25} text={prefix + '_' + item} />
-      {selectedDevice === item ? (
-        <MyCheckbox width={30} disabled value={true} />
-      ) : (
-        <View style={styles.cb} />
-      )}
-    </Pressable>
-  );
-
-  const renderNetwork = ({item}: {item: ESPWifiList}) => (
-    <Pressable
-      style={({pressed}) => [
-        {
-          borderWidth: pressed ? 1 : 0,
-          borderColor: theme.colors.primary,
-        },
-        styles.item,
-      ]}
-      onPress={() => {
-        setStep(4);
-        setNetwork(item);
-      }}
-      disabled={isLoading}>
-      <MyText size={25}>{item.ssid}</MyText>
-      {network?.ssid == item.ssid && isLoading && (
-        <View style={styles.network}>{renderConnectedTags()}</View>
-      )}
-    </Pressable>
-  );
-
   const renderPrefix = ({item}: {item: string}) => (
     <Pressable
       style={({pressed}) => [
@@ -168,26 +179,162 @@ export default function DeviceSetup() {
     </Pressable>
   );
 
+  //old
+
+  // const scanDevices = async () => {
+  //   try {
+  //     const myDevices = await ESPProvisionManager.searchESPDevices(
+  //       selectedPrefix,
+  //       ESPTransport.softap,
+  //       ESPSecurity.secure,
+  //     );
+  //     setDevices(myDevices);
+  //     console.log('Available Devices: ', myDevices);
+  //   } catch (error) {
+  //     console.error('Error scanning devices:', error);
+  //   }
+  // };
+
+  // const requestPermissions = async () => {
+  //   try {
+  //     const grantedLocation = await PermissionsAndroid.request(
+  //       PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+  //       {
+  //         title: 'Location Access',
+  //         message: 'App needs your location to proceed.',
+  //         buttonNegative: 'Cancel',
+  //         buttonPositive: 'OK',
+  //       },
+  //     );
+  //     const grantedBluetoothConnect = await PermissionsAndroid.request(
+  //       PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
+  //       {
+  //         title: 'Bluetooth Connect Access',
+  //         message: 'App needs Bluetooth Connect access to proceed.',
+  //         buttonNegative: 'Cancel',
+  //         buttonPositive: 'OK',
+  //       },
+  //     );
+  //     const grantedBluetooth = await PermissionsAndroid.request(
+  //       PermissionsAndroid.PERMISSIONS.BLUETOOTH,
+  //       {
+  //         title: 'Bluetooth Access',
+  //         message: 'App needs Bluetooth access to proceed.',
+  //         buttonNegative: 'Cancel',
+  //         buttonPositive: 'OK',
+  //       },
+  //     );
+  //     const grantedBluetoothAdmin = await PermissionsAndroid.request(
+  //       PermissionsAndroid.PERMISSIONS.BLUETOOTH_ADMIN,
+  //       {
+  //         title: 'Bluetooth Admin Access',
+  //         message: 'App needs Bluetooth admin access to proceed.',
+  //         buttonNegative: 'Cancel',
+  //         buttonPositive: 'OK',
+  //       },
+  //     );
+  //     const grantedBluetoothScan = await PermissionsAndroid.request(
+  //       PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
+  //       {
+  //         title: 'Bluetooth Scan Access',
+  //         message: 'App needs Bluetooth Scan access to proceed.',
+  //         buttonNegative: 'Cancel',
+  //         buttonPositive: 'OK',
+  //       },
+  //     );
+
+  //     return (
+  //       grantedLocation &&
+  //       grantedBluetooth &&
+  //       grantedBluetoothAdmin &&
+  //       grantedBluetoothScan &&
+  //       grantedBluetoothConnect === PermissionsAndroid.RESULTS.GRANTED
+  //     );
+  //   } catch (error) {
+  //     console.error('Error requesting permissions:', error);
+  //     return false;
+  //   }
+  // };
+
   const scanDevices = async () => {
     try {
-      const myDevices = await ESPProvisionManager.searchESPDevices(
-        selectedPrefix,
-        ESPTransport.softap,
-        ESPSecurity.secure,
-      );
-      setDevices(myDevices);
+      if (granted) {
+        const myDevices = await ESPProvisionManager.searchESPDevices(
+          selectedPrefix,
+          ESPTransport.softap,
+          ESPSecurity.secure,
+        );
+        setDevices(myDevices);
+        console.log('Available Devices:', myDevices);
+      } else {
+        console.log('Some permissions are not granted.');
+      }
     } catch (error) {
       console.error('Error scanning devices:', error);
     }
   };
 
+  const renderDevice = ({item}: {item: ESPDevice}) => (
+    <Pressable
+      style={({pressed}) => [
+        {
+          borderWidth: pressed ? 1 : 0,
+          borderColor: theme.colors.primary,
+        },
+        styles.item,
+      ]}
+      onPress={() => {
+        setSelectedDevice(item);
+        console.log('Device Slected: ', selectedDevice);
+      }}>
+      <MyText size={25} text={prefix + '_' + item} />
+      {selectedDevice === item ? (
+        <MyCheckbox width={30} disabled value={true} />
+      ) : (
+        <View style={styles.cb} />
+      )}
+    </Pressable>
+  );
+
   const connectDevice = () => {
     device?.connect(pop);
-    console.log('connected:', device?.connected);
+    console.log('Is Device connected:', device?.connected);
     if (device?.connected) {
       scanWifiList();
     }
   };
+
+  const scanWifiList = async () => {
+    try {
+      const wifiList = await device?.scanWifiList();
+      console.log('wifi List: ', wifiList);
+      setNetworks(wifiList);
+    } catch (error) {
+      console.error('Error scanning WiFi list:', error);
+    }
+  };
+
+  const renderNetwork = ({item}: {item: ESPWifiList}) => (
+    <Pressable
+      style={({pressed}) => [
+        {
+          borderWidth: pressed ? 1 : 0,
+          borderColor: theme.colors.primary,
+        },
+        styles.item,
+      ]}
+      onPress={() => {
+        setStep(4);
+        setNetwork(item);
+        console.log('Selected Network: ', network);
+      }}
+      disabled={isLoading}>
+      <MyText size={25}>{item.ssid}</MyText>
+      {network?.ssid == item.ssid && isLoading && (
+        <View style={styles.network}>{renderConnectedTags()}</View>
+      )}
+    </Pressable>
+  );
 
   const connectNetwork = async () => {
     setIsLoading(true);
@@ -198,7 +345,7 @@ export default function DeviceSetup() {
         await device?.provision(ssid, passphrase);
         const data = JSON.stringify(device?.sendData('', ''));
         setData(data);
-
+        console.error('Provisioning Test: Pass');
         setIsLoading(false);
         setIsVisible(true);
       } else {
@@ -211,14 +358,12 @@ export default function DeviceSetup() {
     }
   };
 
-  const scanWifiList = async () => {
-    try {
-      const wifiList = await device?.scanWifiList();
-      console.log('wifi List: ', wifiList);
-      setNetworks(wifiList);
-    } catch (error) {
-      console.error('Error scanning WiFi list:', error);
+  const renderConnectedTags = () => {
+    const connectedTags = [];
+    for (let i = 0; i < animationIndex; i++) {
+      connectedTags.push(<Connected key={i} />);
     }
+    return connectedTags;
   };
 
   function renderStep() {
@@ -248,6 +393,7 @@ export default function DeviceSetup() {
               labelStyle={{fontSize: 18}}
               onPress={() => {
                 setPrefix(selectedPrefix);
+                scanDevices();
                 setStep(1);
               }}
             />
@@ -256,7 +402,6 @@ export default function DeviceSetup() {
       case 1:
         return (
           <>
-            {scanDevices()}
             <View style={{flexDirection: 'row', width: '100%'}}>
               <MyText
                 text="Device Prefix:  "
@@ -382,7 +527,6 @@ export default function DeviceSetup() {
                 width={120}
                 labelStyle={{fontSize: 20}}
                 onPress={() => {
-                  setConnecting(true);
                   connectNetwork();
                   setStep(3);
                 }}
