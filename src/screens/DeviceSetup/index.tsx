@@ -205,7 +205,7 @@ export default function DeviceSetup() {
         const myDevices = await ESPProvisionManager.searchESPDevices(
           selectedPrefix,
           ESPTransport.softap,
-          ESPSecurity.secure,
+          ESPSecurity.unsecure,
         );
         setDevices(myDevices);
         console.log('Available Devices:', myDevices);
@@ -228,7 +228,7 @@ export default function DeviceSetup() {
       ]}
       onPress={() => {
         setSelectedDevice(item);
-        console.log('Device Slected: ', selectedDevice);
+        console.log('Device Selected: ', selectedDevice);
       }}>
       <MyText size={25} text={prefix + '_' + item} />
       {selectedDevice === item ? (
@@ -239,11 +239,16 @@ export default function DeviceSetup() {
     </Pressable>
   );
 
-  const connectDevice = () => {
-    device?.connect(pop);
-    console.log('Is Device connected:', device?.connected);
-    if (device?.connected) {
-      scanWifiList();
+  const connectDevice = async () => {
+    try {
+      console.log('device: ', device, 'pop: ', pop);
+      const conn = await device?.connect(pop);
+      console.log('Is Device connected:', conn);
+      if (device?.connected) {
+        scanWifiList();
+      }
+    } catch (error) {
+      console.error('Error connecting to device:', error);
     }
   };
 
@@ -403,9 +408,9 @@ export default function DeviceSetup() {
               label="Next"
               style={{paddingHorizontal: 45}}
               labelStyle={{fontSize: 18}}
-              onPress={() => {
+              onPress={async () => {
                 setDevice(selectedDevice);
-                connectDevice();
+                await connectDevice();
                 setStep(3);
               }}
             />
