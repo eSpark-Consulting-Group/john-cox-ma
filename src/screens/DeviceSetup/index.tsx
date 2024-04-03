@@ -59,14 +59,11 @@ export default function DeviceSetup() {
   const [count, setCount] = useState(0);
 
   const prefixes = ['TIMESP', 'ABCSP1', 'XYZSP1', 'MNOSP1'];
-  // const devices = [' ', '1', '2', '3', '4'];
-  // const networks = ['Network1', 'Network2', 'Network3', 'Network4'];
 
   const [devices, setDevices] = useState<ESPDevice[]>();
   const [pop, setPop] = useState('');
   const [password, setPassword] = useState('');
   const [networks, setNetworks] = useState<ESPWifiList[]>();
-  const [data, setData] = useState<string>();
   const [granted, setGranted] = useState(false);
 
   async function requestPermissions() {
@@ -229,7 +226,7 @@ export default function DeviceSetup() {
       ]}
       onPress={() => {
         setSelectedDevice(item);
-        console.log('Device Selected: ', selectedDevice);
+        // console.log('Device Selected: ', selectedDevice);
       }}>
       <MyText size={25} text={prefix + '_' + item} />
       {selectedDevice === item ? (
