@@ -21,6 +21,7 @@ import {
   requestMultiple,
   checkMultiple,
 } from 'react-native-permissions';
+import WifiManager from 'react-native-wifi-reborn';
 
 import {
   GapView,
@@ -239,16 +240,31 @@ export default function DeviceSetup() {
     </Pressable>
   );
 
-  const connectDevice = async () => {
+  const connectDevice = async (device: any) => {
     try {
-      console.log('device: ', device, 'pop: ', pop);
-      const conn = await device?.connect(pop);
-      console.log('Is Device connected:', conn);
-      if (device?.connected) {
-        scanWifiList();
-      }
+      console.log('dev', device, 'pop: ', pop);
+
+      WifiManager.connectToProtectedSSID(device.name, '', false, false).then(
+        async a => {
+          console.log('Connected successfully!', a);
+          const dev = new ESPDevice({
+            ...device,
+            security: 1,
+          });
+          const connectedDev: any = await dev.connect(pop);
+          if (connectedDev?.status == 'connected') {
+            scanWifiList();
+            setStep(3);
+          } else {
+            console.log('Unable to connect');
+          }
+        },
+        e => {
+          console.log('Connection failed!', e);
+        },
+      );
     } catch (error) {
-      console.error('Error connecting to device:', error);
+      console.log(error);
     }
   };
 
@@ -293,7 +309,7 @@ export default function DeviceSetup() {
         await device?.provision(ssid, passphrase);
         const data = JSON.stringify(device?.sendData('', ''));
         setData(data);
-        console.error('Provisioning Test: Pass');
+        console.log('Provisioning Test: Pass');
         setIsLoading(false);
         setIsVisible(true);
       } else {
@@ -319,6 +335,7 @@ export default function DeviceSetup() {
       case 0:
         return (
           <>
+            <GapView length={15} />
             <MyText
               text="Select Device Prefix"
               size={24}
@@ -374,7 +391,7 @@ export default function DeviceSetup() {
                 showsVerticalScrollIndicator={false}
               />
             </MyCard>
-            <GapView length={120} />
+            <GapView length={90} />
             <MyButton
               label="Select"
               style={{paddingHorizontal: 45}}
@@ -395,6 +412,7 @@ export default function DeviceSetup() {
               fontFamily="NotoSans-Bold"
               style={styles.title}
             />
+            <GapView length={40} />
             <View style={styles.inputContainer}>
               <MyInput height={45} size={16} onChange={text => setPop(text)} />
               <MyText
@@ -409,9 +427,7 @@ export default function DeviceSetup() {
               style={{paddingHorizontal: 45}}
               labelStyle={{fontSize: 18}}
               onPress={async () => {
-                setDevice(selectedDevice);
-                await connectDevice();
-                setStep(3);
+                await connectDevice(device);
               }}
             />
             <GapView length={20} />
@@ -422,6 +438,7 @@ export default function DeviceSetup() {
               gradient
               style={{width: 150}}
             />
+            <GapView length={60} />
           </>
         );
       case 3:
@@ -442,7 +459,7 @@ export default function DeviceSetup() {
                 showsVerticalScrollIndicator={false}
               />
             </MyCard>
-            <GapView length={20} />
+            <GapView length={40} />
             <MyButton
               label="Back"
               labelStyle={{fontSize: 18}}
@@ -450,6 +467,7 @@ export default function DeviceSetup() {
               gradient
               style={{width: 150}}
             />
+            <GapView length={93} />
           </>
         );
       case 4:
@@ -481,11 +499,13 @@ export default function DeviceSetup() {
               />
               <GapView length={20} />
             </MyCard>
+            <GapView length={150} />
           </>
         );
       case 5:
         return (
           <>
+            <GapView length={60} />
             <MyText
               text="Do you want another network?"
               size={26}
@@ -494,7 +514,7 @@ export default function DeviceSetup() {
             <GapView length={85} />
             <View
               style={{
-                width: '43%',
+                width: '50%',
                 justifyContent: 'space-between',
                 flexDirection: 'row',
               }}>
@@ -515,6 +535,7 @@ export default function DeviceSetup() {
                 }}
               />
             </View>
+            <GapView length={220} />
           </>
         );
 
@@ -556,7 +577,7 @@ export default function DeviceSetup() {
 }
 
 const styles = StyleSheet.create({
-  main: {flex: 1, justifyContent: 'center', alignItems: 'center'},
+  main: {justifyContent: 'space-between', alignItems: 'center'},
   title: {alignSelf: 'flex-start', paddingLeft: 18, paddingBottom: 20},
   network: {flexDirection: 'row', gap: 3, alignItems: 'center'},
   item: {
@@ -572,7 +593,7 @@ const styles = StyleSheet.create({
   inputContainer: {width: '85%', paddingTop: 10},
   caption: {
     alignSelf: 'center',
-    paddingTop: 20,
+    paddingTop: 30,
     lineHeight: 30,
     width: '60%',
     textAlign: 'center',
