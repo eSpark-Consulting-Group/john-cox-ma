@@ -243,7 +243,6 @@ export default function DeviceSetup() {
   const connectDevice = async (device: any) => {
     try {
       console.log('dev', device, 'pop: ', pop);
-
       WifiManager.connectToProtectedSSID(device.name, '', false, false).then(
         async a => {
           console.log('Connected successfully!', a);
@@ -300,15 +299,25 @@ export default function DeviceSetup() {
     </Pressable>
   );
 
+  const sendDataToDev = async (data: string, device?: ESPDevice) => {
+    try {
+      const res = await device?.sendData('domain-name', data);
+      console.log('data sent? ', res);
+    } catch (error) {
+      console.error('Error sending data:', error);
+    }
+  };
+
   const connectNetwork = async () => {
     setIsLoading(true);
     try {
       if (network?.ssid) {
         const ssid = network.ssid;
         const passphrase = password;
+
+        await sendDataToDev('TEST DATA', device);
         await device?.provision(ssid, passphrase);
-        const data = JSON.stringify(device?.sendData('', ''));
-        setData(data);
+
         console.log('Provisioning Test: Pass');
         setIsLoading(false);
         setIsVisible(true);
