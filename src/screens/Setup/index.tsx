@@ -1,33 +1,21 @@
-import React, {useState} from 'react';
-import {
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-  Modal,
-  Pressable,
-  KeyboardAvoidingView,
-} from 'react-native';
+import React from 'react';
+import {ScrollView, StyleSheet, View, KeyboardAvoidingView} from 'react-native';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 
 import {
   GapView,
-  LabelInput,
   MyButton,
   MyCanvas,
   MyCard,
   MyFooter,
   MyHeader,
-  MyInput,
   MyText,
 } from '../../components';
 import {MyTheme} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
 import {Engines, temp} from '../../constants';
 import LabelDropdown from '../../components/LabelDropdown';
-import {Connected, Wifi} from '../../assets';
-import MyCheckbox from '../../components/MyCheckbox';
 
 type SetupScreenProps = NativeStackScreenProps<RootStackParamsList, 'Setup'>;
 
