@@ -12,6 +12,7 @@ export type MyTheme = Theme & {
     placeholder?: string;
     secondary: string;
     switch?: string;
+    proSecondary?: string;
     semiSecondary?: string;
     pale: string;
     paleBorder?: string;

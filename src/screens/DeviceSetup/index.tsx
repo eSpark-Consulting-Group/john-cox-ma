@@ -228,7 +228,7 @@ export default function DeviceSetup() {
         setSelectedDevice(item);
         // console.log('Device Selected: ', selectedDevice);
       }}>
-      <MyText size={25} text={prefix + '_' + item} />
+      <MyText size={25} text={item.name} />
       {selectedDevice === item ? (
         <MyCheckbox width={30} disabled value={true} />
       ) : (
@@ -277,11 +277,13 @@ export default function DeviceSetup() {
   const renderNetwork = ({item}: {item: ESPWifiList}) => (
     <Pressable
       style={({pressed}) => [
+        styles.item,
         {
           borderWidth: pressed ? 1 : 0,
           borderColor: theme.colors.primary,
+          paddingLeft: 10,
+          justifyContent: 'flex-start',
         },
-        styles.item,
       ]}
       onPress={() => {
         setStep(4);
@@ -289,6 +291,7 @@ export default function DeviceSetup() {
         console.log('Selected Network: ', network);
       }}
       disabled={isLoading}>
+      <Wifi />
       <MyText size={25}>{item.ssid}</MyText>
       {network?.ssid == item.ssid && isLoading && (
         <View style={styles.network}>{renderConnectedTags()}</View>
@@ -357,7 +360,7 @@ export default function DeviceSetup() {
                 showsVerticalScrollIndicator={false}
               />
             </MyCard>
-            <GapView length={120} />
+            <GapView length={40} />
             <MyButton
               label="Select"
               style={{paddingHorizontal: 45}}
@@ -367,7 +370,9 @@ export default function DeviceSetup() {
                 scanDevices();
                 setStep(1);
               }}
+              textColor={theme.colors.proSecondary}
             />
+            <GapView length={80} />
           </>
         );
       case 1:
@@ -397,7 +402,7 @@ export default function DeviceSetup() {
                 showsVerticalScrollIndicator={false}
               />
             </MyCard>
-            <GapView length={90} />
+            <GapView length={40} />
             <MyButton
               label="Select"
               style={{paddingHorizontal: 45}}
@@ -406,7 +411,9 @@ export default function DeviceSetup() {
                 setDevice(selectedDevice);
                 setStep(2);
               }}
+              textColor={theme.colors.proSecondary}
             />
+            <GapView length={50} />
           </>
         );
       case 2:
@@ -435,6 +442,7 @@ export default function DeviceSetup() {
               onPress={async () => {
                 await connectDevice(device);
               }}
+              textColor={theme.colors.proSecondary}
             />
             <GapView length={20} />
             <MyButton
@@ -594,7 +602,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 15,
   },
-  cb: {width: 20, height: 20},
+  cb: {width: 30, height: 30},
   flatlist: {height: 240, width: '100%'},
   inputContainer: {width: '85%', paddingTop: 10},
   caption: {
