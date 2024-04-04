@@ -11,10 +11,9 @@ import FMMSetup from '../screens/FMMSetup';
 import Main from '../screens/Main';
 import FuelTanks from '../screens/FuelTanks';
 import Trips from '../screens/Trips';
+import DeviceSetup from '../screens/DeviceSetup';
 
 import {DarkTheme} from '../theme';
-import Splash from '../screens/Splash';
-import DeviceSetup from '../screens/DeviceSetup';
 
 const RootStack = createNativeStackNavigator<RootStackParamsList>();
 
@@ -23,13 +22,6 @@ export default function RootNav() {
   return (
     <NavigationContainer theme={DarkTheme}>
       <RootStack.Navigator initialRouteName="DeviceSetup">
-        <RootStack.Screen
-          name="Splash"
-          component={Splash}
-          options={{
-            headerShown: false,
-          }}
-        />
         <RootStack.Screen
           name="DeviceSetup"
           component={DeviceSetup}

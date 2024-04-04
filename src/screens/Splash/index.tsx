@@ -33,13 +33,13 @@ export default function Splash() {
       }),
       Animated.parallel([
         Animated.timing(logoTranslateX, {
-          toValue: -400, // Move to left (adjust value for desired position)
+          toValue: -320, // Move to left (adjust value for desired position)
           duration: 3000, // Flying duration (3 seconds)
           easing: Easing.out(Easing.ease), // Smooth ease out for flying
           useNativeDriver: true,
         }),
         Animated.timing(logoTranslateY, {
-          toValue: -980, // Move slightly up (adjust value for desired position)
+          toValue: -900, // Move slightly up (adjust value for desired position)
           duration: 3000, // Flying duration (3 seconds)
           easing: Easing.out(Easing.ease), // Smooth ease out for flying
           useNativeDriver: true,
