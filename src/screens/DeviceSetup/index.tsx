@@ -25,6 +25,7 @@ import WifiManager from 'react-native-wifi-reborn';
 
 import {
   GapView,
+  Loader,
   MyButton,
   MyCanvas,
   MyCard,
@@ -53,10 +54,13 @@ export default function DeviceSetup() {
   const [device, setDevice] = useState<ESPDevice>();
   const [network, setNetwork] = useState<ESPWifiList>();
   const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [animationIndex, setAnimationIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const [animationInterval, setAnimationInterval] = useState<NodeJS.Timeout>();
   const [count, setCount] = useState(0);
+  const [error, setError] = useState<boolean>();
+  const [authError, setAuthError] = useState<boolean>();
 
   const prefixes = ['TIMESP', 'ABCSP1', 'XYZSP1', 'MNOSP1'];
 
@@ -145,7 +149,10 @@ export default function DeviceSetup() {
       }
     })();
   }, [count]);
-  useEffect(() => console.log('step: ', step), [step]);
+  useEffect(() => {
+    console.log('step: ', step);
+    setError(false);
+  }, [step]);
   useEffect(() => console.log('count: ', count), [count]);
 
   useEffect(() => {
@@ -199,6 +206,7 @@ export default function DeviceSetup() {
 
   const scanDevices = async () => {
     try {
+      setLoading(true); // Start loading
       if (granted) {
         const myDevices = await ESPProvisionManager.searchESPDevices(
           selectedPrefix,
@@ -212,6 +220,9 @@ export default function DeviceSetup() {
       }
     } catch (error) {
       console.error('Error scanning devices:', error);
+      setError(true);
+    } finally {
+      setLoading(false); // Stop loading
     }
   };
 
@@ -253,6 +264,7 @@ export default function DeviceSetup() {
             setStep(3);
           } else {
             console.log('Unable to connect');
+            setError(true);
           }
         },
         e => {
@@ -265,12 +277,15 @@ export default function DeviceSetup() {
   };
 
   const scanWifiList = async () => {
+    setLoading(true);
     try {
       const wifiList = await device?.scanWifiList();
       console.log('wifi List: ', wifiList);
       setNetworks(wifiList);
     } catch (error) {
       console.error('Error scanning WiFi list:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -316,17 +331,21 @@ export default function DeviceSetup() {
         const passphrase = password;
 
         await sendDataToDev('TEST DATA', device);
-        await device?.provision(ssid, passphrase);
-
-        console.log('Provisioning Test: Pass');
-        setIsLoading(false);
-        setIsVisible(true);
+        try {
+          await device?.provision(ssid, passphrase);
+          console.log('Provisioning Test: Pass');
+          setIsVisible(true);
+        } catch (provisionError) {
+          console.error('Error during device provisioning:', provisionError);
+          setAuthError(true);
+        }
       } else {
         console.error('Network SSID is undefined');
       }
-      setIsLoading(false);
     } catch (error) {
       console.error('Error during network provisioning:', error);
+      // setAuthError(true);
+    } finally {
       setIsLoading(false);
     }
   };
@@ -394,6 +413,22 @@ export default function DeviceSetup() {
               style={styles.title}
             />
             <MyCard>
+              {loading && (
+                <Loader
+                  size="large"
+                  style={{
+                    top: 115,
+                    position: 'absolute',
+                  }}
+                />
+              )}
+              {error && (
+                <MyText
+                  text={'DEvice not Found'}
+                  style={{top: 115, position: 'absolute'}}
+                  size={20}
+                />
+              )}
               <FlatList
                 data={devices} //devices
                 renderItem={renderDevice}
@@ -408,8 +443,10 @@ export default function DeviceSetup() {
               style={{paddingHorizontal: 45}}
               labelStyle={{fontSize: 18}}
               onPress={() => {
-                setDevice(selectedDevice);
-                setStep(2);
+                if (!error) {
+                  setDevice(selectedDevice);
+                  setStep(2);
+                }
               }}
               textColor={theme.colors.proSecondary}
             />
@@ -439,9 +476,7 @@ export default function DeviceSetup() {
               label="Next"
               style={{paddingHorizontal: 45}}
               labelStyle={{fontSize: 18}}
-              onPress={async () => {
-                await connectDevice(device);
-              }}
+              onPress={() => connectDevice(device)}
               textColor={theme.colors.proSecondary}
             />
             <GapView length={20} />
@@ -465,6 +500,22 @@ export default function DeviceSetup() {
               style={styles.title}
             />
             <MyCard>
+              {loading && (
+                <Loader
+                  size="large"
+                  style={{
+                    top: 115,
+                    position: 'absolute',
+                  }}
+                />
+              )}
+              {error && (
+                <MyText
+                  text={'Error Scanning Networks'}
+                  style={{top: 115, position: 'absolute'}}
+                  size={20}
+                />
+              )}
               <FlatList
                 data={networks}
                 renderItem={renderNetwork}
@@ -473,7 +524,18 @@ export default function DeviceSetup() {
                 showsVerticalScrollIndicator={false}
               />
             </MyCard>
-            <GapView length={40} />
+            {
+              <View style={{height: 20, width: '100%'}}>
+                {authError && (
+                  <MyText
+                    text={'Authentication Failed'}
+                    style={{top: 115, position: 'absolute'}}
+                    size={20}
+                  />
+                )}
+              </View>
+            }
+            <GapView length={20} />
             <MyButton
               label="Back"
               labelStyle={{fontSize: 18}}
