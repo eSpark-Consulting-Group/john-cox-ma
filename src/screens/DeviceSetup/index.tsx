@@ -425,6 +425,16 @@ export default function DeviceSetup() {
               }}
               textColor={theme.colors.proSecondary}
             />
+            {/* <MyButton
+              label="Skip Setup"
+              style={{paddingHorizontal: 45}}
+              labelStyle={{fontSize: 18}}
+              onPress={() => {
+                navigation.navigate('Main');
+                setStep(1);
+              }}
+              textColor={theme.colors.proSecondary}
+            /> */}
             <GapView length={80} />
           </>
         );
@@ -458,7 +468,7 @@ export default function DeviceSetup() {
               )}
               {error && (
                 <MyText
-                  text={'DEvice not Found'}
+                  text={'Device not Found'}
                   style={{top: 115, position: 'absolute'}}
                   size={20}
                 />
@@ -484,6 +494,7 @@ export default function DeviceSetup() {
               }}
               textColor={theme.colors.proSecondary}
             />
+
             <GapView length={50} />
           </>
         );
