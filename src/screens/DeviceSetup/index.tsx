@@ -237,7 +237,6 @@ export default function DeviceSetup() {
       ]}
       onPress={() => {
         setSelectedDevice(item);
-        // console.log('Device Selected: ', selectedDevice);
       }}>
       <MyText size={25} text={item.name} />
       {selectedDevice === item ? (
@@ -260,6 +259,7 @@ export default function DeviceSetup() {
           });
           const connectedDev: any = await dev.connect(pop);
           if (connectedDev?.status == 'connected') {
+            await sendingData();
             scanWifiList();
             setStep(3);
           } else {
@@ -276,6 +276,40 @@ export default function DeviceSetup() {
     }
   };
 
+  const sendingData = async () => {
+    try {
+      const res1 = await device?.sendData(
+        'domain-name',
+        JSON.stringify({type: 'domain_request'}),
+      );
+      console.log('response : ', res1);
+      if (res1) {
+        const res2 = JSON.parse(res1);
+        if (res2.domain_name == '') {
+          const res3 = await device?.sendData(
+            'domain-name',
+            JSON.stringify({type: 'domain_assignment', domain_name: 'timesp1'}),
+          );
+          console.log('domain assigned is NEW ------ ', res3);
+        } else if (res2.domain_name == 'timesp1') {
+          const res3 = await device?.sendData(
+            'domain-name',
+            JSON.stringify({type: 'domain_assignment', domain_name: 'timesp2'}),
+          );
+          console.log('domain assigned is ALTERNATE ------ ', res3);
+        } else if (res2.domain_name == 'timesp2') {
+          const res3 = await device?.sendData(
+            'domain-name',
+            JSON.stringify({type: 'domain_assignment', domain_name: 'timesp1'}),
+          );
+          console.log('domain assigned is ALTERNATE ------ ', res3);
+        }
+      }
+    } catch (error) {
+      console.error('Error requestiong domain:', error);
+    } finally {
+    }
+  };
   const scanWifiList = async () => {
     setLoading(true);
     try {
@@ -314,14 +348,14 @@ export default function DeviceSetup() {
     </Pressable>
   );
 
-  const sendDataToDev = async (data: string, device?: ESPDevice) => {
-    try {
-      const res = await device?.sendData('domain-name', data);
-      console.log('data sent? ', res);
-    } catch (error) {
-      console.error('Error sending data:', error);
-    }
-  };
+  // const sendDataToDev = async (data: string, device?: ESPDevice) => {
+  //   try {
+  //     const res = await device?.sendData('domain-name', data);
+  //     console.log('data sent? ', res);
+  //   } catch (error) {
+  //     console.error('Error sending data:', error);
+  //   }
+  // };
 
   const connectNetwork = async () => {
     setIsLoading(true);
@@ -330,7 +364,7 @@ export default function DeviceSetup() {
         const ssid = network.ssid;
         const passphrase = password;
 
-        await sendDataToDev('TEST DATA', device);
+        // await sendDataToDev('TEST DATA', device);
         try {
           await device?.provision(ssid, passphrase);
           console.log('Provisioning Test: Pass');
