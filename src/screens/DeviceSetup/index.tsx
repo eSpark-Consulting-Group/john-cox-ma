@@ -22,6 +22,7 @@ import {
   checkMultiple,
 } from 'react-native-permissions';
 import WifiManager from 'react-native-wifi-reborn';
+import * as FileSystem from 'expo-file-system';
 
 import {
   GapView,
@@ -38,6 +39,7 @@ import {
 import {MyTheme} from '../../types';
 import {Connected, Wifi} from '../../assets';
 import {RootStackParamsList} from '../../types/navigationParams';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type DeviceSetupScreenProps = NativeStackScreenProps<
   RootStackParamsList,
@@ -154,6 +156,18 @@ export default function DeviceSetup() {
     setError(false);
   }, [step]);
   useEffect(() => console.log('count: ', count), [count]);
+  async function checkCache() {
+    const data = await AsyncStorage.getItem('@dev1');
+    if (data) {
+      const result = JSON.parse(data);
+      console.log('Cached data:', result);
+    } else {
+      console.log('No data found in cache.');
+    }
+  }
+  useEffect(() => {
+    checkCache();
+  }, []);
 
   useEffect(() => {
     if (isLoading) {
@@ -276,31 +290,89 @@ export default function DeviceSetup() {
     }
   };
 
+  async function setDev1(res: string) {
+    try {
+      await AsyncStorage.setItem('@dev1', res);
+      console.log('cache updated...');
+      const cache = await AsyncStorage.getItem('@dev1');
+      console.log('cache Now--------', cache);
+    } catch (error) {
+      console.error('Error setting app opened flag:', error);
+    }
+  }
+
   const sendingData = async () => {
     try {
-      const res1 = await device?.sendData(
+      const res = await device?.sendData(
         'domain-name',
         JSON.stringify({type: 'domain_request'}),
       );
-      console.log('response : ', res1);
-      if (res1) {
-        const res2 = JSON.parse(res1);
-        if (res2.domain_name == '') {
+      console.log('response : ', res);
+      if (res) {
+        const res1 = JSON.parse(res);
+        if (res1.domain_name == '') {
+          //check cache
+          console.log('now checking cache');
+          const res2 = await AsyncStorage.getItem('@dev1');
+
+          if (Boolean(res2)) {
+            // its not an efficient logic to check if only based on null?
+            //assign from cache
+            const data = JSON.parse(res2!);
+            console.log('checking cache... ', data);
+
+            const res3 = await device?.sendData(
+              'domain-name',
+              JSON.stringify({
+                type: 'domain_assignment',
+                domain_name: data.domain_name,
+              }),
+            );
+            console.log('domain reassigned from cache...', res3);
+          }
+          //check fileSystem
+          //empty cache and empty file
+          // the naming res<number>
+          else {
+            //assign hardcoded timesp1
+            const res3 = await device?.sendData(
+              'domain-name',
+              JSON.stringify({
+                type: 'domain_assignment',
+                domain_name: 'timesp1',
+              }),
+            );
+            console.log('domain assigned is NEW timesp1 ------ ', res3);
+            const res3_JSON = JSON.parse(res3!);
+            if (res3_JSON.status == 'success') {
+              await setDev1(
+                JSON.stringify({
+                  macID: res3_JSON.mac_address,
+                  domain_name: 'timesp1',
+                }),
+              );
+            }
+            // const res4 = await device?.sendData(
+            //   'domain-name',
+            //   JSON.stringify({type: 'domain_request'}),
+            // );
+
+            // if (res4) {
+            //   await setDev1(res4);
+            //   console.log('domain now ------ ', res4); // we dont get the assigned domain here!
+            // }
+          }
+          // not relevant to our case!
+        } else if (res1.domain_name == 'timesp1') {
           const res3 = await device?.sendData(
             'domain-name',
             JSON.stringify({type: 'domain_assignment', domain_name: 'timesp1'}),
           );
-          console.log('domain assigned is NEW ------ ', res3);
-        } else if (res2.domain_name == 'timesp1') {
+          console.log('domain assigned is  ------ ', res3);
+        } else if (res1.domain_name == 'timesp2') {
           const res3 = await device?.sendData(
             'domain-name',
             JSON.stringify({type: 'domain_assignment', domain_name: 'timesp2'}),
-          );
-          console.log('domain assigned is ALTERNATE ------ ', res3);
-        } else if (res2.domain_name == 'timesp2') {
-          const res3 = await device?.sendData(
-            'domain-name',
-            JSON.stringify({type: 'domain_assignment', domain_name: 'timesp1'}),
           );
           console.log('domain assigned is ALTERNATE ------ ', res3);
         }
@@ -310,6 +382,40 @@ export default function DeviceSetup() {
     } finally {
     }
   };
+  // const sendingData = async () => {
+  //   try {
+  //     const res = await device?.sendData(
+  //       'domain-name',
+  //       JSON.stringify({type: 'domain_request'}),
+  //     );
+  //     console.log('response : ', res);
+  //     if (res) {
+  //       const res1 = JSON.parse(res);
+  //       if (res1.domain_name == '') {
+  //         const res3 = await device?.sendData(
+  //           'domain-name',
+  //           JSON.stringify({type: 'domain_assignment', domain_name: 'timesp1'}),
+  //         );
+  //         console.log('domain assigned is NEW ------ ', res3);
+  //       } else if (res1.domain_name == 'timesp1') {
+  //         const res3 = await device?.sendData(
+  //           'domain-name',
+  //           JSON.stringify({type: 'domain_assignment', domain_name: 'timesp2'}),
+  //         );
+  //         console.log('domain assigned is ALTERNATE ------ ', res3);
+  //       } else if (res1.domain_name == 'timesp2') {
+  //         const res3 = await device?.sendData(
+  //           'domain-name',
+  //           JSON.stringify({type: 'domain_assignment', domain_name: 'timesp1'}),
+  //         );
+  //         console.log('domain assigned is ALTERNATE ------ ', res3);
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.error('Error requestiong domain:', error);
+  //   } finally {
+  //   }
+  // };
   const scanWifiList = async () => {
     setLoading(true);
     try {
