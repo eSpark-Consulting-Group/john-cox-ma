@@ -102,6 +102,7 @@ async function checkAndAssignDomain(device: ESPDevice, domainName: string) {
   );
   console.log(`Domain assigned as ${domainName}:`, res);
   updateCacheDomain(device);
+  //   updateFiles(device);
 }
 
 async function updateCacheDomain(device: ESPDevice) {
@@ -112,6 +113,9 @@ async function updateCacheDomain(device: ESPDevice) {
   await setDev1(res!);
 }
 
+// async function updateFiles(device:ESPDevice){
+//     const res =
+// }
 async function handleDomainAssignment(device: ESPDevice, res1: any) {
   await checkCache(res1.mac_address);
 
@@ -123,6 +127,8 @@ async function handleDomainAssignment(device: ESPDevice, res1: any) {
       if (cachedData) {
         await checkAndAssignDomain(device, cachedData.domain_name);
       } else {
+        await request_Permissions(res1.mac_address);
+
         await checkAndAssignDomain(device, 'timesp1');
       }
 
@@ -155,7 +161,7 @@ export const sendingData = async (device: ESPDevice) => {
   }
 };
 
-export async function request_Permissions() {
+export async function request_Permissions(mac_address: string) {
   const res =
     await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
   console.log('permission response: ', res);
@@ -163,8 +169,41 @@ export async function request_Permissions() {
     const files = await FileSystem.StorageAccessFramework.readDirectoryAsync(
       res.directoryUri,
     );
-    console.log('existed?', files[0].includes('ViewA.txt'));
-    // check(res, files[0]);
+    console.log('existed?', files[0].includes(`${mac_address}.txt`));
+    checkFiles(res, files[0], mac_address);
+  }
+}
+
+async function checkFiles(
+  res: FileSystem.FileSystemRequestDirectoryPermissionsResult,
+  fileA: string,
+  mac_address: string,
+) {
+  try {
+    if (res.granted) {
+      if (!fileA.includes(`${mac_address}.txt`)) {
+        const dirInfo = await FileSystem.StorageAccessFramework.createFileAsync(
+          res.directoryUri,
+          `${mac_address}.txt`,
+          'text/plain',
+        );
+        console.log('created file', dirInfo);
+        // const info = await
+        const writeRes =
+          await FileSystem.StorageAccessFramework.writeAsStringAsync(
+            dirInfo,
+            'blue',
+            {encoding: 'utf8'},
+          );
+        console.log('what?', writeRes);
+      }
+      const readRes = await FileSystem.StorageAccessFramework.readAsStringAsync(
+        fileA,
+      );
+      console.log('bta', readRes);
+    }
+  } catch (err) {
+    console.log('error', err);
   }
 }
 
