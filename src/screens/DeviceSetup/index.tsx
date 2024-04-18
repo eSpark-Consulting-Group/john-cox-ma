@@ -16,13 +16,7 @@ import {
   ESPSecurity,
   ESPWifiList,
 } from '@espark-consultants/react-native-esp-idf-provisioning';
-import {
-  PERMISSIONS,
-  requestMultiple,
-  checkMultiple,
-} from 'react-native-permissions';
 import WifiManager from 'react-native-wifi-reborn';
-import * as FileSystem from 'expo-file-system';
 
 import {
   GapView,
