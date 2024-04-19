@@ -12,17 +12,15 @@ export async function requestPermissions() {
     const status = await requestMultiple([
       PERMISSIONS.ANDROID.BLUETOOTH_SCAN,
       PERMISSIONS.ANDROID.BLUETOOTH_CONNECT,
-      PERMISSIONS.ANDROID.BLUETOOTH_ADVERTISE,
       PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
     ]);
 
     console.log('Granted permissions:', status);
 
     if (
-      status[PERMISSIONS.ANDROID.BLUETOOTH_SCAN] &&
-      status[PERMISSIONS.ANDROID.BLUETOOTH_CONNECT] &&
-      status[PERMISSIONS.ANDROID.BLUETOOTH_ADVERTISE] &&
-      status[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION]
+      status[PERMISSIONS.ANDROID.BLUETOOTH_SCAN] == 'granted' &&
+      status[PERMISSIONS.ANDROID.BLUETOOTH_CONNECT] == 'granted' &&
+      status[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION] == 'granted'
     ) {
       console.log('All permissions granted.');
       return true;
@@ -41,16 +39,14 @@ export async function checkPermissions() {
     const status = await checkMultiple([
       PERMISSIONS.ANDROID.BLUETOOTH_SCAN,
       PERMISSIONS.ANDROID.BLUETOOTH_CONNECT,
-      PERMISSIONS.ANDROID.BLUETOOTH_ADVERTISE,
       PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
     ]);
     console.log('check Granted permissions:', status);
 
     if (
-      status[PERMISSIONS.ANDROID.BLUETOOTH_SCAN] &&
-      status[PERMISSIONS.ANDROID.BLUETOOTH_CONNECT] &&
-      status[PERMISSIONS.ANDROID.BLUETOOTH_ADVERTISE] &&
-      status[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION]
+      status[PERMISSIONS.ANDROID.BLUETOOTH_SCAN] == 'granted' &&
+      status[PERMISSIONS.ANDROID.BLUETOOTH_CONNECT] == 'granted' &&
+      status[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION] == 'granted'
     ) {
       console.log('check All permissions granted.');
       return true;
@@ -82,38 +78,29 @@ export const sendingData = async (device: ESPDevice) => {
 };
 
 async function handleDomainAssignment(device: ESPDevice, res1: any) {
-  await checkCache(res1.mac_address);
-
   switch (res1.domain_name) {
     case '':
       console.log('Checking cache and files...');
       const cachedData = await checkCache(res1.mac_address);
-      const filedData = await request_Permissions(
-        device,
-        res1.mac_address,
-        false,
-        true,
-      );
-
       if (cachedData) {
         await checkAndAssignDomain(device, cachedData.domain_name);
-      } else if (filedData) {
-        if (filedData) {
-          await checkAndAssignDomainFromFiles(filedData, device);
-        } else {
-          console.log('No data found in Files.');
-          return null;
-        }
+        await updateFile(res1.mac_address, device);
       } else {
-        await checkAndAssignDomain(device, 'timesp1');
+        const fileData = await checkFile(res1.mac_address);
+        if (fileData) {
+          const data = JSON.parse(fileData);
+          await checkAndAssignDomain(device, data.mac_address);
+        } else {
+          await checkAndAssignDomain(device, 'timesp1');
+          await updateFile(res1.mac_address, device);
+        }
       }
       break;
-
     case 'timesp1':
     case 'timesp2':
       console.log('domain received from device---', res1.domain_name);
       await checkAndAssignDomain(device, res1.domain_name);
-      await request_Permissions(device, res1.mac_address, true, false);
+      await updateFile(res1.mac_address, device);
       break;
 
     default:
@@ -121,90 +108,97 @@ async function handleDomainAssignment(device: ESPDevice, res1: any) {
   }
 }
 
-export async function request_Permissions(
-  device: ESPDevice,
-  mac_address: string,
-  update?: boolean,
-  readOnly?: boolean,
-) {
-  const res =
+// permissions + path only
+async function requstDirectoryPermission(mac_address: string) {
+  const permission =
     await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
-  console.log('permission response: ', res);
-  if (res.granted) {
-    const files = await FileSystem.StorageAccessFramework.readDirectoryAsync(
-      res.directoryUri,
+  console.log('Permission mili ? ', permission);
+  if (permission.granted) {
+    const path = await FileSystem.StorageAccessFramework.readDirectoryAsync(
+      permission.directoryUri,
     );
-    if (files && files.length > 0) {
-      console.log('existed?', files[0].includes(`${mac_address}.txt`));
-      const result = await checkFiles(
-        res,
-        files[0], // Ensure files[0] is valid before passing it to checkFiles
-        mac_address,
-        device,
-        update,
-        readOnly,
+    if (path && path.length > 0) {
+      console.log('path array?', path);
+      console.log(
+        'What is the macAddress????? => ',
+        mac_address.replace(':', '_'),
       );
-      return result;
+
+      const result = path.find(item =>
+        item.includes(`${mac_address.replaceAll(':', '_')}`),
+      );
+      console.log('found file in path?', result);
+
+      if (result) {
+        // console.log('File found:', result);
+        return [result, permission.directoryUri, permission.granted];
+      } else {
+        console.log('File not found in directory.');
+        return [path[0], permission.directoryUri, permission.granted]; // Or handle the case differently
+      }
     } else {
-      console.log('No files found in the directory.');
-      return null; // Return null or handle the case where no files are found
+      console.log('Directory is empty.');
+      return [path[0], permission.directoryUri, permission.granted]; // Or handle the case differently
     }
   }
 }
 
-async function checkFiles(
-  res: FileSystem.FileSystemRequestDirectoryPermissionsResult,
-  fileA: string,
-  mac_address: string,
-  device: ESPDevice,
-  update?: boolean,
-  readOnly?: boolean,
-) {
-  try {
-    if (res.granted) {
-      if ((!fileA.includes(`${mac_address}.txt`) || update) && !readOnly) {
-        const dirInfo = await FileSystem.StorageAccessFramework.createFileAsync(
-          res.directoryUri,
-          `${mac_address}.txt`,
-          'application/json',
-        );
-        console.log('created file', dirInfo);
-        const response = await device.sendData(
-          'domain-name',
-          JSON.stringify({type: 'domain_request'}),
-        );
-
-        const writeRes =
-          await FileSystem.StorageAccessFramework.writeAsStringAsync(
-            dirInfo,
-            response,
-            {encoding: 'utf8'},
-          );
-        console.log('what?', writeRes);
-      }
+//readOnly File
+async function checkFile(mac_address: string) {
+  const res = await requstDirectoryPermission(mac_address);
+  if (res && res[0] && res[2]) {
+    const filePath = res[0]?.toString();
+    if (filePath?.includes(`${mac_address.replaceAll(':', '_')}`)) {
       const readRes = await FileSystem.StorageAccessFramework.readAsStringAsync(
-        fileA,
+        filePath!,
       );
-      console.log('what is in the file?', readRes);
+      console.log('Data in the file: ', readRes);
       return readRes;
     }
-  } catch (err) {
-    console.log('error', err);
   }
 }
 
-async function checkAndAssignDomainFromFiles(data: string, device: ESPDevice) {
-  const result = await JSON.parse(data);
-  console.log('Filed data:', result);
-  const res = await device?.sendData(
-    'domain-name',
-    JSON.stringify({
-      type: 'domain_assignment',
-      domain_name: result.domain_name,
-    }),
+//update FIle
+async function updateFile(mac_address: string, device: ESPDevice) {
+  const res = await requstDirectoryPermission(mac_address);
+  if (res && res[1] && res[2]) {
+    const filePath = res[0]?.toString();
+    if (filePath?.includes(`${mac_address.replaceAll(':', '_')}`)) {
+      await FileSystem.StorageAccessFramework.deleteAsync(filePath!);
+      await createAndWriteFile(res[1].toString(), mac_address, device);
+
+      console.log('File updated --- ');
+    } else {
+      await createAndWriteFile(res[1].toString(), mac_address, device);
+      console.log('File created --- ');
+    }
+    const readRes = await FileSystem.StorageAccessFramework.readAsStringAsync(
+      filePath!,
+    );
+    console.log('File Now: ', readRes);
+  }
+}
+
+async function createAndWriteFile(
+  directoryUri: string,
+  mac_address: string,
+  device: ESPDevice,
+) {
+  const dirInfo = await FileSystem.StorageAccessFramework.createFileAsync(
+    directoryUri,
+    `${mac_address}.json`,
+    'application/json',
   );
-  console.log(`Domain assigned as ${result.domain_name}:`, res);
-  await request_Permissions(device, result.mac_address, true);
+  console.log('created file', dirInfo);
+  const response = await device.sendData(
+    'domain-name',
+    JSON.stringify({type: 'domain_request'}),
+  );
+  const writeRes = await FileSystem.StorageAccessFramework.writeAsStringAsync(
+    dirInfo,
+    response,
+    {encoding: 'utf8'},
+  );
 }
 
 export async function checkCache(mac_address: string) {
@@ -255,6 +249,90 @@ async function updateCacheDomain(device: ESPDevice) {
 }
 
 //DUMP
+// export async function request_Permissions(
+//   device: ESPDevice,
+//   mac_address: string,
+//   update?: boolean,
+//   readOnly?: boolean,
+// ) {
+//   const res =
+//     await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+//   console.log('permission response: ', res);
+//   if (res.granted) {
+//     const files = await FileSystem.StorageAccessFramework.readDirectoryAsync(
+//       res.directoryUri,
+//     );
+//     if (files && files.length > 0) {
+//       console.log('existed?', files[0].includes(`${mac_address}.txt`));
+//       const result = await checkFiles(
+//         res,
+//         files[0], // Ensure files[0] is valid before passing it to checkFiles
+//         mac_address,
+//         device,
+//         update,
+//         readOnly,
+//       );
+//       return result;
+//     } else {
+//       console.log('No files found in the directory.');
+//       return null; // Return null or handle the case where no files are found
+//     }
+//   }
+// }
+
+// async function checkFiles(
+//   res: FileSystem.FileSystemRequestDirectoryPermissionsResult,
+//   fileA: string,
+//   mac_address: string,
+//   device: ESPDevice,
+//   update?: boolean,
+//   readOnly?: boolean,
+// ) {
+//   try {
+//     if (res.granted) {
+//       if ((!fileA.includes(`${mac_address}.txt`) || update) && !readOnly) {
+//         const dirInfo = await FileSystem.StorageAccessFramework.createFileAsync(
+//           res.directoryUri,
+//           `${mac_address}.txt`,
+//           'application/json',
+//         );
+//         console.log('created file', dirInfo);
+//         const response = await device.sendData(
+//           'domain-name',
+//           JSON.stringify({type: 'domain_request'}),
+//         );
+
+//         const writeRes =
+//           await FileSystem.StorageAccessFramework.writeAsStringAsync(
+//             dirInfo,
+//             response,
+//             {encoding: 'utf8'},
+//           );
+//         console.log('what?', writeRes);
+//       }
+//       const readRes = await FileSystem.StorageAccessFramework.readAsStringAsync(
+//         fileA,
+//       );
+//       mac_address: string
+//     }
+//   } catch (err) {
+//     console.log('error', err);
+//   }
+// }
+
+// async function checkAndAssignDomainFromFiles(data: string, device: ESPDevice) {
+//   const result = await JSON.parse(data);
+//   console.log('Filed data:', result);
+//   const res = await device?.sendData(
+//     'domain-name',
+//     JSON.stringify({
+//       type: 'domain_assignment',
+//       domain_name: result.domain_name,
+//     }),
+//   );
+//   console.log(`Domain assigned as ${result.domain_name}:`, res);
+//   await request_Permissions(device, result.mac_address, true);
+// }
 
 // async function handleDomainAssignment(device: ESPDevice, res1: any) {
 //   await checkCache(res1.mac_address);
