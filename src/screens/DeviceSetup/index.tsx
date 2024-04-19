@@ -33,14 +33,7 @@ import {
 import {MyTheme} from '../../types';
 import {Connected, Wifi} from '../../assets';
 import {RootStackParamsList} from '../../types/navigationParams';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {
-  checkCache,
-  checkPermissions,
-  requestPermissions,
-  sendingData,
-  setDev1,
-} from './utils';
+import {checkPermissions, sendingData} from './utils';
 
 type DeviceSetupScreenProps = NativeStackScreenProps<
   RootStackParamsList,

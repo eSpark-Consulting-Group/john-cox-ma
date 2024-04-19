@@ -7,7 +7,7 @@ import {
 } from 'react-native-permissions';
 import * as FileSystem from 'expo-file-system';
 
-export async function requestPermissions() {
+async function requestPermissions() {
   try {
     const status = await requestMultiple([
       PERMISSIONS.ANDROID.BLUETOOTH_SCAN,
@@ -229,7 +229,7 @@ async function checkAndAssignDomain(device: ESPDevice, domainName: string) {
   updateCacheDomain(device);
 }
 
-export async function setDev1(res: string) {
+async function setDev1(res: string) {
   const res_JSON = JSON.parse(res);
   try {
     await AsyncStorage.setItem(res_JSON.mac_address, res);
