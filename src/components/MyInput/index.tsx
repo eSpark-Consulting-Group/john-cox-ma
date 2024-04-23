@@ -14,12 +14,13 @@ function MyInput({
   onFocus,
   size,
   placeholder,
+  value,
 }: MyInputProps) {
   const theme = useTheme() as MyTheme;
   return (
     <View style={styles({width, height}).container}>
       <TextInput
-        value={text!}
+        value={value ? value : text!}
         onChangeText={(val): void => onChange?.(val)}
         style={[
           styles({width, height}).InputStyle,

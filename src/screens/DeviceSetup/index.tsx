@@ -320,17 +320,17 @@ export default function DeviceSetup() {
               }}
               textColor={theme.colors.proSecondary}
             />
-            {/* <MyButton
+            <MyButton
               label="Skip Setup"
-              style={{paddingHorizontal: 45}}
+              style={{paddingHorizontal: 45, marginTop: 20}}
               labelStyle={{fontSize: 18}}
               onPress={() => {
-                navigation.navigate('Main');
+                navigation.navigate('Test');
                 setStep(1);
               }}
               textColor={theme.colors.proSecondary}
-            /> */}
-            <GapView length={80} />
+            />
+            <GapView length={40} />
           </>
         );
       case 1:
@@ -538,7 +538,8 @@ export default function DeviceSetup() {
                 label="NO"
                 labelStyle={{fontSize: 20}}
                 onPress={() => {
-                  navigation.navigate('Main');
+                  // navigation.navigate('Main');
+                  navigation.navigate('Test');
                   setStep(1);
                 }}
               />

@@ -1,6 +1,7 @@
 import {NavigatorScreenParams} from '@react-navigation/native';
 
 export type RootStackParamsList = {
+  Test: undefined;
   Splash: undefined;
   DeviceSetup: undefined;
   Main: undefined;

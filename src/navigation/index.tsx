@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {StyleSheet} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
@@ -14,10 +14,12 @@ import Trips from '../screens/Trips';
 import DeviceSetup from '../screens/DeviceSetup';
 
 import {DarkTheme} from '../theme';
+import Test from '../screens/TestScreen';
 
 const RootStack = createNativeStackNavigator<RootStackParamsList>();
 
 export default function RootNav() {
+  // const [initialRoute, setInitialRoute] = useState('DeviceSetup');
   useEffect(() => {}, []);
   return (
     <NavigationContainer theme={DarkTheme}>
@@ -25,6 +27,13 @@ export default function RootNav() {
         <RootStack.Screen
           name="DeviceSetup"
           component={DeviceSetup}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <RootStack.Screen
+          name="Test"
+          component={Test}
           options={{
             headerShown: false,
           }}
