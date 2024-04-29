@@ -1,19 +1,27 @@
 import {
   ActivityIndicator,
   Button,
+  Linking,
   StyleSheet,
   Text,
   TextInput,
   View,
+  AppState,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {fetch} from 'react-native-ssl-pinning';
+import RNBootSplash from 'react-native-bootsplash';
 
 export default function App() {
   const [url, setUrl] = useState('');
   const [response, setResponse] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const {appStateVisible} = useAppState();
+
+  useEffect(() => {
+    RNBootSplash.hide();
+  }, []);
 
   const getData = (url: string) => {
     console.log(url);
@@ -46,6 +54,16 @@ export default function App() {
       });
   };
 
+  const handleOpenWifiSettingsAndroid = () => {
+    try {
+      const intent = 'android.settings.WIFI_SETTINGS';
+      Linking.sendIntent(intent);
+      console.log('appstate', appStateVisible);
+    } catch (error) {
+      console.log('Error opening Wi-Fi settings:', error);
+    }
+  };
+
   return (
     <View style={{gap: 10}}>
       <Text style={{fontSize: 20}}>Enter Url</Text>
@@ -62,7 +80,13 @@ export default function App() {
           width: '80%',
         }}
       />
-      <Button title="Press Me" onPress={() => getData(url)} />
+      <Button
+        title="Press Me"
+        onPress={() => {
+          handleOpenWifiSettingsAndroid();
+          console.log('chala ha?');
+        }}
+      />
       {loading && <ActivityIndicator size={'large'} color={'#61afef'} />}
       <Text style={{fontSize: 14}}>Response: {response}</Text>
       <Text>
@@ -71,5 +95,31 @@ export default function App() {
     </View>
   );
 }
+
+const useAppState = () => {
+  const appState = useRef(AppState.currentState);
+  const [appStateVisible, setAppStateVisible] = useState(appState.current);
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', nextAppState => {
+      if (
+        appState.current.match(/inactive|background/) &&
+        nextAppState === 'active'
+      ) {
+        console.log('App has come to the foreground!');
+      }
+
+      appState.current = nextAppState;
+      setAppStateVisible(appState.current);
+      console.log('AppState', appState.current);
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+
+  return {appStateVisible};
+};
 
 const styles = StyleSheet.create({});
