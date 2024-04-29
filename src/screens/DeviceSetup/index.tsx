@@ -34,6 +34,7 @@ import {MyTheme} from '../../types';
 import {Connected, Wifi} from '../../assets';
 import {RootStackParamsList} from '../../types/navigationParams';
 import {checkPermissions, sendingData} from './utils';
+import {err} from 'react-native-svg';
 
 type DeviceSetupScreenProps = NativeStackScreenProps<
   RootStackParamsList,
@@ -57,6 +58,7 @@ export default function DeviceSetup() {
   const [count, setCount] = useState(0);
   const [error, setError] = useState<boolean>();
   const [authError, setAuthError] = useState<boolean>();
+  const [logs, setLogs] = useState('');
 
   const prefixes = ['TIMESP', 'ABCSP1', 'XYZSP1', 'MNOSP1'];
 
@@ -189,32 +191,76 @@ export default function DeviceSetup() {
 
   const connectDevice = async (device: any) => {
     try {
-      console.log('dev', device, 'pop: ', pop);
+      setLogs('Starting connection process...');
+      console.log('Device:', device);
+      console.log('Product key:', 'abcd1234');
+
       WifiManager.connectToProtectedSSID(device.name, '', false, false).then(
         async a => {
-          console.log('Connected successfully!', a);
+          setLogs('Connected successfully!');
           const dev = new ESPDevice({
             ...device,
             security: 1,
           });
-          const connectedDev: any = await dev.connect(pop);
+          console.log('ESPDevice:', dev);
+          setLogs('ESPDevice ' + dev);
+
+          const connectedDev: any = await dev.connect('abcd1234');
+          setLogs('Connected device:' + connectedDev);
+
           if (connectedDev?.status == 'connected') {
-            await sendingData(device);
+            setLogs('Device connected successfully:' + connectedDev);
+            const res = await sendingData(device);
+            setLogs(res!);
             scanWifiList();
+            console.log('Scanned Wi-Fi list.');
             setStep(3);
+            console.log('Set step to 3.');
           } else {
             console.log('Unable to connect');
             setError(true);
+            setLogs('Unable to connect');
           }
         },
         e => {
           console.log('Connection failed!', e);
+          setLogs(e);
         },
       );
     } catch (error) {
-      console.log(error);
+      console.log('Error:', error);
+      setLogs('Some Error');
     }
   };
+
+  // const connectDevice = async (device: any) => {
+  //   try {
+  //     console.log('dev', device, 'pop: ', 'abcd1234');
+  //     WifiManager.connectToProtectedSSID(device.name, '', false, false).then(
+  //       async a => {
+  //         console.log('Connected successfully!', a);
+  //         const dev = new ESPDevice({
+  //           ...device,
+  //           security: 1,
+  //         });
+  //         const connectedDev: any = await dev.connect('abcd1234');
+  //         if (connectedDev?.status == 'connected') {
+  //           await sendingData(device);
+  //           scanWifiList();
+  //           setStep(3);
+  //         } else {
+  //           console.log('Unable to connect');
+  //           setError(true);
+  //         }
+  //       },
+  //       e => {
+  //         console.log('Connection failed!', e);
+  //       },
+  //     );
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   const scanWifiList = async () => {
     setLoading(true);
@@ -419,7 +465,8 @@ export default function DeviceSetup() {
               onPress={() => connectDevice(device)}
               textColor={theme.colors.proSecondary}
             />
-            <GapView length={20} />
+            <MyText size={15}>{logs}</MyText>
+            <GapView length={5} />
             <MyButton
               label="Back"
               labelStyle={{fontSize: 18}}

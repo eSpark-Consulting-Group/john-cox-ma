@@ -6,6 +6,7 @@ import {
   checkMultiple,
 } from 'react-native-permissions';
 import * as FileSystem from 'expo-file-system';
+import {err} from 'react-native-svg';
 
 async function requestPermissions() {
   try {
@@ -71,9 +72,11 @@ export const sendingData = async (device: ESPDevice) => {
     if (res) {
       const res1 = JSON.parse(res);
       await handleDomainAssignment(device, res1);
+      return res;
     }
   } catch (error) {
     console.error('Error sending data:', error);
+    return 'error sending data';
   }
 };
 
