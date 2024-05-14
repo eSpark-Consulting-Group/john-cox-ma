@@ -10,12 +10,25 @@ interface MyBoxProps {
   label?: string;
   text?: string | number;
   unit?: string;
-  value?: number;
+  value?: number | string;
   width?: DimensionValue;
   gap?: number;
+  textSize?: number;
+  valueSize?: number;
+  unitSize?: number;
 }
 
-function MyBox({label, text, unit, value, width, gap}: MyBoxProps) {
+function MyBox({
+  label,
+  text,
+  unit,
+  value,
+  width,
+  gap,
+  textSize,
+  unitSize,
+  valueSize,
+}: MyBoxProps) {
   const theme = useTheme() as MyTheme;
   return (
     <View style={{width: width ? width : '100%', paddingVertical: 4}}>
@@ -33,14 +46,22 @@ function MyBox({label, text, unit, value, width, gap}: MyBoxProps) {
           styles.box,
           {gap: gap ? gap : 15, borderColor: theme.colors.box},
         ]}>
-        <MyText textColor={theme.colors.secondary} size={20}>
+        <MyText
+          textColor={theme.colors.secondary}
+          size={textSize ? textSize : 20}>
           {text}
         </MyText>
         <View style={styles.valueContainer}>
-          <MyText fontFamily="NotoSans-Bold" style={styles.value} size={28}>
+          <MyText
+            fontFamily="NotoSans-Bold"
+            style={styles.value}
+            size={valueSize ? valueSize : 28}>
             {value}
           </MyText>
-          <MyText style={styles.unit} fontFamily="NotoSans-Regular" size={16}>
+          <MyText
+            style={styles.unit}
+            fontFamily="NotoSans-Regular"
+            size={unitSize ? unitSize : 16}>
             {unit}
           </MyText>
         </View>

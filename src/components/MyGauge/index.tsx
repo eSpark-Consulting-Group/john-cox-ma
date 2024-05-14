@@ -75,7 +75,7 @@ const styles = (theme?: MyTheme) =>
       justifyContent: 'center',
       gap: 5,
       borderWidth: 2,
-      borderColor: theme?.colors.paleBorder,
+      borderColor: theme?.colors.box,
       paddingHorizontal: 1,
       paddingVertical: 5,
       width: 175,

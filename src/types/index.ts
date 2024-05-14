@@ -12,6 +12,7 @@ export type MyTheme = Theme & {
     placeholder?: string;
     secondary: string;
     switch?: string;
+    proSecondary?: string;
     semiSecondary?: string;
     pale: string;
     paleBorder?: string;
@@ -63,10 +64,14 @@ export interface MyInputProps {
   height?: DimensionValue | any;
   password?: boolean;
   onFocus?: () => void;
+  size?: number;
+  placeholder?: string;
+  value?: string;
 }
 
 export interface LabelInputProps {
   text: string;
+  placeholder?: string;
   subText?: string;
   size?: number;
   checkbox?: boolean;
