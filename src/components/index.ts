@@ -15,3 +15,4 @@ export {default as MyCheckbox} from './MyCheckbox';
 export {default as MyGauge} from './MyGauge';
 export {default as ScaleTanks} from './ScaleTanks';
 export {default as MyCanvas} from './MyCanvas';
+export {default as Loader} from './Loader';

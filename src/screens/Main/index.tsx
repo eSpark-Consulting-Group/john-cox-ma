@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import {ScrollView, StyleSheet, View} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {KeyboardAvoidingView, ScrollView, StyleSheet, View} from 'react-native';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 
@@ -15,6 +15,7 @@ import {
 } from '../../components';
 import {MyTheme} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
+import {api} from '../../api';
 
 type MainScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 
@@ -22,6 +23,7 @@ export default function Main() {
   const theme = useTheme() as MyTheme;
   const navigation = useNavigation<MainScreenProps['navigation']>();
   const [generatorRunning, setGeneratorRunning] = useState<'Yes' | 'No'>('Yes');
+  const [confirmation, setConfirmation] = useState(false);
 
   const toggleGeneratorRunning = () => {
     setGeneratorRunning(generatorRunning === 'Yes' ? 'No' : 'Yes');
@@ -50,91 +52,174 @@ export default function Main() {
     },
   ];
 
+  // const fetchData = async () => {
+  //   try {
+  //     const res = await api.get(
+  //       'https://virtserver.swaggerhub.com/AbeerUlHaq/JohnCox/1.0.0/getSensorData',
+  //     );
+
+  //     if (res.status === 200) {
+  //       console.log('Success:', res.data); // Assuming the response data is in the 'data' property
+  //     } else if (res.status === 404) {
+  //       console.error('Not Found:', res.status);
+  //     } else if (res.status === 500) {
+  //       console.error('Internal Server Error:', res.status);
+  //     } else {
+  //       console.error('Unexpected Error:', res.status);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error fetching data:', error);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   fetchData();
+  // }, []);
+
   return (
     <MyCanvas>
       <ScrollView
-        contentContainerStyle={styles().screen}
+        contentContainerStyle={[styles().screen, {flex: confirmation ? 1 : 0}]}
         showsVerticalScrollIndicator={false}>
         <MyHeader />
-        <GapView length={90} />
-        <View style={styles().GaugeRow}>
-          <MyGauge value={0} name="Engine1" />
-          <MyGauge value={300} name="Engine2" />
-        </View>
-        <GapView length={20} />
-        <View style={styles().GaugeRow}>
-          <MyGauge value={150} name="Engine3" />
-          <MyGauge value={250} name="Engine4" />
-        </View>
-        <GapView length={20} />
-        <View style={styles().container}>
-          <View style={styles().row}>
-            <MyBox
-              label="Efficiency"
-              text="Speed"
-              value={25.4}
-              unit="Knots"
-              width={'50%'}
-              gap={22}
-            />
-            <View style={styles().fuelBurn}>
-              <MyBox
-                text="Total Fuel Burn"
-                value={102.1}
-                unit="gal/hr"
-                width={'100%'}
-                gap={1}
-              />
-            </View>
-          </View>
-          <MyBox text="Gallons per Nautical mile" value={4.17} width={'70%'} />
-          <View style={styles().range}>
-            <View style={{width: '50%'}}>
-              <MyBox
-                label="Range"
-                text="Fuel Remaining"
-                value={854}
-                unit="gal"
-              />
-            </View>
-            <View style={{width: '40%'}}>
-              <View style={styles().box}>
-                <MyText
-                  text="Generator Running"
-                  textColor={theme.colors.secondary}
-                  size={18}
-                />
-                <MyButton
-                  gradient
-                  label={generatorRunning}
-                  onPress={toggleGeneratorRunning}
-                  labelStyle={{fontSize: 20}}
-                />
-              </View>
-            </View>
-          </View>
-          <MyBox
-            text="Distance to Empty"
-            value={205}
-            unit="N.Mile"
-            width={'70%'}
-          />
-        </View>
 
-        <GapView length={20} />
-        <View style={styles().buttons}>
-          {buttonsData.map((item, index) => (
-            <MyButton
-              key={index.toString()}
-              gradient
-              style={{width: '22%'}}
-              label={item.label}
-              labelStyle={item.labelStyle}
-              onPress={item.onPress}
+        {confirmation ? (
+          <>
+            <MyText
+              text="Are you sure you want to Re-provision?"
+              size={26}
+              style={styles().caption}
             />
-          ))}
-        </View>
-        <GapView length={70} />
+            <MyText
+              text="This will let you go through the process again"
+              textColor={theme.colors.secondary}
+              style={styles().subCaption}
+            />
+            <GapView length={55} />
+            <View
+              style={{
+                width: '43%',
+                justifyContent: 'space-between',
+                flexDirection: 'row',
+              }}>
+              <MyButton
+                label="NO"
+                labelStyle={{fontSize: 20}}
+                onPress={() => {
+                  setConfirmation(false);
+                  navigation.navigate('Main');
+                }}
+              />
+              <MyButton
+                label="YES"
+                labelStyle={{fontSize: 20}}
+                textColor={'red'}
+                onPress={() => {
+                  setConfirmation(false);
+                  navigation.navigate('DeviceSetup');
+                }}
+              />
+            </View>
+            <GapView length={90} />
+          </>
+        ) : (
+          <>
+            <GapView length={90} />
+            <View style={styles().GaugeRow}>
+              <MyGauge value={0} name="Engine1" />
+              <MyGauge value={300} name="Engine2" />
+            </View>
+            <GapView length={20} />
+            <View style={styles().GaugeRow}>
+              <MyGauge value={150} name="Engine3" />
+              <MyGauge value={250} name="Engine4" />
+            </View>
+            <GapView length={20} />
+            <View style={styles().container}>
+              <View style={styles().row}>
+                <MyBox
+                  label="Efficiency"
+                  text="Speed"
+                  value={25.4}
+                  unit="Knots"
+                  width={'50%'}
+                  gap={22}
+                />
+                <View style={styles().fuelBurn}>
+                  <MyBox
+                    text="Total Fuel Burn"
+                    value={102.1}
+                    unit="gal/hr"
+                    width={'100%'}
+                    gap={1}
+                  />
+                </View>
+              </View>
+              <MyBox
+                text="Gallons per Nautical mile"
+                value={4.17}
+                width={'70%'}
+              />
+              <View style={styles().range}>
+                <View style={{width: '50%'}}>
+                  <MyBox
+                    label="Range"
+                    text="Fuel Remaining"
+                    value={854}
+                    unit="gal"
+                  />
+                </View>
+                <View style={{width: '40%'}}>
+                  <View style={styles().box}>
+                    <MyText
+                      text="Generator Running"
+                      textColor={theme.colors.secondary}
+                      size={18}
+                    />
+                    <MyButton
+                      gradient
+                      label={generatorRunning}
+                      onPress={toggleGeneratorRunning}
+                      labelStyle={{fontSize: 20}}
+                    />
+                  </View>
+                </View>
+              </View>
+              <MyBox
+                text="Distance to Empty"
+                value={205}
+                unit="N.Mile"
+                width={'70%'}
+              />
+            </View>
+
+            <GapView length={40} />
+            <View style={styles().buttons}>
+              {buttonsData.map((item, index) => (
+                <MyButton
+                  key={index.toString()}
+                  gradient
+                  style={{width: '22%'}}
+                  label={item.label}
+                  labelStyle={item.labelStyle}
+                  onPress={item.onPress}
+                />
+              ))}
+            </View>
+            <GapView length={40} />
+            <MyButton
+              label="Re-Provision"
+              labelStyle={{fontSize: 18}}
+              onPress={() => {
+                setConfirmation(true);
+                // navigation.navigate('DeviceSetup');
+                // console.log('Device Setup pe jayein');
+              }}
+            />
+            <GapView length={70} />
+          </>
+        )}
+
         <MyFooter />
       </ScrollView>
     </MyCanvas>
@@ -170,7 +255,6 @@ const styles = (theme?: MyTheme) =>
       flexDirection: 'row',
       width: '90%',
       justifyContent: 'space-between',
-      paddingBottom: 10,
     },
     GaugeRow: {
       flexDirection: 'row',
@@ -178,4 +262,13 @@ const styles = (theme?: MyTheme) =>
       justifyContent: 'space-evenly',
       width: '100%',
     },
+    caption: {
+      alignSelf: 'center',
+      paddingVertical: 20,
+      lineHeight: 30,
+      width: '60%',
+      textAlign: 'center',
+      letterSpacing: 1,
+    },
+    subCaption: {alignSelf: 'center', textAlign: 'center', width: '75%'},
   });

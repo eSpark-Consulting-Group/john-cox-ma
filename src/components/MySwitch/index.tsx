@@ -1,4 +1,4 @@
-import React, {memo, useState} from 'react';
+import React, {memo} from 'react';
 import {TouchableOpacity, StyleSheet} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import {LinearGradient} from 'expo-linear-gradient';

@@ -7,6 +7,7 @@ const colors = {
     background: '#FFFFFF',
     text: '#4BDB07',
     switch: '#ffff00',
+    proSecondary: '#0E3D5F',
     semiSecondary: '#066DB8',
     pale: '#B9F29E',
     paleBorder: '#88B6D8',
@@ -17,6 +18,7 @@ const colors = {
   dark: {
     primary: '#4BDB07',
     secondary: '#3CA9F9',
+    proSecondary: '#0E3D5F',
     background: '#090824',
     text: '#4BDB07',
     switch: '#ffff00',

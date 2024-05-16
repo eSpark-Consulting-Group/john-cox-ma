@@ -1,5 +1,5 @@
-import React, {useEffect} from 'react';
-import {ImageBackground, StyleSheet, View} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {StyleSheet} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
@@ -11,20 +11,29 @@ import FMMSetup from '../screens/FMMSetup';
 import Main from '../screens/Main';
 import FuelTanks from '../screens/FuelTanks';
 import Trips from '../screens/Trips';
+import DeviceSetup from '../screens/DeviceSetup';
 
 import {DarkTheme} from '../theme';
-import Splash from '../screens/Splash';
+import Test from '../screens/TestScreen';
 
 const RootStack = createNativeStackNavigator<RootStackParamsList>();
 
 export default function RootNav() {
+  // const [initialRoute, setInitialRoute] = useState('DeviceSetup');
   useEffect(() => {}, []);
   return (
     <NavigationContainer theme={DarkTheme}>
-      <RootStack.Navigator initialRouteName="Main">
+      <RootStack.Navigator initialRouteName="DeviceSetup">
         <RootStack.Screen
-          name="Splash"
-          component={Splash}
+          name="DeviceSetup"
+          component={DeviceSetup}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <RootStack.Screen
+          name="Test"
+          component={Test}
           options={{
             headerShown: false,
           }}

@@ -12,21 +12,27 @@ function MyInput({
   height,
   password,
   onFocus,
+  size,
+  placeholder,
+  value,
 }: MyInputProps) {
   const theme = useTheme() as MyTheme;
   return (
     <View style={styles({width, height}).container}>
       <TextInput
-        value={text!}
+        value={value ? value : text!}
         onChangeText={(val): void => onChange?.(val)}
         style={[
           styles({width, height}).InputStyle,
           {
             color: theme.colors.primary,
+            fontSize: size,
           },
         ]}
         secureTextEntry={password}
         onFocus={onFocus}
+        placeholder={placeholder}
+        placeholderTextColor={theme.colors.primary}
       />
       <LinearGradient
         colors={['#72e14d89', 'transparent']}
@@ -74,7 +80,7 @@ const styles = ({
       fontSize: 12,
       zIndex: 20,
       paddingVertical: 0,
-      paddingHorizontal: 10,
+      paddingHorizontal: 20,
     },
     outerGradient: {
       ...StyleSheet.absoluteFillObject,
