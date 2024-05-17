@@ -29,7 +29,7 @@ export default function Test() {
       },
     })
       .then(response => {
-        console.log(`response received ${response}`);
+        console.log(`response received ${JSON.stringify(response)}`);
         setResponse(JSON.stringify(response));
         setLoading(false);
       })
@@ -48,7 +48,7 @@ export default function Test() {
         <MyInput
           value={url}
           placeholder="Enter Url"
-          onChangeText={val => setUrl(val)}
+          onChange={val => setUrl(val)}
           width={310}
           height={40}
         />
