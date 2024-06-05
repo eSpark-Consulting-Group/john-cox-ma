@@ -92,7 +92,7 @@ async function handleDomainAssignment(device: ESPDevice, res1: any) {
         const fileData = await checkFile(res1.mac_address);
         if (fileData) {
           const data = JSON.parse(fileData);
-          await checkAndAssignDomain(device, data.mac_address);
+          await checkAndAssignDomain(device, data.domain_name);
         } else {
           await checkAndAssignDomain(device, 'timesp1');
           await updateFile(res1.mac_address, device);
