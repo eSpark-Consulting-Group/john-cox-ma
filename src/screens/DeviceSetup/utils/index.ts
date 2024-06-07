@@ -6,7 +6,6 @@ import {
   checkMultiple,
 } from 'react-native-permissions';
 import * as FileSystem from 'expo-file-system';
-import {err} from 'react-native-svg';
 
 async function requestPermissions() {
   try {
@@ -111,12 +110,30 @@ async function handleDomainAssignment(device: ESPDevice, res1: any) {
   }
 }
 
+let cachedPermission: {
+  directoryUri: string;
+  granted: boolean;
+} | null = null;
+
+async function requestDirectoryPermission() {
+  if (!cachedPermission || !cachedPermission.granted) {
+    const permission =
+      await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+    console.log('Permission granted? ', permission);
+    if (permission.granted) {
+      cachedPermission = {
+        directoryUri: permission.directoryUri,
+        granted: permission.granted,
+      };
+    }
+  }
+  return cachedPermission;
+}
+
 // permissions + path only
-async function requstDirectoryPermission(mac_address: string) {
-  const permission =
-    await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
-  console.log('Permission mili ? ', permission);
-  if (permission.granted) {
+async function checkDirectoryPermission(mac_address: string) {
+  const permission = await requestDirectoryPermission();
+  if (permission && permission.granted) {
     const path = await FileSystem.StorageAccessFramework.readDirectoryAsync(
       permission.directoryUri,
     );
@@ -147,7 +164,7 @@ async function requstDirectoryPermission(mac_address: string) {
 
 //readOnly File
 async function checkFile(mac_address: string) {
-  const res = await requstDirectoryPermission(mac_address);
+  const res = await checkDirectoryPermission(mac_address);
   if (res && res[0] && res[2]) {
     const filePath = res[0]?.toString();
     if (filePath?.includes(`${mac_address.replaceAll(':', '_')}`)) {
@@ -162,7 +179,7 @@ async function checkFile(mac_address: string) {
 
 //update FIle
 async function updateFile(mac_address: string, device: ESPDevice) {
-  const res = await requstDirectoryPermission(mac_address);
+  const res = await checkDirectoryPermission(mac_address);
   if (res && res[1] && res[2]) {
     const filePath = res[0]?.toString();
     if (filePath?.includes(`${mac_address.replaceAll(':', '_')}`)) {

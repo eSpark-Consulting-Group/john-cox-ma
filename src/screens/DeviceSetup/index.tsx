@@ -233,35 +233,6 @@ export default function DeviceSetup() {
     }
   };
 
-  // const connectDevice = async (device: any) => {
-  //   try {
-  //     console.log('dev', device, 'pop: ', 'abcd1234');
-  //     WifiManager.connectToProtectedSSID(device.name, '', false, false).then(
-  //       async a => {
-  //         console.log('Connected successfully!', a);
-  //         const dev = new ESPDevice({
-  //           ...device,
-  //           security: 1,
-  //         });
-  //         const connectedDev: any = await dev.connect('abcd1234');
-  //         if (connectedDev?.status == 'connected') {
-  //           await sendingData(device);
-  //           scanWifiList();
-  //           setStep(3);
-  //         } else {
-  //           console.log('Unable to connect');
-  //           setError(true);
-  //         }
-  //       },
-  //       e => {
-  //         console.log('Connection failed!', e);
-  //       },
-  //     );
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
-
   const scanWifiList = async () => {
     setLoading(true);
     try {
