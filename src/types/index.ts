@@ -80,6 +80,8 @@ export interface LabelInputProps {
   password?: boolean;
   value?: boolean;
   onFocus?: () => void;
+  onChange: (e: string) => void;
+  inputValue: string;
 }
 
 export interface DropdownProps {

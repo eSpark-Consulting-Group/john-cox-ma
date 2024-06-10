@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import {KeyboardAvoidingView, ScrollView, StyleSheet, View} from 'react-native';
+import React, {useState} from 'react';
+import {ScrollView, StyleSheet, View} from 'react-native';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 
@@ -12,19 +12,23 @@ import {
   GapView,
   MyGauge,
   MyCanvas,
+  Loader,
 } from '../../components';
 import {MyTheme} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
 import {api} from '../../api';
+import {useSocket} from '../../components/SocketProvider';
+import NauticalMile from './NauticalMilte';
 
 type MainScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 
 export default function Main() {
+  const {enginesData1, fuelManagementData, speed, enginesData2, provision} =
+    useSocket();
   const theme = useTheme() as MyTheme;
   const navigation = useNavigation<MainScreenProps['navigation']>();
   const [generatorRunning, setGeneratorRunning] = useState<'Yes' | 'No'>('Yes');
   const [confirmation, setConfirmation] = useState(false);
-
   const toggleGeneratorRunning = () => {
     setGeneratorRunning(generatorRunning === 'Yes' ? 'No' : 'Yes');
   };
@@ -126,21 +130,41 @@ export default function Main() {
           <>
             <GapView length={90} />
             <View style={styles().GaugeRow}>
-              <MyGauge value={0} name="Engine1" />
-              <MyGauge value={300} name="Engine2" />
+              {enginesData1.length ? (
+                enginesData1.map((item, index) => (
+                  <MyGauge
+                    key={item.id}
+                    value={item.fuel ? +item.fuel : 0}
+                    name={item.name}
+                  />
+                ))
+              ) : (
+                <Loader size="large" />
+              )}
             </View>
             <GapView length={20} />
-            <View style={styles().GaugeRow}>
-              <MyGauge value={150} name="Engine3" />
-              <MyGauge value={250} name="Engine4" />
-            </View>
+            {provision.timesp2 && (
+              <View style={styles().GaugeRow}>
+                {enginesData2.length ? (
+                  enginesData2.map((item, index) => (
+                    <MyGauge
+                      key={item.id}
+                      value={item.fuel ? +item.fuel : 0}
+                      name={item.name}
+                    />
+                  ))
+                ) : (
+                  <Loader size="large" />
+                )}
+              </View>
+            )}
             <GapView length={20} />
             <View style={styles().container}>
               <View style={styles().row}>
                 <MyBox
                   label="Efficiency"
                   text="Speed"
-                  value={25.4}
+                  value={speed}
                   unit="Knots"
                   width={'50%'}
                   gap={22}
@@ -148,24 +172,20 @@ export default function Main() {
                 <View style={styles().fuelBurn}>
                   <MyBox
                     text="Total Fuel Burn"
-                    value={102.1}
+                    value={fuelManagementData.total_fuel_burned.toString()}
                     unit="gal/hr"
                     width={'100%'}
                     gap={1}
                   />
                 </View>
               </View>
-              <MyBox
-                text="Gallons per Nautical mile"
-                value={4.17}
-                width={'70%'}
-              />
+              <NauticalMile />
               <View style={styles().range}>
                 <View style={{width: '50%'}}>
                   <MyBox
                     label="Range"
                     text="Fuel Remaining"
-                    value={854}
+                    value={fuelManagementData.remaining_fuel}
                     unit="gal"
                   />
                 </View>
@@ -187,7 +207,7 @@ export default function Main() {
               </View>
               <MyBox
                 text="Distance to Empty"
-                value={205}
+                value={fuelManagementData.distance_to_empty.toString()}
                 unit="N.Mile"
                 width={'70%'}
               />

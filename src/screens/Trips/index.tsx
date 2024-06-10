@@ -17,11 +17,13 @@ import {
 } from '../../components';
 import {MyTheme} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
+import {useSocket} from '../../components/SocketProvider';
 
 type TripsScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 
 export default function Trips() {
   const theme = useTheme() as MyTheme;
+  const {speed} = useSocket();
   const navigation = useNavigation<TripsScreenProps['navigation']>();
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [warningVisible, setWarningVisible] = useState(false);
@@ -162,7 +164,11 @@ export default function Trips() {
             <MyCard>
               <RenderRow title="Total Distance" unit="N.Mile" />
               <RenderRow title="Estimated Run Time" unit="hours/minute" />
-              <RenderRow title="Average Speed" unit="knots" />
+              <RenderRow
+                title="Average Speed"
+                value={Number(speed).toFixed(3)}
+                unit="knots"
+              />
               <RenderRow title="Efficiency" unit="Gal/N.Mile" />
             </MyCard>
             <GapView length={30} />
@@ -242,12 +248,20 @@ function RenderModal({visible, type, onClose}: RenderModalProps) {
   );
 }
 
-function RenderRow({title, unit}: {title: string; unit: string}) {
+function RenderRow({
+  title,
+  unit,
+  value,
+}: {
+  title: string;
+  unit: string;
+  value?: string;
+}) {
   return (
     <View style={styles.sectionContainer}>
       <MyText style={{width: '50%'}}>{title}</MyText>
       <View style={{width: '50%', paddingHorizontal: 15}}>
-        <MyInput />
+        <MyInput value={value} />
         <MyText text={unit} fontFamily="NotoSans-Regular" />
       </View>
     </View>
