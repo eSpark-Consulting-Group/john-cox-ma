@@ -25,12 +25,14 @@ export default function Login() {
   const theme = useTheme() as MyTheme;
   const navigation = useNavigation<LoginScreenProps['navigation']>();
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
   const [creds, setCreds] = useState({
     username: 'ESP_409151',
     password: 'fc32a4',
   });
   const loginHandler = async () => {
     try {
+      setError('');
       setIsLoading(true);
       const response = await api('https://timesp1.local').post(
         '/userLogin',
@@ -41,12 +43,16 @@ export default function Login() {
       }
       const data = response.data as {token: string};
       if (data) {
-        console.log(data);
         await AsyncStorage.setItem('token', data.token);
         navigation.navigate('Setup');
       }
-    } catch (error) {
-      console.log(`Error while login: ${error}`);
+    } catch (error: any) {
+      if (error.message) {
+        setError(error.message);
+      } else {
+        setError('Internal Server Error!');
+      }
+      console.log(`Error while login: ${JSON.stringify(error)}`);
     } finally {
       setIsLoading(false);
     }
@@ -96,6 +102,7 @@ export default function Login() {
             />
           )}
           <GapView length={30} />
+          <MyText text={error} />
         </MyCard>
         <GapView length={120} />
         <MyButton
