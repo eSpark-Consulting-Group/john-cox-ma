@@ -15,6 +15,7 @@ import DeviceSetup from '../screens/DeviceSetup';
 
 import {DarkTheme} from '../theme';
 import Test from '../screens/TestScreen';
+import SocketProvider from '../components/SocketProvider';
 
 const RootStack = createNativeStackNavigator<RootStackParamsList>();
 
@@ -22,66 +23,68 @@ export default function RootNav() {
   // const [initialRoute, setInitialRoute] = useState('DeviceSetup');
   useEffect(() => {}, []);
   return (
-    <NavigationContainer theme={DarkTheme}>
-      <RootStack.Navigator initialRouteName="DeviceSetup">
-        <RootStack.Screen
-          name="DeviceSetup"
-          component={DeviceSetup}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <RootStack.Screen
-          name="Test"
-          component={Test}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <RootStack.Screen
-          name="Main"
-          component={Main}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <RootStack.Screen
-          name="Login"
-          component={Login}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <RootStack.Screen
-          name="Setup"
-          component={Setup}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <RootStack.Screen
-          name="FMMSetup"
-          component={FMMSetup}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <RootStack.Screen
-          name="FuelTanks"
-          component={FuelTanks}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <RootStack.Screen
-          name="Trips"
-          component={Trips}
-          options={{
-            headerShown: false,
-          }}
-        />
-      </RootStack.Navigator>
-    </NavigationContainer>
+    <SocketProvider>
+      <NavigationContainer theme={DarkTheme}>
+        <RootStack.Navigator initialRouteName="DeviceSetup">
+          <RootStack.Screen
+            name="DeviceSetup"
+            component={DeviceSetup}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <RootStack.Screen
+            name="Test"
+            component={Test}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <RootStack.Screen
+            name="Main"
+            component={Main}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <RootStack.Screen
+            name="Login"
+            component={Login}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <RootStack.Screen
+            name="Setup"
+            component={Setup}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <RootStack.Screen
+            name="FMMSetup"
+            component={FMMSetup}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <RootStack.Screen
+            name="FuelTanks"
+            component={FuelTanks}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <RootStack.Screen
+            name="Trips"
+            component={Trips}
+            options={{
+              headerShown: false,
+            }}
+          />
+        </RootStack.Navigator>
+      </NavigationContainer>
+    </SocketProvider>
   );
 }
 

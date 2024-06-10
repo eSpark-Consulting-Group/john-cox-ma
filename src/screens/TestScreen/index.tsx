@@ -1,10 +1,9 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {GapView, MyButton, MyCanvas, MyInput, MyText} from '../../components';
 import {ActivityIndicator, View} from 'react-native';
-import {fetch} from 'react-native-ssl-pinning';
 
 export default function Test() {
-  const [url, setUrl] = useState<string>('');
+  const [url, setUrl] = useState<string>('https://timesp1.local/userLogin');
   const [response, setResponse] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -16,27 +15,18 @@ export default function Test() {
     setLoading(true);
 
     fetch(url, {
-      method: 'GET',
-      timeoutInterval: 10000, // milliseconds
-      // your certificates array (needed only in android) ios will pick it automatically
-      sslPinning: {
-        certs: ['cacert'], // your certificates name (without extension), for example cert1.cer, cert2.cer
-      },
-      headers: {
-        Accept: 'application/json; charset=utf-8',
-        'Access-Control-Allow-Origin': '*',
-        e_platform: 'mobile',
-      },
+      method: 'POST',
+      body: JSON.stringify({
+        username: 'ESP_409151',
+        password: 'fc32a4',
+      }),
     })
-      .then(response => {
-        console.log(`response received ${JSON.stringify(response)}`);
-        setResponse(JSON.stringify(response));
-        setLoading(false);
+      .then(response => response.json())
+      .then((data: any) => {
+        console.log(data.token);
       })
-      .catch(err => {
-        console.log(`error: ${err}`);
-        setError(err);
-        setLoading(false);
+      .catch(error => {
+        console.error('Error:', error);
       });
   };
 
