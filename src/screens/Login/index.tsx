@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {KeyboardAvoidingView, StyleSheet} from 'react-native';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -6,6 +6,7 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {
   GapView,
   LabelInput,
+  Loader,
   MyButton,
   MyCanvas,
   MyCard,
@@ -15,13 +16,41 @@ import {
 } from '../../components';
 import {MyTheme} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
+import {api} from '../../api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type LoginScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 
 export default function Login() {
   const theme = useTheme() as MyTheme;
   const navigation = useNavigation<LoginScreenProps['navigation']>();
-
+  const [isLoading, setIsLoading] = useState(false);
+  const [creds, setCreds] = useState({
+    username: 'ESP_409151',
+    password: 'fc32a4',
+  });
+  const loginHandler = async () => {
+    try {
+      setIsLoading(true);
+      const response = await api('https://timesp1.local').post(
+        '/userLogin',
+        creds,
+      );
+      if (response.status !== 200) {
+        throw response.data;
+      }
+      const data = response.data as {token: string};
+      if (data) {
+        console.log(data);
+        await AsyncStorage.setItem('token', data.token);
+        navigation.navigate('Setup');
+      }
+    } catch (error) {
+      console.log(`Error while login: ${error}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   return (
     <MyCanvas>
       <KeyboardAvoidingView
@@ -39,18 +68,33 @@ export default function Login() {
         />
         <MyCard>
           <GapView length={10} />
-          <LabelInput text="Username:" width={114} height={21} size={18} />
-          <GapView length={20} />
-          <LabelInput text="Password:" width={114} height={21} size={18} />
-          <GapView length={30} />
-          <MyButton
-            label="Sign In"
-            style={styles().signin}
-            onPress={() => {
-              console.log('setup pe jayein');
-              navigation.navigate('Setup');
-            }}
+          <LabelInput
+            inputValue={creds.username}
+            onChange={value => setCreds(prev => ({...prev, username: value}))}
+            text="Username:"
+            width={114}
+            height={21}
+            size={18}
           />
+          <GapView length={20} />
+          <LabelInput
+            inputValue={creds.password}
+            onChange={value => setCreds(prev => ({...prev, password: value}))}
+            text="Password:"
+            width={114}
+            height={21}
+            size={18}
+          />
+          <GapView length={30} />
+          {isLoading ? (
+            <Loader size="small" />
+          ) : (
+            <MyButton
+              label="Sign In"
+              style={styles().signin}
+              onPress={loginHandler}
+            />
+          )}
           <GapView length={30} />
         </MyCard>
         <GapView length={120} />

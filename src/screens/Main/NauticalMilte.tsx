@@ -16,10 +16,10 @@ const NauticalMile = () => {
     setTime(getTimerValue());
   }, [provision.timesp1]);
   useEffect(() => {
-    // startTimer();
-    // return () => {
-    //   clearInterval(interval.current);
-    // };
+    startTimer();
+    return () => {
+      clearInterval(interval.current);
+    };
   }, []);
 
   return (
