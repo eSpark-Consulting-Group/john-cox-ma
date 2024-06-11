@@ -9,7 +9,6 @@ import {
   AppState,
 } from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
-import {fetch} from 'react-native-ssl-pinning';
 import RNBootSplash from 'react-native-bootsplash';
 
 export default function App() {
@@ -22,37 +21,6 @@ export default function App() {
   useEffect(() => {
     RNBootSplash.hide();
   }, []);
-
-  const getData = (url: string) => {
-    console.log(url);
-    setResponse('');
-    setError('');
-    setLoading(true);
-
-    fetch(url, {
-      method: 'GET',
-      timeoutInterval: 10000, // milliseconds
-      // your certificates array (needed only in android) ios will pick it automatically
-      sslPinning: {
-        certs: ['cacert_pem'], // your certificates name (without extension), for example cert1.cer, cert2.cer
-      },
-      headers: {
-        Accept: 'application/json; charset=utf-8',
-        'Access-Control-Allow-Origin': '*',
-        e_platform: 'mobile',
-      },
-    })
-      .then(response => {
-        console.log(`response received ${response}`);
-        setResponse(JSON.stringify(response));
-        setLoading(false);
-      })
-      .catch(err => {
-        console.log(`error: ${err}`);
-        setError(err);
-        setLoading(false);
-      });
-  };
 
   const handleOpenWifiSettingsAndroid = () => {
     try {

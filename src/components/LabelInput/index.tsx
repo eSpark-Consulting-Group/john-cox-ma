@@ -18,6 +18,8 @@ function LabelInput({
   value,
   onFocus,
   placeholder,
+  onChange,
+  inputValue,
 }: LabelInputProps) {
   return (
     <View style={styles.main}>
@@ -27,11 +29,13 @@ function LabelInput({
       </View>
       <View style={styles.inner}>
         <MyInput
+          onChange={onChange}
           width={width}
           height={height}
           password={password}
           onFocus={onFocus}
           placeholder={placeholder}
+          value={inputValue}
         />
         {checkbox && <MyCheckbox width={18} value={value} />}
       </View>

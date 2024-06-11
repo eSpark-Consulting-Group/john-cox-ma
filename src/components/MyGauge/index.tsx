@@ -29,12 +29,15 @@ function MyGauge({value = 0, name}: MyGaugeProps) {
           style={styles().name}
         />
         <RNSpeedometer
-          key={name}
           value={value}
           size={170}
           minValue={0}
           maxValue={300}
-          labels={['']}
+          labels={[
+            {
+              name: '',
+            },
+          ]}
           labelStyle={{
             color: 'transparent',
           }}
@@ -50,7 +53,7 @@ function MyGauge({value = 0, name}: MyGaugeProps) {
       </View>
       <View style={styles(theme).textBox}>
         <MyText fontFamily="NotoSans-Bold" size={30}>
-          {value.toString()}
+          {value.toFixed(3)}
         </MyText>
         <MyText fontFamily="NotoSans-Regular" size={18}>
           gal/hr

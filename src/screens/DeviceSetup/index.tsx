@@ -342,7 +342,7 @@ export default function DeviceSetup() {
               style={{paddingHorizontal: 45, marginTop: 20}}
               labelStyle={{fontSize: 18}}
               onPress={() => {
-                navigation.navigate('Test');
+                navigation.navigate('Main');
                 setStep(1);
               }}
               textColor={theme.colors.proSecondary}
