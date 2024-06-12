@@ -4,6 +4,7 @@ import {
   Modal,
   Pressable,
   StyleSheet,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
@@ -17,6 +18,7 @@ import {
   ESPWifiList,
 } from '@espark-consultants/react-native-esp-idf-provisioning';
 import WifiManager from 'react-native-wifi-reborn';
+import {Ionicons} from '@expo/vector-icons';
 
 import {
   GapView,
@@ -34,7 +36,6 @@ import {MyTheme} from '../../types';
 import {Connected, Wifi} from '../../assets';
 import {RootStackParamsList} from '../../types/navigationParams';
 import {checkPermissions, sendingData} from './utils';
-import {err} from 'react-native-svg';
 
 type DeviceSetupScreenProps = NativeStackScreenProps<
   RootStackParamsList,
@@ -165,6 +166,7 @@ export default function DeviceSetup() {
       setError(true);
     } finally {
       setLoading(false); // Stop loading
+      setError(false);
     }
   };
 
@@ -362,12 +364,23 @@ export default function DeviceSetup() {
               />
               <MyText text={prefix + '_'} size={30} />
             </View>
-            <MyText
-              text="Select Device"
-              size={24}
-              fontFamily="NotoSans-Bold"
-              style={styles.title}
-            />
+            <View style={styles.reloadRow}>
+              <MyText
+                text="Select Device"
+                size={24}
+                fontFamily="NotoSans-Bold"
+                style={styles.title}
+              />
+              <TouchableOpacity
+                style={{paddingRight: '5%'}}
+                onPress={scanDevices}>
+                <Ionicons
+                  name="reload"
+                  size={24}
+                  color={theme.colors.primary}
+                />
+              </TouchableOpacity>
+            </View>
             <MyCard>
               {loading && (
                 <Loader
@@ -614,6 +627,11 @@ export default function DeviceSetup() {
 const styles = StyleSheet.create({
   main: {justifyContent: 'space-between', alignItems: 'center'},
   title: {alignSelf: 'flex-start', paddingLeft: 18, paddingBottom: 20},
+  reloadRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
   network: {flexDirection: 'row', gap: 3, alignItems: 'center'},
   item: {
     width: '100%',
