@@ -262,12 +262,12 @@ export default function DeviceSetup() {
       onPress={() => {
         setStep(4);
         setNetwork(item);
-        console.log('Selected Network: ', network);
+        console.log('Selected Network: ', item.ssid);
       }}
       disabled={isLoading}>
       <Wifi />
       <MyText size={25}>{item.ssid}</MyText>
-      {network?.ssid == item.ssid && isLoading && (
+      {network?.ssid === item.ssid && isLoading && (
         <View style={styles.network}>{renderConnectedTags()}</View>
       )}
     </Pressable>
@@ -464,12 +464,23 @@ export default function DeviceSetup() {
       case 3:
         return (
           <>
-            <MyText
-              text="Available Networks"
-              size={24}
-              fontFamily="NotoSans-Bold"
-              style={styles.title}
-            />
+            <View style={styles.reloadRow}>
+              <MyText
+                text="Available Networks"
+                size={24}
+                fontFamily="NotoSans-Bold"
+                style={styles.title}
+              />
+              <TouchableOpacity
+                style={{paddingRight: '5%'}}
+                onPress={scanWifiList}>
+                <Ionicons
+                  name="reload"
+                  size={24}
+                  color={theme.colors.primary}
+                />
+              </TouchableOpacity>
+            </View>
             <MyCard>
               {loading && (
                 <Loader
