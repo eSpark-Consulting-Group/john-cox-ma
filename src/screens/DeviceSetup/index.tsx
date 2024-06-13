@@ -59,7 +59,6 @@ export default function DeviceSetup() {
   const [count, setCount] = useState(0);
   const [error, setError] = useState<boolean>();
   const [authError, setAuthError] = useState<boolean>();
-  const [logs, setLogs] = useState('');
 
   const prefixes = ['TIMESP', 'ABCSP1', 'XYZSP1', 'MNOSP1'];
 
@@ -193,45 +192,42 @@ export default function DeviceSetup() {
 
   const connectDevice = async (device: any) => {
     try {
-      setLogs('Starting connection process...');
+      console.log('Starting connection process...');
       console.log('Device:', device);
       console.log('Product key:', 'abcd1234');
 
       WifiManager.connectToProtectedSSID(device.name, '', false, false).then(
         async a => {
-          setLogs('Connected successfully!');
+          console.log('Connected successfully!');
           const dev = new ESPDevice({
             ...device,
             security: 1,
           });
           console.log('ESPDevice:', dev);
-          setLogs('ESPDevice ' + dev);
 
           const connectedDev: any = await dev.connect('abcd1234');
-          setLogs('Connected device:' + connectedDev);
+          console.log('Connected device:' + connectedDev);
 
           if (connectedDev?.status == 'connected') {
-            setLogs('Device connected successfully:' + connectedDev);
+            console.log('Device connected successfully:' + connectedDev);
             const res = await sendingData(device);
-            setLogs(res!);
-            scanWifiList();
+            console.log(res!);
+            await scanWifiList();
             console.log('Scanned Wi-Fi list.');
             setStep(3);
             console.log('Set step to 3.');
           } else {
             console.log('Unable to connect');
             setError(true);
-            setLogs('Unable to connect');
+            console.log('Unable to connect');
           }
         },
         e => {
           console.log('Connection failed!', e);
-          setLogs(e);
         },
       );
     } catch (error) {
       console.log('Error:', error);
-      setLogs('Some Error');
     }
   };
 
@@ -274,12 +270,12 @@ export default function DeviceSetup() {
   );
 
   const connectNetwork = async () => {
+    setAuthError(false);
     setIsLoading(true);
     try {
       if (network?.ssid) {
         const ssid = network.ssid;
         const passphrase = password;
-
         try {
           await device?.provision(ssid, passphrase);
           console.log('Provisioning Test: Pass');
@@ -287,14 +283,17 @@ export default function DeviceSetup() {
         } catch (provisionError) {
           console.error('Error during device provisioning:', provisionError);
           setAuthError(true);
+          setStep(1);
         }
       } else {
         console.error('Network SSID is undefined');
       }
     } catch (error) {
       console.error('Error during network provisioning:', error);
+      setStep(3);
     } finally {
       setIsLoading(false);
+      setAuthError(false);
     }
   };
 
@@ -449,8 +448,7 @@ export default function DeviceSetup() {
               onPress={() => connectDevice(device)}
               textColor={theme.colors.proSecondary}
             />
-            <MyText size={15}>{logs}</MyText>
-            <GapView length={5} />
+            <GapView length={20} />
             <MyButton
               label="Back"
               labelStyle={{fontSize: 18}}
@@ -580,8 +578,7 @@ export default function DeviceSetup() {
                 label="NO"
                 labelStyle={{fontSize: 20}}
                 onPress={() => {
-                  // navigation.navigate('Main');
-                  navigation.navigate('Test');
+                  navigation.navigate('Main');
                   setStep(1);
                 }}
               />
