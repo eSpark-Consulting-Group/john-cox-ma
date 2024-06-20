@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {ScrollView, StyleSheet, View, KeyboardAvoidingView} from 'react-native';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -16,13 +16,32 @@ import {MyTheme} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
 import {Engines, temp} from '../../constants';
 import LabelDropdown from '../../components/LabelDropdown';
+import {useSocket} from '../../components/SocketProvider';
 
 type SetupScreenProps = NativeStackScreenProps<RootStackParamsList, 'Setup'>;
 
 export default function Setup() {
   const theme = useTheme() as MyTheme;
   const navigation = useNavigation<SetupScreenProps['navigation']>();
-
+  const {enginesData1} = useSocket();
+  const [config, setConfig] = useState(enginesData1);
+  const onPress = (index: number) => {
+    const allConfig = [...config];
+    allConfig[index] = {
+      ...allConfig[index],
+      enabled: allConfig[index].enabled === '0' ? '1' : '0',
+    };
+    setConfig(allConfig);
+  };
+  const onPositionSelect = (value: string, index: number) => {
+    const allConfig = [...config];
+    allConfig[index] = {
+      ...allConfig[index],
+      position: value,
+    };
+    setConfig(allConfig);
+  };
+  let count = 0;
   return (
     <MyCanvas>
       <ScrollView
@@ -67,19 +86,28 @@ export default function Setup() {
                   />
                 ))}
               </View>
-              {Engines.map((item, index) => (
-                <View key={index}>
-                  <LabelDropdown
-                    text={item.text}
-                    data={item.options}
-                    onSelect={() => {}}
-                    isActive={item.status}
-                    zIndex={item.zindez}
-                    status
-                  />
-                  <GapView length={index != 3 ? 20 : 15} />
-                </View>
-              ))}
+
+              {config.map((item, index) => {
+                count += 2;
+                return (
+                  <View key={index}>
+                    <LabelDropdown
+                      text={item.name}
+                      data={['drive engine', 'generator']}
+                      onSelect={e => {
+                        onPositionSelect(e, index);
+                      }}
+                      isActive={item.enabled === '0' ? false : true}
+                      zIndex={58 - count}
+                      egnineId={item.id}
+                      onPress={() => onPress(index)}
+                      status
+                      value={item.position}
+                    />
+                    <GapView length={index != 3 ? 20 : 15} />
+                  </View>
+                );
+              })}
             </MyCard>
           </View>
           <GapView length={15} />
@@ -127,7 +155,7 @@ export default function Setup() {
             labelStyle={{fontSize: 20}}
             style={styles().signin}
             onPress={() => {
-              navigation.navigate('FMMSetup');
+              navigation.navigate('FMMSetup', {config});
               console.log('Fuel Mgt pe jayein');
             }}
           />

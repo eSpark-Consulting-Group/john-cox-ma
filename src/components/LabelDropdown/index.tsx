@@ -1,5 +1,5 @@
-import {memo} from 'react';
-import {StyleSheet, View} from 'react-native';
+import {memo, useState} from 'react';
+import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 
 import MyText from '../MyText';
@@ -20,13 +20,25 @@ function LabelDropdown({
   status,
   isActive,
   dropdnHeight,
+  egnineId,
+  onPress,
+  value,
 }: LabelDropdownProps) {
   const theme = useTheme() as MyTheme;
+  const activeHanlder = () => {
+    if (onPress) {
+      onPress(egnineId);
+    }
+  };
   return (
     <View style={styles.main}>
       <MyText text={text} size={size} />
       <View style={styles.inner}>
-        {status ? isActive ? <Active /> : <Inactive /> : null}
+        {status && (
+          <TouchableOpacity onPress={activeHanlder}>
+            {isActive ? <Active /> : <Inactive />}
+          </TouchableOpacity>
+        )}
         <MyDropdown
           data={data}
           onSelect={onSelect}
@@ -36,6 +48,7 @@ function LabelDropdown({
           containerStyle={containerStyle}
           height={height}
           dropdnHeight={dropdnHeight}
+          value={value}
         />
       </View>
     </View>

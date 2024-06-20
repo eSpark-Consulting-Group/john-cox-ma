@@ -1,4 +1,5 @@
 import {NavigatorScreenParams} from '@react-navigation/native';
+import { EngineData } from '.';
 
 export type RootStackParamsList = {
   Test: undefined;
@@ -7,7 +8,7 @@ export type RootStackParamsList = {
   Main: undefined;
   Login: undefined;
   Setup: undefined;
-  FMMSetup: undefined;
+  FMMSetup: {config: EngineData[]};
   FuelTanks: undefined;
   Trips: undefined;
 };

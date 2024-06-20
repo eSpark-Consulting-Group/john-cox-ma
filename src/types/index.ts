@@ -80,8 +80,8 @@ export interface LabelInputProps {
   password?: boolean;
   value?: boolean;
   onFocus?: () => void;
-  onChange: (e: string) => void;
-  inputValue: string;
+  onChange?: (e: string) => void;
+  inputValue?: string;
 }
 
 export interface DropdownProps {
@@ -93,6 +93,7 @@ export interface DropdownProps {
   height?: number;
   dropdnHeight?: number;
   theme: MyTheme;
+  value?: string;
 }
 
 export interface LabelDropdownProps {
@@ -107,6 +108,9 @@ export interface LabelDropdownProps {
   status?: boolean;
   isActive?: boolean;
   dropdnHeight?: number;
+  egnineId?: string;
+  onPress?: (id: string | undefined) => void;
+  value?: string;
 }
 
 export type MyCheckboxProps = {
@@ -127,4 +131,15 @@ export type DisplayBoxProps = {
   textColor?: string;
   size?: number;
   fontFamily?: Fonts;
+};
+
+export type EngineData = {
+  id: string;
+  name: string;
+  fuel: string;
+  enabled: '1' | '0';
+  position: string;
+  volume_per_cycle: string;
+  engine_type: string;
+  fuel_type: string;
 };

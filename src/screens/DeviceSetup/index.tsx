@@ -35,6 +35,8 @@ import {Connected, Wifi} from '../../assets';
 import {RootStackParamsList} from '../../types/navigationParams';
 import {checkPermissions, sendingData} from './utils';
 import {err} from 'react-native-svg';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useSocket} from '../../components/SocketProvider';
 
 type DeviceSetupScreenProps = NativeStackScreenProps<
   RootStackParamsList,
@@ -42,6 +44,7 @@ type DeviceSetupScreenProps = NativeStackScreenProps<
 >;
 
 export default function DeviceSetup() {
+  const {setProvision} = useSocket();
   const navigation = useNavigation<DeviceSetupScreenProps['navigation']>();
   const theme = useTheme() as MyTheme;
   const [step, setStep] = useState(0);
@@ -309,6 +312,11 @@ export default function DeviceSetup() {
 
         try {
           await device?.provision(ssid, passphrase);
+          await AsyncStorage.setItem(
+            'provisionedDevices',
+            JSON.stringify({timesp1: true, timesp2: false}),
+          );
+          setProvision({timesp1: true, timesp2: false});
           console.log('Provisioning Test: Pass');
           setIsVisible(true);
         } catch (provisionError) {

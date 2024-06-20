@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -6,6 +6,7 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {
   GapView,
   LabelInput,
+  Loader,
   MyButton,
   MyCanvas,
   MyCard,
@@ -13,113 +14,49 @@ import {
   MyHeader,
   MyText,
 } from '../../components';
-import {Fonts, MyTheme} from '../../types';
+import {EngineData, Fonts, MyTheme} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
 import LabelDropdown from '../../components/LabelDropdown';
+import {api} from '../../api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type FMMSetupScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
-
-interface CardItem {
-  title: string;
-  labelInput?: string[];
-  titleColor?: string; // Assuming titleColor is a color string
-  font: Fonts; // Assuming font is a font name string
-  labelDropdown?: {
-    label: string;
-    options: string[];
-    zIndex: number;
-  }[];
-}
-export default function FMMSetup() {
+type RouteType = {
+  route: {
+    params: {
+      config: EngineData[];
+    };
+  };
+};
+export default function FMMSetup({route}: RouteType) {
+  const config = route.params.config;
+  const prevConfig = config.map(item => {
+    return {
+      engine_id: item.id,
+      enabled: item.enabled,
+      position: item.position,
+      volume_per_cycle: item.volume_per_cycle,
+      name: item.name,
+      engine_type: item.engine_type,
+      fuel_type: item.fuel_type,
+    };
+  });
+  const [allConfig, setAllConfig] = useState(prevConfig);
+  const [isLoading, setIsLoading] = useState(false);
   const theme = useTheme() as MyTheme;
   const navigation = useNavigation<FMMSetupScreenProps['navigation']>();
-  const card1: CardItem[] = [
-    {
-      title: 'FMM #1',
-
-      font: 'NotoSans-Bold',
-    },
-
-    {
-      title: 'Engine1',
-      titleColor: theme.colors.secondary,
-      font: 'NotoSans-Bold',
-      labelInput: ['Volume per cycle'],
-      labelDropdown: [
-        {
-          label: 'Fuel Type',
-          options: ['Gasoline', 'Diesel', 'Biodiesel'],
-          zIndex: 56,
-        },
-        {
-          label: 'Engine Type',
-          options: ['drive engine', 'generator'],
-          zIndex: 54,
-        },
-      ],
-    },
-    {
-      title: 'Engine2',
-      titleColor: theme.colors.secondary,
-      font: 'NotoSans-Bold',
-      labelInput: ['Volume per cycle'],
-      labelDropdown: [
-        {
-          label: 'Fuel Type',
-          options: ['Gasoline', 'Diesel', 'Biodiesel'],
-          zIndex: 52,
-        },
-        {
-          label: 'Engine Type',
-          options: ['drive engine', 'generator'],
-          zIndex: 50,
-        },
-      ],
-    },
-  ];
-  const card2: CardItem[] = [
-    {
-      title: 'FMM #2',
-      font: 'NotoSans-Bold',
-    },
-    {
-      title: 'Engine3',
-      titleColor: theme.colors.secondary,
-      font: 'NotoSans-Bold',
-      labelInput: ['Volume per cycle'],
-      labelDropdown: [
-        {
-          label: 'Fuel Type',
-          options: ['Gasoline', 'Diesel', 'Biodiesel'],
-          zIndex: 56,
-        },
-        {
-          label: 'Engine Type',
-          options: ['drive engine', 'generator'],
-          zIndex: 54,
-        },
-      ],
-    },
-    {
-      title: 'Engine4',
-      titleColor: theme.colors.secondary,
-      font: 'NotoSans-Bold',
-      labelInput: ['Volume per cycle'],
-      labelDropdown: [
-        {
-          label: 'Fuel Type',
-          options: ['Gasoline', 'Diesel', 'Biodiesel'],
-          zIndex: 52,
-        },
-        {
-          label: 'Engine Type',
-          options: ['drive engine', 'generator'],
-          zIndex: 50,
-        },
-      ],
-    },
-  ];
-
+  const onValuesChange = (
+    value: string,
+    index: number,
+    key: 'fuel_type' | 'engine_type' | 'volume_per_cycle',
+  ) => {
+    const conf = [...allConfig];
+    conf[index] = {
+      ...conf[index],
+      [key]: value,
+    };
+    setAllConfig(conf);
+  };
   return (
     <MyCanvas>
       <ScrollView
@@ -134,83 +71,76 @@ export default function FMMSetup() {
           style={{alignSelf: 'flex-start', paddingLeft: 18, paddingBottom: 20}}
         />
         <MyCard>
-          {card1.map((item, index) => (
+          <MyText
+            text="FMM #1"
+            style={{alignSelf: 'flex-start'}}
+            fontFamily="NotoSans-Bold"
+          />
+          {allConfig.map((item, index) => (
             <>
               <MyText
-                text={item.title}
-                textColor={item.titleColor}
+                text={item.name}
+                textColor={theme.colors.secondary}
                 style={{alignSelf: 'flex-start'}}
-                fontFamily={item.font}
+                fontFamily="NotoSans-Bold"
               />
-              {item.labelInput &&
-                item.labelInput.map((label, index) => (
-                  <LabelInput
-                    key={index}
-                    text={label}
-                    width={150}
-                    height={30}
-                    placeholder="Enter here"
-                  />
-                ))}
-              {item.labelDropdown &&
-                item.labelDropdown.map((dropdown, index) => (
-                  <LabelDropdown
-                    key={index}
-                    text={dropdown.label}
-                    data={dropdown.options}
-                    onSelect={() => {}}
-                    zIndex={dropdown.zIndex}
-                  />
-                ))}
+              <LabelInput
+                text={'Volume per cycle'}
+                width={150}
+                height={30}
+                placeholder="Enter here"
+                inputValue={item.volume_per_cycle}
+                onChange={val => onValuesChange(val, index, 'volume_per_cycle')}
+              />
+              <LabelDropdown
+                text="Fuel Type"
+                data={['Gasoline', 'Diesel', 'Biodiesel']}
+                onSelect={val => onValuesChange(val, index, 'fuel_type')}
+                value={item.fuel_type}
+                zIndex={56}
+              />
+              <LabelDropdown
+                text="Engine Type"
+                data={['drive engine', 'generator']}
+                onSelect={val => onValuesChange(val, index, 'engine_type')}
+                value={item.engine_type}
+                zIndex={54}
+              />
             </>
           ))}
         </MyCard>
         <GapView length={15} />
-        <View style={{zIndex: -1}}>
-          <MyCard>
-            {card2.map((item, index) => (
-              <>
-                <MyText
-                  text={item.title}
-                  textColor={item.titleColor}
-                  style={{alignSelf: 'flex-start'}}
-                  fontFamily={item.font}
-                />
-                {item.labelInput &&
-                  item.labelInput.map((label, index) => (
-                    <LabelInput
-                      key={index}
-                      text={label}
-                      width={150}
-                      height={30}
-                      placeholder="Enter here"
-                    />
-                  ))}
-                {item.labelDropdown &&
-                  item.labelDropdown.map((dropdown, index) => (
-                    <LabelDropdown
-                      key={index}
-                      text={dropdown.label}
-                      data={dropdown.options}
-                      onSelect={() => {}}
-                      zIndex={dropdown.zIndex}
-                    />
-                  ))}
-              </>
-            ))}
-          </MyCard>
-        </View>
-
         <GapView length={25} />
         <View style={{width: '30%'}}>
-          <MyButton
-            label="Done"
-            labelStyle={{fontSize: 20}}
-            onPress={() => {
-              navigation.navigate('Main');
-              console.log('Main pe jayein');
-            }}
-          />
+          {isLoading ? (
+            <Loader size="small" />
+          ) : (
+            <MyButton
+              label="Done"
+              labelStyle={{fontSize: 20}}
+              onPress={async () => {
+                const API = api('https://timesp1.local');
+                try {
+                  setIsLoading(true);
+                  const token = await AsyncStorage.getItem('token');
+                  API.setHeader('Authorization', `Bearer ${token}`);
+                  const response = await API.post('/setConfigurations', {
+                    data: allConfig,
+                  });
+                  if (response.status === 200) {
+                    navigation.navigate('Main');
+                  } else if (response.status === 401) {
+                    navigation.navigate('Login');
+                  }
+                } catch (error) {
+                  console.log('-=======', error);
+                } finally {
+                  setIsLoading(false);
+                }
+              }}
+            />
+          )}
+
           <GapView length={25} />
           <MyButton
             label="Back"
