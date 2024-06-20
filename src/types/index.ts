@@ -136,10 +136,26 @@ export type DisplayBoxProps = {
 export type EngineData = {
   id: string;
   name: string;
-  fuel: string;
+  fuel: string | undefined;
   enabled: '1' | '0';
   position: string;
   volume_per_cycle: string;
   engine_type: string;
   fuel_type: string;
+};
+
+export type SocketJSON = {
+  data: {
+    Engines: EngineData[];
+    SensorData: {
+      engine_id: string;
+      fuel: string | undefined;
+      speed: string;
+    }[];
+    FuelManagement: {
+      remaining_fuel: string;
+      distance_to_empty: string;
+      total_fuel_burned: string;
+    }[];
+  };
 };

@@ -14,7 +14,7 @@ import {
 } from '../../components';
 import {MyTheme} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
-import {Engines, temp} from '../../constants';
+import {temp} from '../../constants';
 import LabelDropdown from '../../components/LabelDropdown';
 import {useSocket} from '../../components/SocketProvider';
 
@@ -156,7 +156,6 @@ export default function Setup() {
             style={styles().signin}
             onPress={() => {
               navigation.navigate('FMMSetup', {config});
-              console.log('Fuel Mgt pe jayein');
             }}
           />
           <GapView length={25} />
