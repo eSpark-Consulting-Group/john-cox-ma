@@ -263,14 +263,13 @@ export default function DeviceSetup() {
       disabled={isLoading}>
       <Wifi />
       <MyText size={25}>{item.ssid}</MyText>
-      {network?.ssid === item.ssid && isLoading && (
+      {network?.ssid == item.ssid && isLoading && (
         <View style={styles.network}>{renderConnectedTags()}</View>
       )}
     </Pressable>
   );
 
   const connectNetwork = async () => {
-    setAuthError(false);
     setIsLoading(true);
     try {
       if (network?.ssid) {
@@ -283,17 +282,14 @@ export default function DeviceSetup() {
         } catch (provisionError) {
           console.error('Error during device provisioning:', provisionError);
           setAuthError(true);
-          setStep(1);
         }
       } else {
         console.error('Network SSID is undefined');
       }
     } catch (error) {
       console.error('Error during network provisioning:', error);
-      setStep(3);
     } finally {
       setIsLoading(false);
-      setAuthError(false);
     }
   };
 
