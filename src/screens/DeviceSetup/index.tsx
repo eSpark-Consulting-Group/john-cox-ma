@@ -39,7 +39,7 @@ import {checkPermissions, sendingData} from './utils';
 
 type DeviceSetupScreenProps = NativeStackScreenProps<
   RootStackParamsList,
-  'DeviceSetup'
+  'ScanDevices'
 >;
 
 export default function DeviceSetup() {

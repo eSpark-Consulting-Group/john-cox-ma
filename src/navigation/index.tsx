@@ -11,11 +11,14 @@ import FMMSetup from '../screens/FMMSetup';
 import Main from '../screens/Main';
 import FuelTanks from '../screens/FuelTanks';
 import Trips from '../screens/Trips';
-import DeviceSetup from '../screens/DeviceSetup';
+// import DeviceSetup from '../screens/DeviceSetup';
 
 import {DarkTheme} from '../theme';
 import Test from '../screens/TestScreen';
 import SocketProvider from '../components/SocketProvider';
+import ScanDevices from '../screens/Provisioning/ScanDevices';
+import Proof from '../screens/Provisioning/Proof';
+import ScanNetworks from '../screens/Provisioning/ScanNetworks';
 
 const RootStack = createNativeStackNavigator<RootStackParamsList>();
 
@@ -25,10 +28,24 @@ export default function RootNav() {
   return (
     <SocketProvider>
       <NavigationContainer theme={DarkTheme}>
-        <RootStack.Navigator initialRouteName="DeviceSetup">
+        <RootStack.Navigator initialRouteName="ScanDevices">
           <RootStack.Screen
-            name="DeviceSetup"
-            component={DeviceSetup}
+            name="ScanDevices"
+            component={ScanDevices}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <RootStack.Screen
+            name="Proof"
+            component={Proof}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <RootStack.Screen
+            name="ScanNetworks"
+            component={ScanNetworks}
             options={{
               headerShown: false,
             }}

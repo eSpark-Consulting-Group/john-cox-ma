@@ -203,21 +203,28 @@ async function createAndWriteFile(
   mac_address: string,
   device: ESPDevice,
 ) {
-  const dirInfo = await FileSystem.StorageAccessFramework.createFileAsync(
-    directoryUri,
-    `${mac_address}.json`,
-    'application/json',
-  );
-  console.log('created file', dirInfo);
-  const response = await device.sendData(
-    'domain-name',
-    JSON.stringify({type: 'domain_request'}),
-  );
-  const writeRes = await FileSystem.StorageAccessFramework.writeAsStringAsync(
-    dirInfo,
-    response,
-    {encoding: 'utf8'},
-  );
+  try {
+    const dirInfo = await FileSystem.StorageAccessFramework.createFileAsync(
+      directoryUri,
+      `${mac_address}.json`,
+      'application/json',
+    );
+    console.log('Created file:', dirInfo); // Log the file info
+
+    const response = await device.sendData(
+      'domain-name',
+      JSON.stringify({ type: 'domain_request' }),
+    );
+    
+    const writeRes = await FileSystem.StorageAccessFramework.writeAsStringAsync(
+      dirInfo,
+      response,
+      { encoding: 'utf8' },
+    );
+    console.log('Write result:', writeRes); // Log the write result
+  } catch (error) {
+    console.error('Error creating/writing file:', error);
+  }
 }
 
 export async function checkCache(mac_address: string) {
