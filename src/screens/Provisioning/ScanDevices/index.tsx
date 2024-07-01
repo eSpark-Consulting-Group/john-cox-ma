@@ -48,16 +48,18 @@ export default function ScanDevices() {
   const [granted, setGranted] = useState(false);
 
   useEffect(() => {
-    async () => {
+    const requestPermissionsAndScan = async () => {
       try {
         const grantedPermissions = await checkPermissions();
         setGranted(grantedPermissions);
-        console.log('Permission granted: ', grantedPermissions ? 'yes' : 'no');
+        if (grantedPermissions) {
+          await scanDevices();
+        }
       } catch (error) {
         console.error('Error fetching permissions:', error);
       }
     };
-    scanDevices();
+    requestPermissionsAndScan();
   }, []);
 
   const scanDevices = async () => {

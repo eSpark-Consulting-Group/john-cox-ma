@@ -79,6 +79,16 @@ export const sendingData = async (device: ESPDevice) => {
   }
 };
 
+export const scanWifiList = async (device: ESPDevice) => {
+  try {
+    const wifiList = await device?.scanWifiList();
+    console.log('wifi List: ', wifiList);
+    return wifiList;
+  } catch (error) {
+    console.error('Error scanning WiFi list:', error);
+  }
+};
+
 async function handleDomainAssignment(device: ESPDevice, res1: any) {
   switch (res1.domain_name) {
     case '':
@@ -213,13 +223,13 @@ async function createAndWriteFile(
 
     const response = await device.sendData(
       'domain-name',
-      JSON.stringify({ type: 'domain_request' }),
+      JSON.stringify({type: 'domain_request'}),
     );
-    
+
     const writeRes = await FileSystem.StorageAccessFramework.writeAsStringAsync(
       dirInfo,
       response,
-      { encoding: 'utf8' },
+      {encoding: 'utf8'},
     );
     console.log('Write result:', writeRes); // Log the write result
   } catch (error) {

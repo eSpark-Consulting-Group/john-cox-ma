@@ -1,4 +1,4 @@
-import { ESPDevice } from "@espark-consultants/react-native-esp-idf-provisioning";
+import {ESPDevice} from '@espark-consultants/react-native-esp-idf-provisioning';
 
 export type RootStackParamsList = {
   Test: undefined;
@@ -9,7 +9,8 @@ export type RootStackParamsList = {
   Setup: undefined;
   FMMSetup: undefined;
   FuelTanks: undefined;
-  Proof: { device: ESPDevice };
   ScanDevices: undefined;
-  ScanNetworks: undefined;
+  Proof: {device: ESPDevice};
+  ScanNetworks: {device: ESPDevice};
+  Confirmation: undefined;
 };
