@@ -1,4 +1,9 @@
 import {KeyboardAvoidingView, StyleSheet, View} from 'react-native';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {useNavigation, useTheme} from '@react-navigation/native';
+import {ESPDevice} from '@espark-consultants/react-native-esp-idf-provisioning';
+import WifiManager from 'react-native-wifi-reborn';
+
 import {
   GapView,
   MyButton,
@@ -8,13 +13,9 @@ import {
   MyInput,
   MyText,
 } from '../../../components';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {RootStackParamsList} from '../../../types/navigationParams';
-import WifiManager from 'react-native-wifi-reborn';
-import {ESPDevice} from '@espark-consultants/react-native-esp-idf-provisioning';
-import {scanWifiList, sendingData} from '../utils';
+import {sendingData} from '../utils';
 import {useState} from 'react';
-import {useNavigation, useTheme} from '@react-navigation/native';
 import {MyTheme} from '../../../types';
 
 type ProofScreenProps = NativeStackScreenProps<RootStackParamsList, 'Proof'>;

@@ -19,6 +19,7 @@ import SocketProvider from '../components/SocketProvider';
 import ScanDevices from '../screens/Provisioning/ScanDevices';
 import Proof from '../screens/Provisioning/Proof';
 import ScanNetworks from '../screens/Provisioning/ScanNetworks';
+import Confirmation from '../screens/Provisioning/Confirmation';
 
 const RootStack = createNativeStackNavigator<RootStackParamsList>();
 
@@ -46,6 +47,13 @@ export default function RootNav() {
           <RootStack.Screen
             name="ScanNetworks"
             component={ScanNetworks}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <RootStack.Screen
+            name="Confirmation"
+            component={Confirmation}
             options={{
               headerShown: false,
             }}

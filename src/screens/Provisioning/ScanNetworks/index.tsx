@@ -1,3 +1,4 @@
+import React, {useEffect, useState} from 'react';
 import {
   FlatList,
   KeyboardAvoidingView,
@@ -7,6 +8,11 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import {Ionicons} from '@expo/vector-icons';
+import {ESPWifiList} from '@espark-consultants/react-native-esp-idf-provisioning';
+import {useNavigation, useTheme} from '@react-navigation/native';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+
 import {
   GapView,
   Loader,
@@ -19,17 +25,7 @@ import {
   MyInput,
   MyText,
 } from '../../../components';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {RootStackParamsList} from '../../../types/navigationParams';
-import React, {useEffect, useState} from 'react';
-import navigation from '../../../navigation';
-import {Ionicons} from '@expo/vector-icons';
-import {scanWifiList} from '../utils';
-import {
-  ESPDevice,
-  ESPWifiList,
-} from '@espark-consultants/react-native-esp-idf-provisioning';
-import {useNavigation, useTheme} from '@react-navigation/native';
 import {Wifi, Connected} from '../../../assets';
 import {MyTheme} from '../../../types';
 
@@ -46,7 +42,7 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
   const [error, setError] = useState<boolean>();
   const [authError, setAuthError] = useState<boolean>();
   const [networks, setNetworks] = useState<ESPWifiList[]>();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>();
   const [loading, setLoading] = useState(false);
   const [animationIndex, setAnimationIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
@@ -54,6 +50,7 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
   const [password, setPassword] = useState('');
   const [step, setStep] = useState(1);
   const [count, setCount] = useState(0);
+  const [animationInterval, setAnimationInterval] = useState<NodeJS.Timeout>();
 
   const scanWifiList = async () => {
     setLoading(true);
@@ -73,18 +70,34 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
       const timeout = setTimeout(() => {
         setCount(count + 1);
         if (count % 2 != 0) {
-          navigation.navigate('Confirmation');
+          navigation.navigate('Main');
           setIsVisible(false);
           setStep(1);
         } else {
           setIsVisible(false);
-          setStep(5);
+          navigation.navigate('Confirmation');
         }
       }, 2000);
 
       return () => clearTimeout(timeout);
     }
   }, [isVisible]);
+
+  useEffect(() => {
+    if (isLoading) {
+      const interval = setInterval(() => {
+        setAnimationIndex(prevIndex => (prevIndex + 1) % 4); // Change 4 to the number of animations you want to cycle through
+      }, 500); // Adjust the interval duration as needed
+      setAnimationInterval(interval);
+    } else {
+      clearInterval(animationInterval);
+    }
+    return () => clearInterval(animationInterval);
+  }, [isLoading]);
+
+  useEffect(() => {
+    scanWifiList;
+  }, []);
 
   const renderNetwork = ({item}: {item: ESPWifiList}) => (
     <Pressable
@@ -239,7 +252,7 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
                   setStep(1);
                 }}
               />
-              <GapView length={30} />
+              <GapView length={40} />
             </MyCard>
             <GapView length={150} />
           </>
