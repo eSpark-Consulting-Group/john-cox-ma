@@ -11,7 +11,6 @@ import FMMSetup from '../screens/FMMSetup';
 import Main from '../screens/Main';
 import FuelTanks from '../screens/FuelTanks';
 import Trips from '../screens/Trips';
-// import DeviceSetup from '../screens/DeviceSetup';
 
 import {DarkTheme} from '../theme';
 import Test from '../screens/TestScreen';
@@ -24,7 +23,6 @@ import Confirmation from '../screens/Provisioning/Confirmation';
 const RootStack = createNativeStackNavigator<RootStackParamsList>();
 
 export default function RootNav() {
-  // const [initialRoute, setInitialRoute] = useState('DeviceSetup');
   useEffect(() => {}, []);
   return (
     <SocketProvider>
