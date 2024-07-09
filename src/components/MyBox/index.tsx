@@ -56,7 +56,7 @@ function MyBox({
             fontFamily="NotoSans-Bold"
             style={styles.value}
             size={valueSize ? valueSize : 28}>
-            {Number(Number(value).toFixed(3))}
+            {value ? Number(Number(value).toFixed(3)) : 'NA'}
           </MyText>
           <MyText
             style={styles.unit}
