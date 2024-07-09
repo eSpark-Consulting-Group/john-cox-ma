@@ -28,6 +28,8 @@ import {
 import {RootStackParamsList} from '../../../types/navigationParams';
 import {Wifi, Connected} from '../../../assets';
 import {MyTheme} from '../../../types';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useSocket} from '../../../components/SocketProvider';
 
 type ScanNetworksScreenProps = NativeStackScreenProps<
   RootStackParamsList,
@@ -38,6 +40,7 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
   const theme = useTheme() as MyTheme;
   const navigation = useNavigation<ScanNetworksScreenProps['navigation']>();
   const {device} = route.params;
+  const {setProvision} = useSocket();
 
   const [error, setError] = useState<boolean>();
   const [authError, setAuthError] = useState<boolean>();
@@ -132,6 +135,11 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
         const passphrase = password;
         try {
           await device?.provision(ssid, passphrase);
+          await AsyncStorage.setItem(
+            'provisionedDevices',
+            JSON.stringify({timesp1: true, timesp2: false}),
+          );
+          setProvision({timesp1: true, timesp2: false});
           console.log('Provisioning Test: Pass');
           setIsVisible(true);
         } catch (provisionError) {
