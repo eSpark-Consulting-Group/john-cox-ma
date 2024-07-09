@@ -8,12 +8,8 @@ import {
   useRef,
   useState,
 } from 'react';
-type EngineData = {
-  id: string;
-  name: string;
-  fuel: string;
-  enabled: '1' | '0';
-};
+import {EngineData, SocketJSON} from '../../types';
+import {getEnginesData, getFuelMGT} from './socket.helper';
 type ProvisionData = {timesp1: boolean; timesp2: boolean};
 type SetState = Dispatch<SetStateAction<ProvisionData>>;
 
@@ -50,15 +46,14 @@ export const useSocket = () => useContext(SocketContext);
 
 function SocketProvider({children}: {children: React.ReactNode}) {
   const [enginesData1, setEnginesData1] = useState<EngineData[]>([]);
-  const [enginesData2, setEnginesData2] = useState<EngineData[]>([]);
+  const [enginesData2] = useState<EngineData[]>([]);
   const [speed, setSpeed] = useState('0');
   const [fuelManagementData, setFuelManagementData] = useState({
     distance_to_empty: 0,
     remaining_fuel: 0,
     total_fuel_burned: 0,
   });
-  const enginer1Ref = useRef([]);
-  const enginer2Ref = useRef([]);
+  const engine1Ref = useRef<EngineData[]>([]);
   const fuelDataRef = useRef({
     distance_to_empty: 0,
     remaining_fuel: 0,
@@ -82,6 +77,7 @@ function SocketProvider({children}: {children: React.ReactNode}) {
     console.log('=====WEB SOCKET START======');
     // Create socket`
     const ws = new WebSocket(`wss://${domain}/ws`);
+
     ws.onopen = () => {
       if (domain === 'timesp1.local') {
         clearInterval(interval.current);
@@ -91,63 +87,25 @@ function SocketProvider({children}: {children: React.ReactNode}) {
     };
     ws.onmessage = e => {
       try {
-        const jsonData = JSON.parse(e.data);
+        const jsonData: SocketJSON = JSON.parse(e.data);
         const sensors = jsonData.data.SensorData;
-        const enginesData = jsonData.data.Engines.map((engine: EngineData) => {
-          const foundSensor = sensors.find(
-            (s: any) => s.engine_id === engine.id,
-          );
-          return {
-            name: engine.name,
-            id: engine.id,
-            fuel: foundSensor?.fuel,
-            enabled: engine.enabled,
-          };
-        });
+        const enginesData = getEnginesData(jsonData);
         if (domain === 'timesp1.local') {
           if (sensors.length) {
             setSpeed(sensors[0].speed);
           } else {
             setSpeed('0');
           }
+          const fuelMGT = getFuelMGT(jsonData);
+          if (JSON.stringify(fuelDataRef.current) !== JSON.stringify(fuelMGT)) {
+            fuelDataRef.current = fuelMGT;
+            setFuelManagementData(fuelMGT);
+          }
           if (
-            JSON.stringify(enginer1Ref.current) !== JSON.stringify(enginesData)
+            JSON.stringify(engine1Ref.current) !== JSON.stringify(enginesData)
           ) {
-            enginer1Ref.current = enginesData;
+            engine1Ref.current = enginesData;
             setEnginesData1(enginesData);
-          }
-          const fuelData = jsonData.data.FuelManagement;
-          let remaining_fuel = 0;
-          let distance_to_empty = 0;
-          let total_fuel_burned = 0;
-          fuelData.forEach((item: any) => {
-            remaining_fuel += +item.remaining_fuel;
-            distance_to_empty += +item.distance_to_empty;
-            total_fuel_burned += +item.total_fuel_burned;
-          });
-          const fuelDataJson = {
-            remaining_fuel,
-            distance_to_empty,
-            total_fuel_burned,
-          };
-          if (
-            JSON.stringify(fuelDataRef.current) !== JSON.stringify(fuelDataJson)
-          ) {
-            fuelDataRef.current = {
-              remaining_fuel,
-              distance_to_empty,
-              total_fuel_burned,
-            };
-            setFuelManagementData({
-              remaining_fuel,
-              distance_to_empty,
-              total_fuel_burned,
-            });
-          }
-        } else {
-          if (JSON.stringify(enginer2Ref.current) !== enginesData) {
-            enginer2Ref.current = jsonData.data.Engines;
-            setEnginesData2(jsonData.data.Engines);
           }
         }
       } catch (error) {
@@ -159,13 +117,23 @@ function SocketProvider({children}: {children: React.ReactNode}) {
       console.log('WebSocket error:', e.message);
     };
     ws.onclose = e => {
-      console.log('WebSocket connection closed:', e.code, e.reason);
+      const {reason} = e;
+      console.log('WebSocket connection closed:', e.code, reason);
+      if (reason === 'Broken pipe') {
+        getSocketData(domain);
+      } else if (reason === 'Connection reset') {
+        getSocketData(domain);
+      } else if (reason === null) {
+        getSocketData(domain);
+      } else if (reason === 'Control frames must be final.') {
+        getSocketData(domain);
+      }
     };
   };
   useEffect(() => {
     (async () => {
       try {
-        const isProvisioned = await AsyncStorage.getItem('privisionedDevices');
+        const isProvisioned = await AsyncStorage.getItem('provisionedDevices');
         const prevTime = await AsyncStorage.getItem('timer');
         if (prevTime) {
           timer.current = +prevTime;
@@ -184,7 +152,7 @@ function SocketProvider({children}: {children: React.ReactNode}) {
   useEffect(() => {
     (async () => {
       try {
-        const isProvisioned = await AsyncStorage.getItem('privisionedDevices');
+        const isProvisioned = await AsyncStorage.getItem('provisionedDevices');
         if (isProvisioned) {
           const data = JSON.parse(isProvisioned);
           if (data.timesp2) {

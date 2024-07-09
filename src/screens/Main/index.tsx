@@ -16,9 +16,9 @@ import {
 } from '../../components';
 import {MyTheme} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
-import {api} from '../../api';
 import {useSocket} from '../../components/SocketProvider';
 import NauticalMile from './NauticalMilte';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type MainScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 
@@ -52,7 +52,14 @@ export default function Main() {
     {
       label: 'Setup',
       labelStyle: {paddingVertical: 20, fontSize: 16},
-      onPress: () => navigation.navigate('Login'),
+      onPress: async () => {
+        const token = await AsyncStorage.getItem('token');
+        if (!token) {
+          navigation.navigate('Login');
+        } else {
+          navigation.navigate('Setup');
+        }
+      },
     },
   ];
 

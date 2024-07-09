@@ -20,12 +20,11 @@ function MyDropdown({
   height = 30,
   theme,
   dropdnHeight,
+  value,
 }: DropdownProps) {
   const [show, setShow] = useState(false);
-  const [label, setLabel] = useState('Select');
-  const [selectedItem, setSelectedItem] = useState<string | undefined>(
-    undefined,
-  );
+  const [label, setLabel] = useState(value ?? 'Select');
+  const [selectedItem, setSelectedItem] = useState<string | undefined>(value);
   const dropdownHeight = show ? dropdnHeight || data.length * height : height;
 
   const handleSelection = (item: string) => {

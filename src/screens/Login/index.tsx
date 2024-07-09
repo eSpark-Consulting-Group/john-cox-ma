@@ -47,7 +47,7 @@ export default function Login() {
         navigation.navigate('Setup');
       }
     } catch (error: any) {
-      if (error.message) {
+      if (error?.message) {
         setError(error.message);
       } else {
         setError('Internal Server Error!');
