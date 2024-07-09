@@ -120,7 +120,7 @@ export default function Main() {
                 textColor={'red'}
                 onPress={() => {
                   setConfirmation(false);
-                  navigation.navigate('DeviceSetup');
+                  navigation.navigate('ScanDevices');
                 }}
               />
             </View>
@@ -232,7 +232,7 @@ export default function Main() {
               labelStyle={{fontSize: 18}}
               onPress={() => {
                 setConfirmation(true);
-                // navigation.navigate('DeviceSetup');
+                // navigation.navigate('ScanDevies');
                 // console.log('Device Setup pe jayein');
               }}
             />
