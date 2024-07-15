@@ -1,14 +1,17 @@
-import {NavigatorScreenParams} from '@react-navigation/native';
-import { EngineData } from '.';
+import {ESPDevice} from '@espark-consultants/react-native-esp-idf-provisioning';
+import {EngineData} from '.';
 
 export type RootStackParamsList = {
   Test: undefined;
   Splash: undefined;
-  DeviceSetup: undefined;
+  Trips: undefined;
   Main: undefined;
   Login: undefined;
   Setup: undefined;
   FMMSetup: {config: EngineData[]};
   FuelTanks: undefined;
-  Trips: undefined;
+  ScanDevices: undefined;
+  Proof: {device: ESPDevice};
+  ScanNetworks: {device: ESPDevice};
+  Confirmation: undefined;
 };
