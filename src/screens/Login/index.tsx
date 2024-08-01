@@ -28,7 +28,7 @@ export default function Login() {
   const [error, setError] = useState('');
   const [creds, setCreds] = useState({
     username: 'ESP_409151',
-    password: 'fc32a4',
+    password: 'fc3258 ',
   });
   const loginHandler = async () => {
     try {

@@ -170,6 +170,18 @@ export default function ScanDevices() {
             }}
             textColor={theme.colors.proSecondary}
           />
+          <MyButton
+            label="Skip Setup"
+            style={{
+              paddingHorizontal: 45,
+              marginTop: 10,
+            }}
+            labelStyle={{fontSize: 18}}
+            onPress={() => {
+              navigation.navigate('Main');
+            }}
+            textColor={theme.colors.proSecondary}
+          />
         </View>
         <MyFooter />
       </View>

@@ -89,6 +89,24 @@ export const scanWifiList = async (device: ESPDevice) => {
   }
 };
 
+async function checkCompleteCacheForDomain(domainName: string) {
+  const keys = await AsyncStorage.getAllKeys();
+  for (const key of keys) {
+    const data = await AsyncStorage.getItem(key);
+    console.log(data, '--------------');
+    if (data) {
+      const parsedData = JSON.parse(data);
+      if (parsedData.domain_name === domainName) {
+        console.log(' ---- timesp1 already exists ---- ');
+        return true;
+      }
+    }
+  }
+  console.log(' ---- timesp2 does not exist already ---- ');
+  return false;
+}
+
+//res1 device se jo domain aur device details arhi wo heyn
 async function handleDomainAssignment(device: ESPDevice, res1: any) {
   switch (res1.domain_name) {
     case '':
@@ -103,8 +121,14 @@ async function handleDomainAssignment(device: ESPDevice, res1: any) {
           const data = JSON.parse(fileData);
           await checkAndAssignDomain(device, data.domain_name);
         } else {
-          await checkAndAssignDomain(device, 'timesp1');
+          // Check complete cache for "timesp1"
+          const timesp1Exists = await checkCompleteCacheForDomain('timesp1');
+          const domainToAssign = timesp1Exists ? 'timesp2' : 'timesp1';
+          await checkAndAssignDomain(device, domainToAssign);
           await updateFile(res1.mac_address, device);
+          // here is the problem 1 -  if timesp1 has already been assigned - timesp2 should be assigned
+          // await checkAndAssignDomain(device, 'timesp1');
+          // await updateFile(res1.mac_address, device);
         }
       }
       break;
@@ -255,6 +279,7 @@ export async function checkCache(mac_address: string) {
 }
 
 async function checkAndAssignDomain(device: ESPDevice, domainName: string) {
+  // now here is the problem 2 - both devices return timesp1 WHY???
   const res = await device?.sendData(
     'domain-name',
     JSON.stringify({
