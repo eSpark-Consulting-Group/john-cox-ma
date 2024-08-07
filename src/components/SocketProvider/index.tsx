@@ -107,6 +107,7 @@ function SocketProvider({children}: {children: React.ReactNode}) {
         startTimer();
       }
       console.log('WebSocket connection opened for : ', domain);
+      // console.log('engines data fr 2: ', enginesData2);
     };
 
     ws.onmessage = e => {
@@ -118,6 +119,7 @@ function SocketProvider({children}: {children: React.ReactNode}) {
         if (domain === 'timesp1.local') {
           handleTimesp1Data(sensors, enginesData, jsonData);
         } else if (domain === 'timesp2.local') {
+          console.log('engines data for 2 ye aya : ', enginesData);
           handleTimesp2Data(sensors, enginesData, jsonData);
         }
       } catch (error) {
@@ -174,10 +176,12 @@ function SocketProvider({children}: {children: React.ReactNode}) {
     if (JSON.stringify(fuelDataRef2.current) !== JSON.stringify(fuelMGT)) {
       fuelDataRef2.current = fuelMGT;
       setFuelManagementData2(fuelMGT);
+      console.log(fuelManagementData2);
     }
     if (JSON.stringify(engine2Ref.current) !== JSON.stringify(enginesData)) {
       engine2Ref.current = enginesData;
       setEnginesData2(enginesData);
+      console.log(enginesData2);
     }
   };
 

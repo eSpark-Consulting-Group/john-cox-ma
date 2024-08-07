@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -69,29 +69,7 @@ export default function Main() {
     },
   ];
 
-  // const fetchData = async () => {
-  //   try {
-  //     const res = await api.get(
-  //       'https://virtserver.swaggerhub.com/AbeerUlHaq/JohnCox/1.0.0/getSensorData',
-  //     );
-
-  //     if (res.status === 200) {
-  //       console.log('Success:', res.data); // Assuming the response data is in the 'data' property
-  //     } else if (res.status === 404) {
-  //       console.error('Not Found:', res.status);
-  //     } else if (res.status === 500) {
-  //       console.error('Internal Server Error:', res.status);
-  //     } else {
-  //       console.error('Unexpected Error:', res.status);
-  //     }
-  //   } catch (error) {
-  //     console.error('Error fetching data:', error);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   fetchData();
-  // }, []);
+  useEffect(() => console.log(provision), []);
 
   return (
     <MyCanvas>

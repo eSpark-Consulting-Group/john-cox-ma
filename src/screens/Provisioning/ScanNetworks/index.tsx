@@ -135,14 +135,13 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
         const passphrase = password;
 
         try {
-          //YEHAN MASLA HEY
-          await device?.provision(ssid, passphrase); //network se connect horha hey lkn iss se aagey nahi brh rha .. KYUN???
-          console.log('network se tou connect hogya');
-
           const res = await device?.sendData(
             'domain-name',
             JSON.stringify({type: 'domain_request'}),
           );
+          await device?.provision(ssid, passphrase);
+          console.log('network se tou connect hogya'); // works fine till here
+
           console.log(res);
           const res1 = JSON.parse(res);
           console.log('Response:', res1?.domain_name);
