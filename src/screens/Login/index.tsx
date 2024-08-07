@@ -18,6 +18,7 @@ import {MyTheme} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
 import {api} from '../../api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 type LoginScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 
@@ -30,33 +31,73 @@ export default function Login() {
     username: 'ESP_409151',
     password: 'fc3258 ',
   });
+  // const loginHandler = async () => {
+  //   try {
+  //     setError('');
+  //     setIsLoading(true); //axios lagadein
+
+  //     const response = await api('https://timesp1.local').post(
+  //       '/userLogin',
+  //       creds,
+  //     );
+  //     if (response.status !== 200) {
+  //       throw response.data;
+  //     }
+  //     const data = response.data as {token: string};
+  //     if (data) {
+  //       await AsyncStorage.setItem('token', data.token);
+  //       navigation.navigate('Setup');
+  //     }
+  //   } catch (error: any) {
+  //     if (error?.message) {
+  //       setError(error.message);
+  //     } else {
+  //       setError('Internal Server Error!');
+  //     }
+  //     console.log(`Error while login: ${JSON.stringify(error)}`);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
   const loginHandler = async () => {
     try {
       setError('');
       setIsLoading(true);
-      const response = await api('https://timesp1.local').post(
-        '/userLogin',
-        creds,
-      );
-      if (response.status !== 200) {
-        throw response.data;
+
+      const domains = ['timesp1.local', 'timesp2.local'];
+      let success = false;
+
+      for (const domain of domains) {
+        try {
+          const response = await axios.post(
+            `https://${domain}/userLogin`,
+            creds,
+          );
+
+          if (response.status === 200) {
+            const data = response.data as {token: string};
+            await AsyncStorage.setItem('token', data.token);
+            navigation.navigate('Setup');
+            success = true;
+            break; // Exit the loop if login is successful
+          }
+        } catch (error: any) {
+          console.log(`Error with ${domain}: ${JSON.stringify(error)}`);
+        }
       }
-      const data = response.data as {token: string};
-      if (data) {
-        await AsyncStorage.setItem('token', data.token);
-        navigation.navigate('Setup');
+
+      if (!success) {
+        throw new Error('Failed to log in to both devices.');
       }
     } catch (error: any) {
-      if (error?.message) {
-        setError(error.message);
-      } else {
-        setError('Internal Server Error!');
-      }
+      setError(error.message || 'Internal Server Error!');
       console.log(`Error while login: ${JSON.stringify(error)}`);
     } finally {
       setIsLoading(false);
     }
   };
+
   return (
     <MyCanvas>
       <KeyboardAvoidingView

@@ -23,8 +23,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 type MainScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 
 export default function Main() {
-  const {enginesData1, fuelManagementData, speed, enginesData2, provision} =
-    useSocket();
+  const {
+    enginesData1,
+    fuelManagementData,
+    fuelManagementData2,
+    speed,
+    enginesData2,
+    provision,
+  } = useSocket();
   const theme = useTheme() as MyTheme;
   const navigation = useNavigation<MainScreenProps['navigation']>();
   const [generatorRunning, setGeneratorRunning] = useState<'Yes' | 'No'>('Yes');
@@ -179,7 +185,10 @@ export default function Main() {
                 <View style={styles().fuelBurn}>
                   <MyBox
                     text="Total Fuel Burn"
-                    value={fuelManagementData.total_fuel_burned.toString()}
+                    value={(
+                      fuelManagementData.total_fuel_burned +
+                      fuelManagementData2.total_fuel_burned
+                    ).toString()}
                     unit="gal/hr"
                     width={'100%'}
                     gap={1}
@@ -192,7 +201,10 @@ export default function Main() {
                   <MyBox
                     label="Range"
                     text="Fuel Remaining"
-                    value={fuelManagementData.remaining_fuel}
+                    value={
+                      fuelManagementData.remaining_fuel +
+                      fuelManagementData2.remaining_fuel
+                    }
                     unit="gal"
                   />
                 </View>
@@ -214,7 +226,10 @@ export default function Main() {
               </View>
               <MyBox
                 text="Distance to Empty"
-                value={fuelManagementData.distance_to_empty.toString()}
+                value={(
+                  fuelManagementData.distance_to_empty +
+                  fuelManagementData2.distance_to_empty
+                ).toString()}
                 unit="N.Mile"
                 width={'70%'}
               />

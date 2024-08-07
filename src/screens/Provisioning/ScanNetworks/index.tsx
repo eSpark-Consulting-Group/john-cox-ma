@@ -133,17 +133,44 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
       if (network?.ssid) {
         const ssid = network.ssid;
         const passphrase = password;
+
         try {
-          await device?.provision(ssid, passphrase);
+          //YEHAN MASLA HEY
+          await device?.provision(ssid, passphrase); //network se connect horha hey lkn iss se aagey nahi brh rha .. KYUN???
+          console.log('network se tou connect hogya');
+
+          const res = await device?.sendData(
+            'domain-name',
+            JSON.stringify({type: 'domain_request'}),
+          );
+          console.log(res);
+          const res1 = JSON.parse(res);
+          console.log('Response:', res1?.domain_name);
+
+          const currentProvision = await AsyncStorage.getItem(
+            'provisionedDevices',
+          );
+          const provisionedDevices = currentProvision
+            ? JSON.parse(currentProvision)
+            : {timesp1: false, timesp2: false};
+
+          if (res1?.domain_name === 'timesp1') {
+            provisionedDevices.timesp1 = true;
+          } else if (res1?.domain_name === 'timesp2') {
+            provisionedDevices.timesp2 = true;
+          }
+
           await AsyncStorage.setItem(
             'provisionedDevices',
-            JSON.stringify({timesp1: true, timesp2: false}),
+            JSON.stringify(provisionedDevices),
           );
-          setProvision({timesp1: true, timesp2: false});
+          setProvision(provisionedDevices);
+          console.log('Provisioned devices:', provisionedDevices);
+
           console.log('Provisioning Test: Pass');
           setIsVisible(true);
-        } catch (provisionError) {
-          console.error('Error during device provisioning:', provisionError);
+        } catch (error) {
+          console.error('Error during device provisioning:', error);
           setAuthError(true);
         }
       } else {
@@ -152,6 +179,8 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
       }
     } catch (error) {
       console.error('Error during network provisioning:', error);
+      setIsLoading(false);
+    } finally {
       setIsLoading(false);
     }
   };
