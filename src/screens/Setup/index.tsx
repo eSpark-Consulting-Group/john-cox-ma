@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {ScrollView, StyleSheet, View, KeyboardAvoidingView} from 'react-native';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {
   GapView,
@@ -43,6 +44,14 @@ export default function Setup() {
   };
   let count = 0;
 
+  const logoutHandler = async () => {
+    try {
+      await AsyncStorage.removeItem('token');
+      navigation.navigate('Main');
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
+  };
   return (
     <MyCanvas>
       <ScrollView
@@ -166,7 +175,7 @@ export default function Setup() {
             style={styles().button}
             labelStyle={{fontSize: 20}}
             onPress={() => {
-              navigation.navigate('Main');
+              logoutHandler();
               console.log('Wapis jayein');
             }}
             gradient

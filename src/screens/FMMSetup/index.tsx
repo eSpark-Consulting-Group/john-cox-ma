@@ -57,6 +57,14 @@ export default function FMMSetup({route}: RouteType) {
     };
     setAllConfig(conf);
   };
+  const logoutHandler = async () => {
+    try {
+      await AsyncStorage.removeItem('token');
+      navigation.navigate('Main');
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
+  };
   return (
     <MyCanvas>
       <ScrollView
@@ -128,7 +136,7 @@ export default function FMMSetup({route}: RouteType) {
                     data: allConfig,
                   });
                   if (response.status === 200) {
-                    navigation.navigate('Main');
+                    logoutHandler();
                   } else if (response.status === 401) {
                     navigation.navigate('Login');
                   }

@@ -29,13 +29,15 @@ export default function Main() {
     fuelManagementData2,
     speed,
     enginesData2,
-    provision,
-    setProvision,
   } = useSocket();
   const theme = useTheme() as MyTheme;
   const navigation = useNavigation<MainScreenProps['navigation']>();
   const [generatorRunning, setGeneratorRunning] = useState<'Yes' | 'No'>('Yes');
   const [confirmation, setConfirmation] = useState(false);
+  const [prov, setProv] = useState<{timesp1: boolean; timesp2: boolean}>({
+    timesp1: false,
+    timesp2: false,
+  });
   const toggleGeneratorRunning = () => {
     setGeneratorRunning(generatorRunning === 'Yes' ? 'No' : 'Yes');
   };
@@ -69,15 +71,14 @@ export default function Main() {
       },
     },
   ];
-
+  //loader pe timer aur refresh lagana he
   const fetchProvisionedDevices = async () => {
-    console.log(provision);
     const currentProvision = await AsyncStorage.getItem('provisionedDevices');
     console.log(currentProvision);
     const provisionedDevices = currentProvision
       ? JSON.parse(currentProvision)
       : {timesp1: false, timesp2: false};
-    currentProvision && setProvision(provisionedDevices);
+    setProv(provisionedDevices);
   };
 
   useEffect(() => {
@@ -133,21 +134,23 @@ export default function Main() {
         ) : (
           <>
             <GapView length={90} />
-            <View style={styles().GaugeRow}>
-              {enginesData1.length ? (
-                enginesData1.map((item, index) => (
-                  <MyGauge
-                    key={item.id}
-                    value={item.fuel ? +item.fuel : 0}
-                    name={item.name}
-                  />
-                ))
-              ) : (
-                <Loader size="large" />
-              )}
-            </View>
+            {prov.timesp1 && (
+              <View style={styles().GaugeRow}>
+                {enginesData1.length ? (
+                  enginesData1.map((item, index) => (
+                    <MyGauge
+                      key={item.id}
+                      value={item.fuel ? +item.fuel : 0}
+                      name={item.name}
+                    />
+                  ))
+                ) : (
+                  <Loader size="large" />
+                )}
+              </View>
+            )}
             <GapView length={20} />
-            {provision.timesp2 && (
+            {prov.timesp2 && (
               <View style={styles().GaugeRow}>
                 {enginesData2.length ? (
                   enginesData2.map((item, index) => (

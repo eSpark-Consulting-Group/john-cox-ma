@@ -38,7 +38,6 @@ export default function Login() {
       setIsLoading(true);
 
       const domains = ['timesp1.local', 'timesp2.local'];
-      let success = false;
 
       for (const domain of domains) {
         try {
@@ -46,39 +45,15 @@ export default function Login() {
             `https://${domain}/userLogin`,
             creds,
           );
+          const data = response.data as {token: string};
+          await AsyncStorage.setItem('token', data.token);
+          navigation.navigate('Setup');
+          console.log(response.data);
 
-          if (response.status === 200) {
-            const data = response.data as {token: string};
-            await AsyncStorage.setItem('token', data.token);
-            navigation.navigate('Setup');
-            success = true;
-            break; // Exit the loop if login is successful
-          }
+          break; // Exit the loop if login is successful
         } catch (error: any) {
-          if (axios.isAxiosError(error)) {
-            console.log(`Axios error with ${domain}: ${error.message}`);
-            console.log(`Error config: ${JSON.stringify(error.config)}`);
-            if (error.response) {
-              console.log(
-                `Error response data: ${JSON.stringify(error.response.data)}`,
-              );
-              console.log(`Error response status: ${error.response.status}`);
-              console.log(
-                `Error response headers: ${JSON.stringify(
-                  error.response.headers,
-                )}`,
-              );
-            } else if (error.request) {
-              console.log(`Error request: ${JSON.stringify(error.request)}`);
-            }
-          } else {
-            console.log(`Non-Axios error with ${domain}: ${error.message}`);
-          }
+          console.log(error);
         }
-      }
-
-      if (!success) {
-        throw new Error('Failed to log in to both devices.');
       }
     } catch (error: any) {
       setError(error.message || 'Internal Server Error!');
