@@ -126,20 +126,12 @@ async function handleDomainAssignment(device: ESPDevice, res1: any) {
           const domainToAssign = timesp1Exists ? 'timesp2' : 'timesp1';
           await checkAndAssignDomain(device, domainToAssign);
           await updateFile(res1.mac_address, device);
-          // here is the problem 1 -  if timesp1 has already been assigned - timesp2 should be assigned
-          // await checkAndAssignDomain(device, 'timesp1');
-          // await updateFile(res1.mac_address, device);
         }
       }
       break;
     case 'timesp1':
     case 'timesp2':
-      console.log(
-        'domain received from device---',
-        res1.domain_name,
-        // ' but we will forcefully assign timesp2 this time',
-      );
-      // await checkAndAssignDomain(device, 'timesp2');
+      console.log('domain received from device---', res1.domain_name);
       await checkAndAssignDomain(device, res1.domain_name);
       await updateFile(res1.mac_address, device);
       break;

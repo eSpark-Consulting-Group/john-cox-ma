@@ -42,6 +42,7 @@ export default function Setup() {
     setConfig(allConfig);
   };
   let count = 0;
+
   return (
     <MyCanvas>
       <ScrollView

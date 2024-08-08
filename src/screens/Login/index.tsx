@@ -29,36 +29,8 @@ export default function Login() {
   const [error, setError] = useState('');
   const [creds, setCreds] = useState({
     username: 'ESP_409151',
-    password: 'fc3258 ',
+    password: 'fc3258',
   });
-  // const loginHandler = async () => {
-  //   try {
-  //     setError('');
-  //     setIsLoading(true); //axios lagadein
-
-  //     const response = await api('https://timesp1.local').post(
-  //       '/userLogin',
-  //       creds,
-  //     );
-  //     if (response.status !== 200) {
-  //       throw response.data;
-  //     }
-  //     const data = response.data as {token: string};
-  //     if (data) {
-  //       await AsyncStorage.setItem('token', data.token);
-  //       navigation.navigate('Setup');
-  //     }
-  //   } catch (error: any) {
-  //     if (error?.message) {
-  //       setError(error.message);
-  //     } else {
-  //       setError('Internal Server Error!');
-  //     }
-  //     console.log(`Error while login: ${JSON.stringify(error)}`);
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
 
   const loginHandler = async () => {
     try {
@@ -83,7 +55,25 @@ export default function Login() {
             break; // Exit the loop if login is successful
           }
         } catch (error: any) {
-          console.log(`Error with ${domain}: ${JSON.stringify(error)}`);
+          if (axios.isAxiosError(error)) {
+            console.log(`Axios error with ${domain}: ${error.message}`);
+            console.log(`Error config: ${JSON.stringify(error.config)}`);
+            if (error.response) {
+              console.log(
+                `Error response data: ${JSON.stringify(error.response.data)}`,
+              );
+              console.log(`Error response status: ${error.response.status}`);
+              console.log(
+                `Error response headers: ${JSON.stringify(
+                  error.response.headers,
+                )}`,
+              );
+            } else if (error.request) {
+              console.log(`Error request: ${JSON.stringify(error.request)}`);
+            }
+          } else {
+            console.log(`Non-Axios error with ${domain}: ${error.message}`);
+          }
         }
       }
 
@@ -92,7 +82,7 @@ export default function Login() {
       }
     } catch (error: any) {
       setError(error.message || 'Internal Server Error!');
-      console.log(`Error while login: ${JSON.stringify(error)}`);
+      console.log(`Error while login: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
