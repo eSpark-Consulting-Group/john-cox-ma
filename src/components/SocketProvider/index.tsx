@@ -97,6 +97,23 @@ function SocketProvider({children}: {children: React.ReactNode}) {
 
   const getTimerValue = () => timer.current;
 
+  // iske sath loader pe timer laga deti hun -
+  // aur ek reload ka button bhi add krdeti -
+
+  const fetchProvisionedDevices = async () => {
+    console.log('before refreshing', provision);
+    const currentProvision = await AsyncStorage.getItem('provisionedDevices');
+    const provisionedDevices = currentProvision
+      ? JSON.parse(currentProvision)
+      : {timesp1: false, timesp2: false};
+    currentProvision && setProvision(provisionedDevices);
+    console.log('after refreshing', provision);
+  };
+
+  useEffect(() => {
+    fetchProvisionedDevices();
+  }, []);
+
   const getSocketData = (domain: string) => {
     console.log('=====WEB SOCKET START======');
     const ws = new WebSocket(`wss://${domain}/ws`);

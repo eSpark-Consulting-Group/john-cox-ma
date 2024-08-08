@@ -127,6 +127,8 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
     </Pressable>
   );
 
+  //set tou krlia cache -  ager ek device hey tou wapis unset kese kiya hey?
+
   const connectNetwork = async () => {
     setIsLoading(true);
     try {

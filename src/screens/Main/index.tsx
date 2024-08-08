@@ -30,6 +30,7 @@ export default function Main() {
     speed,
     enginesData2,
     provision,
+    setProvision,
   } = useSocket();
   const theme = useTheme() as MyTheme;
   const navigation = useNavigation<MainScreenProps['navigation']>();
@@ -69,7 +70,19 @@ export default function Main() {
     },
   ];
 
-  useEffect(() => console.log(provision), []);
+  const fetchProvisionedDevices = async () => {
+    console.log(provision);
+    const currentProvision = await AsyncStorage.getItem('provisionedDevices');
+    console.log(currentProvision);
+    const provisionedDevices = currentProvision
+      ? JSON.parse(currentProvision)
+      : {timesp1: false, timesp2: false};
+    currentProvision && setProvision(provisionedDevices);
+  };
+
+  useEffect(() => {
+    fetchProvisionedDevices();
+  }, []);
 
   return (
     <MyCanvas>
