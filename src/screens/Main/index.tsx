@@ -85,6 +85,8 @@ export default function Main() {
     fetchProvisionedDevices();
   }, []);
 
+  console.log(enginesData1);
+
   return (
     <MyCanvas>
       <ScrollView
