@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   FlatList,
   Pressable,
@@ -7,7 +7,11 @@ import {
   View,
 } from 'react-native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {useNavigation, useTheme} from '@react-navigation/native';
+import {
+  useFocusEffect,
+  useNavigation,
+  useTheme,
+} from '@react-navigation/native';
 import {Ionicons} from '@expo/vector-icons';
 import {
   ESPProvisionManager,
@@ -46,20 +50,22 @@ export default function ScanDevices() {
   const [devices, setDevices] = useState<ESPDevice[]>();
   const [granted, setGranted] = useState(false);
 
-  useEffect(() => {
-    const requestPermissionsAndScan = async () => {
-      try {
-        const grantedPermissions = await checkPermissions();
-        setGranted(grantedPermissions);
-        if (grantedPermissions) {
-          await scanDevices();
+  useFocusEffect(
+    useCallback(() => {
+      const requestPermissionsAndScan = async () => {
+        try {
+          const grantedPermissions = await checkPermissions();
+          setGranted(grantedPermissions);
+          if (grantedPermissions) {
+            await scanDevices();
+          }
+        } catch (error) {
+          console.error('Error fetching permissions:', error);
         }
-      } catch (error) {
-        console.error('Error fetching permissions:', error);
-      }
-    };
-    requestPermissionsAndScan();
-  }, []);
+      };
+      requestPermissionsAndScan();
+    }, []),
+  );
 
   const scanDevices = async () => {
     try {

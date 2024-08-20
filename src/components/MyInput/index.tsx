@@ -1,7 +1,14 @@
-import React, {memo} from 'react';
-import {DimensionValue, StyleSheet, TextInput, View} from 'react-native';
+import React, {memo, useState} from 'react';
+import {
+  DimensionValue,
+  Pressable,
+  StyleSheet,
+  TextInput,
+  View,
+} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import {LinearGradient} from 'expo-linear-gradient';
+import {Ionicons} from '@expo/vector-icons';
 
 import {MyInputProps, MyTheme} from '../../types';
 
@@ -17,6 +24,7 @@ function MyInput({
   value,
 }: MyInputProps) {
   const theme = useTheme() as MyTheme;
+  const [isVisible, setIsVisible] = useState(!password);
   return (
     <View style={styles({width, height}).container}>
       <TextInput
@@ -29,11 +37,22 @@ function MyInput({
             fontSize: size,
           },
         ]}
-        secureTextEntry={password}
+        secureTextEntry={!isVisible}
         onFocus={onFocus}
         placeholder={placeholder}
         placeholderTextColor={theme.colors.primary}
       />
+      {password && (
+        <Pressable
+          style={styles({width, height}).eyeIcon}
+          onPress={() => setIsVisible(!isVisible)}>
+          <Ionicons
+            name={isVisible ? 'eye-off' : 'eye'}
+            size={height / 1.25}
+            color={theme.colors.primary}
+          />
+        </Pressable>
+      )}
       <LinearGradient
         colors={['#72e14d89', 'transparent']}
         start={{x: 1, y: 0}}
@@ -92,6 +111,11 @@ const styles = ({
       width: width ? width : '97%',
       height: height ? height : 20,
       alignItems: 'center',
+    },
+    eyeIcon: {
+      position: 'absolute',
+      right: 20,
+      zIndex: 30,
     },
     innerGradient: {
       width: width ? width - 7 : '96%',

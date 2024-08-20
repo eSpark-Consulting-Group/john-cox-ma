@@ -79,7 +79,12 @@ export default function Proof({route}: ProofScreenProps) {
           />
           <GapView length={40} />
           <View style={styles.inputContainer}>
-            <MyInput height={45} size={16} onChange={text => setPop(text)} />
+            <MyInput
+              height={45}
+              size={16}
+              onChange={text => setPop(text)}
+              password
+            />
             <MyText
               text={'Enter Pin for ' + device.name}
               size={26}

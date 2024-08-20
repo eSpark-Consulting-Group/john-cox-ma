@@ -58,6 +58,7 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
   const scanWifiList = async () => {
     setLoading(true);
     try {
+      await new Promise(resolve => setTimeout(resolve, 1000));
       const wifiList = await device?.scanWifiList();
       console.log('wifi List: ', wifiList);
       setNetworks(wifiList);
@@ -99,7 +100,7 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
   }, [isLoading]);
 
   useEffect(() => {
-    scanWifiList;
+    scanWifiList();
   }, []);
 
   const renderNetwork = ({item}: {item: ESPWifiList}) => (
@@ -147,6 +148,8 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
           console.log(res);
           const res1 = JSON.parse(res);
           console.log('Response:', res1?.domain_name);
+          await new Promise(resolve => setTimeout(resolve, 5000));
+          console.log('NOW');
 
           const currentProvision = await AsyncStorage.getItem(
             'provisionedDevices',
@@ -278,7 +281,11 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
                 <MyText size={24}>{network?.ssid}</MyText>
               </View>
               <View style={{width: '95%', paddingTop: 15}}>
-                <MyInput height={45} onChange={text => setPassword(text)} />
+                <MyInput
+                  height={45}
+                  onChange={text => setPassword(text)}
+                  password
+                />
               </View>
               <GapView length={60} />
               <MyButton

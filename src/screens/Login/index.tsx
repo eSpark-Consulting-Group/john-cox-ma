@@ -96,6 +96,7 @@ export default function Login() {
             width={114}
             height={21}
             size={18}
+            password
           />
           <GapView length={30} />
           {isLoading ? (
