@@ -50,21 +50,24 @@ export default function ScanDevices() {
   const [devices, setDevices] = useState<ESPDevice[]>();
   const [granted, setGranted] = useState(false);
 
+  const requestPermissionsAndScan = async () => {
+    try {
+      const grantedPermissions = await checkPermissions();
+      setGranted(grantedPermissions);
+    } catch (error) {
+      console.error('Error fetching permissions:', error);
+    }
+  };
+
   useFocusEffect(
     useCallback(() => {
-      const requestPermissionsAndScan = async () => {
-        try {
-          const grantedPermissions = await checkPermissions();
-          setGranted(grantedPermissions);
-          if (grantedPermissions) {
-            await scanDevices();
-          }
-        } catch (error) {
-          console.error('Error fetching permissions:', error);
-        }
-      };
       requestPermissionsAndScan();
-    }, []),
+      if (granted) {
+        console.log('scanning devices again');
+
+        scanDevices();
+      }
+    }, [granted]),
   );
 
   const scanDevices = async () => {
@@ -81,7 +84,7 @@ export default function ScanDevices() {
         setDevices(myDevices);
         console.log('Available Devices:', myDevices);
       } else {
-        console.log('Some permissions are not granted.');
+        console.log('some issue');
       }
     } catch (error) {
       console.error('Error scanning devices:', error);

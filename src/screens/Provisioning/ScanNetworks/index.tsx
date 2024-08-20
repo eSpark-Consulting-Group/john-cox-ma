@@ -129,7 +129,7 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
   );
 
   //set tou krlia cache -  ager ek device hey tou wapis unset kese kiya hey?
-
+  // double try remove
   const connectNetwork = async () => {
     setIsLoading(true);
     try {
@@ -142,14 +142,13 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
             'domain-name',
             JSON.stringify({type: 'domain_request'}),
           );
-          await device?.provision(ssid, passphrase);
-          console.log('network se tou connect hogya'); // works fine till here
 
+          await device?.provision(ssid, passphrase);
           console.log(res);
+
           const res1 = JSON.parse(res);
           console.log('Response:', res1?.domain_name);
-          await new Promise(resolve => setTimeout(resolve, 5000));
-          console.log('NOW');
+          //here
 
           const currentProvision = await AsyncStorage.getItem(
             'provisionedDevices',
