@@ -18,6 +18,7 @@ import {MyTheme} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
 import {api} from '../../api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 type LoginScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 
@@ -28,35 +29,40 @@ export default function Login() {
   const [error, setError] = useState('');
   const [creds, setCreds] = useState({
     username: 'ESP_409151',
-    password: 'fc32a4',
+    password: 'fc3258',
   });
+
   const loginHandler = async () => {
     try {
       setError('');
       setIsLoading(true);
-      const response = await api('https://timesp1.local').post(
-        '/userLogin',
-        creds,
-      );
-      if (response.status !== 200) {
-        throw response.data;
-      }
-      const data = response.data as {token: string};
-      if (data) {
-        await AsyncStorage.setItem('token', data.token);
-        navigation.navigate('Setup');
+
+      const domains = ['timesp1.local', 'timesp2.local'];
+
+      for (const domain of domains) {
+        try {
+          const response = await axios.post(
+            `https://${domain}/userLogin`,
+            creds,
+          );
+          const data = response.data as {token: string};
+          await AsyncStorage.setItem('token', data.token);
+          navigation.navigate('Setup');
+          console.log(response.data);
+
+          break; // Exit the loop if login is successful
+        } catch (error: any) {
+          console.log(error);
+        }
       }
     } catch (error: any) {
-      if (error?.message) {
-        setError(error.message);
-      } else {
-        setError('Internal Server Error!');
-      }
-      console.log(`Error while login: ${JSON.stringify(error)}`);
+      setError(error.message || 'Internal Server Error!');
+      console.log(`Error while login: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
   };
+
   return (
     <MyCanvas>
       <KeyboardAvoidingView
@@ -90,6 +96,7 @@ export default function Login() {
             width={114}
             height={21}
             size={18}
+            password
           />
           <GapView length={30} />
           {isLoading ? (

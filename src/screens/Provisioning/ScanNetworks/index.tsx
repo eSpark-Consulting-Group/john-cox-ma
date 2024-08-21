@@ -58,6 +58,7 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
   const scanWifiList = async () => {
     setLoading(true);
     try {
+      await new Promise(resolve => setTimeout(resolve, 1000));
       const wifiList = await device?.scanWifiList();
       console.log('wifi List: ', wifiList);
       setNetworks(wifiList);
@@ -99,7 +100,7 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
   }, [isLoading]);
 
   useEffect(() => {
-    scanWifiList;
+    scanWifiList();
   }, []);
 
   const renderNetwork = ({item}: {item: ESPWifiList}) => (
@@ -127,23 +128,52 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
     </Pressable>
   );
 
+  //set tou krlia cache -  ager ek device hey tou wapis unset kese kiya hey?
+  // double try remove
   const connectNetwork = async () => {
     setIsLoading(true);
     try {
       if (network?.ssid) {
         const ssid = network.ssid;
         const passphrase = password;
+
         try {
+          const res = await device?.sendData(
+            'domain-name',
+            JSON.stringify({type: 'domain_request'}),
+          );
+
           await device?.provision(ssid, passphrase);
+          console.log(res);
+
+          const res1 = JSON.parse(res);
+          console.log('Response:', res1?.domain_name);
+          //here
+
+          const currentProvision = await AsyncStorage.getItem(
+            'provisionedDevices',
+          );
+          const provisionedDevices = currentProvision
+            ? JSON.parse(currentProvision)
+            : {timesp1: false, timesp2: false};
+
+          if (res1?.domain_name === 'timesp1') {
+            provisionedDevices.timesp1 = true;
+          } else if (res1?.domain_name === 'timesp2') {
+            provisionedDevices.timesp2 = true;
+          }
+
           await AsyncStorage.setItem(
             'provisionedDevices',
-            JSON.stringify({timesp1: true, timesp2: false}),
+            JSON.stringify(provisionedDevices),
           );
-          setProvision({timesp1: true, timesp2: false});
+          setProvision(provisionedDevices);
+          console.log('Provisioned devices:', provisionedDevices);
+
           console.log('Provisioning Test: Pass');
           setIsVisible(true);
-        } catch (provisionError) {
-          console.error('Error during device provisioning:', provisionError);
+        } catch (error) {
+          console.error('Error during device provisioning:', error);
           setAuthError(true);
         }
       } else {
@@ -152,6 +182,8 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
       }
     } catch (error) {
       console.error('Error during network provisioning:', error);
+      setIsLoading(false);
+    } finally {
       setIsLoading(false);
     }
   };
@@ -248,7 +280,11 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
                 <MyText size={24}>{network?.ssid}</MyText>
               </View>
               <View style={{width: '95%', paddingTop: 15}}>
-                <MyInput height={45} onChange={text => setPassword(text)} />
+                <MyInput
+                  height={45}
+                  onChange={text => setPassword(text)}
+                  password
+                />
               </View>
               <GapView length={60} />
               <MyButton

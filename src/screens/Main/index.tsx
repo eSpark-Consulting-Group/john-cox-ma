@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -23,12 +23,21 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 type MainScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 
 export default function Main() {
-  const {enginesData1, fuelManagementData, speed, enginesData2, provision} =
-    useSocket();
+  const {
+    enginesData1,
+    fuelManagementData,
+    fuelManagementData2,
+    speed,
+    enginesData2,
+  } = useSocket();
   const theme = useTheme() as MyTheme;
   const navigation = useNavigation<MainScreenProps['navigation']>();
   const [generatorRunning, setGeneratorRunning] = useState<'Yes' | 'No'>('Yes');
   const [confirmation, setConfirmation] = useState(false);
+  const [prov, setProv] = useState<{timesp1: boolean; timesp2: boolean}>({
+    timesp1: false,
+    timesp2: false,
+  });
   const toggleGeneratorRunning = () => {
     setGeneratorRunning(generatorRunning === 'Yes' ? 'No' : 'Yes');
   };
@@ -62,30 +71,21 @@ export default function Main() {
       },
     },
   ];
+  //loader pe timer aur refresh lagana he
+  const fetchProvisionedDevices = async () => {
+    const currentProvision = await AsyncStorage.getItem('provisionedDevices');
+    console.log(currentProvision);
+    const provisionedDevices = currentProvision
+      ? JSON.parse(currentProvision)
+      : {timesp1: false, timesp2: false};
+    setProv(provisionedDevices);
+  };
 
-  // const fetchData = async () => {
-  //   try {
-  //     const res = await api.get(
-  //       'https://virtserver.swaggerhub.com/AbeerUlHaq/JohnCox/1.0.0/getSensorData',
-  //     );
+  useEffect(() => {
+    fetchProvisionedDevices();
+  }, []);
 
-  //     if (res.status === 200) {
-  //       console.log('Success:', res.data); // Assuming the response data is in the 'data' property
-  //     } else if (res.status === 404) {
-  //       console.error('Not Found:', res.status);
-  //     } else if (res.status === 500) {
-  //       console.error('Internal Server Error:', res.status);
-  //     } else {
-  //       console.error('Unexpected Error:', res.status);
-  //     }
-  //   } catch (error) {
-  //     console.error('Error fetching data:', error);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   fetchData();
-  // }, []);
+  console.log(enginesData1);
 
   return (
     <MyCanvas>
@@ -136,21 +136,23 @@ export default function Main() {
         ) : (
           <>
             <GapView length={90} />
-            <View style={styles().GaugeRow}>
-              {enginesData1.length ? (
-                enginesData1.map((item, index) => (
-                  <MyGauge
-                    key={item.id}
-                    value={item.fuel ? +item.fuel : 0}
-                    name={item.name}
-                  />
-                ))
-              ) : (
-                <Loader size="large" />
-              )}
-            </View>
+            {prov.timesp1 && (
+              <View style={styles().GaugeRow}>
+                {enginesData1.length ? (
+                  enginesData1.map((item, index) => (
+                    <MyGauge
+                      key={item.id}
+                      value={item.fuel ? +item.fuel : 0}
+                      name={item.name}
+                    />
+                  ))
+                ) : (
+                  <Loader size="large" />
+                )}
+              </View>
+            )}
             <GapView length={20} />
-            {provision.timesp2 && (
+            {prov.timesp2 && (
               <View style={styles().GaugeRow}>
                 {enginesData2.length ? (
                   enginesData2.map((item, index) => (
@@ -179,7 +181,10 @@ export default function Main() {
                 <View style={styles().fuelBurn}>
                   <MyBox
                     text="Total Fuel Burn"
-                    value={fuelManagementData.total_fuel_burned.toString()}
+                    value={(
+                      fuelManagementData.total_fuel_burned +
+                      fuelManagementData2.total_fuel_burned
+                    ).toString()}
                     unit="gal/hr"
                     width={'100%'}
                     gap={1}
@@ -192,7 +197,10 @@ export default function Main() {
                   <MyBox
                     label="Range"
                     text="Fuel Remaining"
-                    value={fuelManagementData.remaining_fuel}
+                    value={
+                      fuelManagementData.remaining_fuel +
+                      fuelManagementData2.remaining_fuel
+                    }
                     unit="gal"
                   />
                 </View>
@@ -214,7 +222,10 @@ export default function Main() {
               </View>
               <MyBox
                 text="Distance to Empty"
-                value={fuelManagementData.distance_to_empty.toString()}
+                value={(
+                  fuelManagementData.distance_to_empty +
+                  fuelManagementData2.distance_to_empty
+                ).toString()}
                 unit="N.Mile"
                 width={'70%'}
               />

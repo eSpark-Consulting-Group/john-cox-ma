@@ -57,6 +57,14 @@ export default function FMMSetup({route}: RouteType) {
     };
     setAllConfig(conf);
   };
+  const logoutHandler = async () => {
+    try {
+      await AsyncStorage.removeItem('token');
+      navigation.navigate('Main');
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
+  };
   return (
     <MyCanvas>
       <ScrollView
@@ -77,7 +85,7 @@ export default function FMMSetup({route}: RouteType) {
             fontFamily="NotoSans-Bold"
           />
           {allConfig.map((item, index) => (
-            <>
+            <React.Fragment key={item.engine_id}>
               <MyText
                 text={item.name}
                 textColor={theme.colors.secondary}
@@ -106,9 +114,10 @@ export default function FMMSetup({route}: RouteType) {
                 value={item.engine_type}
                 zIndex={54}
               />
-            </>
+            </React.Fragment>
           ))}
         </MyCard>
+
         <GapView length={15} />
         <GapView length={25} />
         <View style={{width: '30%'}}>
@@ -128,7 +137,7 @@ export default function FMMSetup({route}: RouteType) {
                     data: allConfig,
                   });
                   if (response.status === 200) {
-                    navigation.navigate('Main');
+                    logoutHandler();
                   } else if (response.status === 401) {
                     navigation.navigate('Login');
                   }

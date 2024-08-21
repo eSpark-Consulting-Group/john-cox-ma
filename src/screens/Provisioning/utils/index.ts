@@ -7,6 +7,46 @@ import {
 } from 'react-native-permissions';
 import * as FileSystem from 'expo-file-system';
 
+export async function checkPermissions() {
+  try {
+    const status = await checkMultiple([
+      PERMISSIONS.ANDROID.BLUETOOTH_SCAN,
+      PERMISSIONS.ANDROID.BLUETOOTH_CONNECT,
+      PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
+    ]);
+    console.log('check Granted permissions HERE:---------------------------');
+
+    console.log(
+      'Bluetooth Scan Permission:',
+      status[PERMISSIONS.ANDROID.BLUETOOTH_SCAN],
+    );
+    console.log(
+      'Bluetooth Connect Permission:',
+      status[PERMISSIONS.ANDROID.BLUETOOTH_CONNECT],
+    );
+    console.log(
+      'Location Permission:',
+      status[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION],
+    );
+
+    if (
+      status[PERMISSIONS.ANDROID.BLUETOOTH_SCAN] == 'granted' &&
+      status[PERMISSIONS.ANDROID.BLUETOOTH_CONNECT] == 'granted' &&
+      status[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION] == 'granted'
+    ) {
+      console.log('All permissions granted. HERE');
+      return true;
+    } else {
+      console.log('Some permissions are not granted. so requesting again HERE');
+      const res = await requestPermissions();
+      return res;
+    }
+  } catch (err) {
+    console.error('check Error requesting permissions:', err);
+    return false;
+  }
+}
+
 async function requestPermissions() {
   try {
     const status = await requestMultiple([
@@ -15,7 +55,20 @@ async function requestPermissions() {
       PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
     ]);
 
-    console.log('Granted permissions:', status);
+    console.log('check Granted permissions:---------------------------');
+
+    console.log(
+      'Bluetooth Scan Permission:',
+      status[PERMISSIONS.ANDROID.BLUETOOTH_SCAN],
+    );
+    console.log(
+      'Bluetooth Connect Permission:',
+      status[PERMISSIONS.ANDROID.BLUETOOTH_CONNECT],
+    );
+    console.log(
+      'Location Permission:',
+      status[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION],
+    );
 
     if (
       status[PERMISSIONS.ANDROID.BLUETOOTH_SCAN] == 'granted' &&
@@ -30,33 +83,6 @@ async function requestPermissions() {
     }
   } catch (err) {
     console.error('Error requesting permissions:', err);
-    return false;
-  }
-}
-
-export async function checkPermissions() {
-  try {
-    const status = await checkMultiple([
-      PERMISSIONS.ANDROID.BLUETOOTH_SCAN,
-      PERMISSIONS.ANDROID.BLUETOOTH_CONNECT,
-      PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
-    ]);
-    console.log('check Granted permissions:', status);
-
-    if (
-      status[PERMISSIONS.ANDROID.BLUETOOTH_SCAN] == 'granted' &&
-      status[PERMISSIONS.ANDROID.BLUETOOTH_CONNECT] == 'granted' &&
-      status[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION] == 'granted'
-    ) {
-      console.log('check All permissions granted.');
-      return true;
-    } else {
-      console.log('check Some permissions are not granted.');
-      const res = await requestPermissions();
-      return res;
-    }
-  } catch (err) {
-    console.error('check Error requesting permissions:', err);
     return false;
   }
 }
@@ -89,6 +115,24 @@ export const scanWifiList = async (device: ESPDevice) => {
   }
 };
 
+async function checkCompleteCacheForDomain(domainName: string) {
+  const keys = await AsyncStorage.getAllKeys();
+  for (const key of keys) {
+    const data = await AsyncStorage.getItem(key);
+    console.log(data, '--------------');
+    if (data) {
+      const parsedData = JSON.parse(data);
+      if (parsedData.domain_name === domainName) {
+        console.log(' ---- timesp1 already exists ---- ');
+        return true;
+      }
+    }
+  }
+  console.log(' ---- timesp2 does not exist already ---- ');
+  return false;
+}
+
+//res1 device se jo domain aur device details arhi wo heyn
 async function handleDomainAssignment(device: ESPDevice, res1: any) {
   switch (res1.domain_name) {
     case '':
@@ -103,7 +147,10 @@ async function handleDomainAssignment(device: ESPDevice, res1: any) {
           const data = JSON.parse(fileData);
           await checkAndAssignDomain(device, data.domain_name);
         } else {
-          await checkAndAssignDomain(device, 'timesp1');
+          // Check complete cache for "timesp1"
+          const timesp1Exists = await checkCompleteCacheForDomain('timesp1');
+          const domainToAssign = timesp1Exists ? 'timesp2' : 'timesp1';
+          await checkAndAssignDomain(device, domainToAssign);
           await updateFile(res1.mac_address, device);
         }
       }
@@ -255,6 +302,7 @@ export async function checkCache(mac_address: string) {
 }
 
 async function checkAndAssignDomain(device: ESPDevice, domainName: string) {
+  // now here is the problem 2 - both devices return timesp1 WHY???
   const res = await device?.sendData(
     'domain-name',
     JSON.stringify({

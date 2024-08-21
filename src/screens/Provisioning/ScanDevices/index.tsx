@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   FlatList,
   Pressable,
@@ -7,7 +7,11 @@ import {
   View,
 } from 'react-native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {useNavigation, useTheme} from '@react-navigation/native';
+import {
+  useFocusEffect,
+  useNavigation,
+  useTheme,
+} from '@react-navigation/native';
 import {Ionicons} from '@expo/vector-icons';
 import {
   ESPProvisionManager,
@@ -46,20 +50,25 @@ export default function ScanDevices() {
   const [devices, setDevices] = useState<ESPDevice[]>();
   const [granted, setGranted] = useState(false);
 
-  useEffect(() => {
-    const requestPermissionsAndScan = async () => {
-      try {
-        const grantedPermissions = await checkPermissions();
-        setGranted(grantedPermissions);
-        if (grantedPermissions) {
-          await scanDevices();
-        }
-      } catch (error) {
-        console.error('Error fetching permissions:', error);
+  const requestPermissionsAndScan = async () => {
+    try {
+      const grantedPermissions = await checkPermissions();
+      setGranted(grantedPermissions);
+    } catch (error) {
+      console.error('Error fetching permissions:', error);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      requestPermissionsAndScan();
+      if (granted) {
+        console.log('scanning devices again');
+
+        scanDevices();
       }
-    };
-    requestPermissionsAndScan();
-  }, []);
+    }, [granted]),
+  );
 
   const scanDevices = async () => {
     try {
@@ -75,7 +84,7 @@ export default function ScanDevices() {
         setDevices(myDevices);
         console.log('Available Devices:', myDevices);
       } else {
-        console.log('Some permissions are not granted.');
+        console.log('some issue');
       }
     } catch (error) {
       console.error('Error scanning devices:', error);
@@ -167,6 +176,18 @@ export default function ScanDevices() {
               if (device) {
                 navigation.navigate('Proof', {device});
               }
+            }}
+            textColor={theme.colors.proSecondary}
+          />
+          <MyButton
+            label="Skip Setup"
+            style={{
+              paddingHorizontal: 45,
+              marginTop: 10,
+            }}
+            labelStyle={{fontSize: 18}}
+            onPress={() => {
+              navigation.navigate('Main');
             }}
             textColor={theme.colors.proSecondary}
           />
