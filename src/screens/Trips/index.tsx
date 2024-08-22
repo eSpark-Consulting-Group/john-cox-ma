@@ -28,10 +28,11 @@ export default function Trips() {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [warningVisible, setWarningVisible] = useState(false);
   const [resetVisible, setResetVisible] = useState(false);
-  const [selectedSwitch, setSelectedSwitch] = useState<number>(0); // Stores the currently selected switch index
+  const [selectedSwitch, setSelectedSwitch] = useState<number>(1); // Stores the currently selected switch index
+  const [value, SetValue] = useState(false);
 
   const handleSwitchPress = (index: number) => {
-    setSelectedSwitch(index === selectedSwitch ? 0 : index); // Toggle selection or deselect
+    setSelectedSwitch(index === selectedSwitch ? selectedSwitch : index); // Toggle selection
   };
 
   useEffect(() => {
@@ -172,11 +173,18 @@ export default function Trips() {
               <RenderRow title="Efficiency" unit="Gal/N.Mile" />
             </MyCard>
             <GapView length={30} />
-            <MyButton
-              label="Trip Reset"
-              width={80}
-              onPress={() => setShowConfirmation(true)}
-            />
+            <View style={{flexDirection: 'row', gap: 20}}>
+              <MyButton
+                label={value ? 'End Trip' : 'Start Trip'}
+                width={80}
+                onPress={() => SetValue(!value)}
+              />
+              <MyButton
+                label="Trip Reset"
+                width={80}
+                onPress={() => setShowConfirmation(true)}
+              />
+            </View>
             <GapView length={25} />
             <MyButton
               label="Back"
