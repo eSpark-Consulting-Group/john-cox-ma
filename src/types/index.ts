@@ -67,6 +67,7 @@ export interface MyInputProps {
   size?: number;
   placeholder?: string;
   value?: string;
+  editable?: boolean;
 }
 
 export interface LabelInputProps {

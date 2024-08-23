@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {Modal, ScrollView, StyleSheet, View} from 'react-native';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -23,16 +23,85 @@ type TripsScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 
 export default function Trips() {
   const theme = useTheme() as MyTheme;
-  const {speed} = useSocket();
+  const {
+    enginesData1,
+    fuelManagementData,
+    fuelManagementData2,
+    speed,
+    enginesData2,
+  } = useSocket();
   const navigation = useNavigation<TripsScreenProps['navigation']>();
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [warningVisible, setWarningVisible] = useState(false);
   const [resetVisible, setResetVisible] = useState(false);
   const [selectedSwitch, setSelectedSwitch] = useState<number>(1); // Stores the currently selected switch index
   const [value, SetValue] = useState(false);
+  const [startTime, setStartTime] = useState<Date | null>(null);
+  const [displayDistance, setDisplayDistance] = useState(0);
+  const [elapsedTime, setElapsedTime] = useState<string>('0.00');
 
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const distanceRef = useRef(0);
   const handleSwitchPress = (index: number) => {
     setSelectedSwitch(index === selectedSwitch ? selectedSwitch : index); // Toggle selection
+  };
+
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, []);
+
+  const handleStartTrip = (speed: number) => {
+    console.log('Speed', speed);
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+      setStartTime(null);
+      distanceRef.current = 0; // Reset distance when stopping
+      setDisplayDistance(0);
+      setElapsedTime('0.00');
+    } else {
+      const now = new Date();
+      setStartTime(now);
+
+      intervalRef.current = setInterval(() => {
+        setStartTime(prevStartTime => {
+          const currentTime = new Date();
+          const elapsedTimeInHours =
+            (currentTime.getTime() - prevStartTime!.getTime()) / 3600000; // Convert ms to hours
+
+          distanceRef.current = Number(speed) * elapsedTimeInHours; // Incremental distance calculation
+          setDisplayDistance(distanceRef.current); // Update displayed distance
+          setElapsedTime(elapsedTimeInHours.toFixed(2)); // Update displayed elapsed time
+          console.log(elapsedTimeInHours.toFixed(2)); // Log updated elapsed time
+
+          return prevStartTime;
+        });
+      }, 1000); // Update every second
+    }
+    SetValue(!value);
+  };
+  const formatDate = (date: Date | null) => {
+    if (!date) return '';
+    const options: Intl.DateTimeFormatOptions = {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    };
+    return date.toLocaleDateString(undefined, options);
+  };
+
+  const formatTime = (date: Date | null) => {
+    if (!date) return '';
+    const options: Intl.DateTimeFormatOptions = {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    };
+    return date.toLocaleTimeString(undefined, options);
   };
 
   useEffect(() => {
@@ -142,8 +211,18 @@ export default function Trips() {
                 </View>
               </TripSection>
               <GapView length={5} />
-              <RenderRow title="Trip Start" unit="Date" />
-              <RenderRow title="" unit="Time" />
+              <RenderRow
+                title="Trip Start"
+                unit="Date"
+                value={formatDate(startTime)}
+                editable={false}
+              />
+              <RenderRow
+                title=""
+                unit="Time"
+                value={formatTime(startTime)}
+                editable={false}
+              />
             </MyCard>
             <GapView length={20} />
             <MyCard>
@@ -163,8 +242,16 @@ export default function Trips() {
             </MyCard>
             <GapView length={20} />
             <MyCard>
-              <RenderRow title="Total Distance" unit="N.Mile" />
-              <RenderRow title="Estimated Run Time" unit="hours/minute" />
+              <RenderRow
+                title="Total Distance"
+                unit="N.Mile"
+                value={displayDistance.toFixed(2)}
+              />
+              <RenderRow
+                title="Estimated Run Time"
+                unit="hours/minute"
+                value={elapsedTime}
+              />
               <RenderRow
                 title="Average Speed"
                 value={Number(speed).toFixed(3)}
@@ -177,7 +264,7 @@ export default function Trips() {
               <MyButton
                 label={value ? 'End Trip' : 'Start Trip'}
                 width={80}
-                onPress={() => SetValue(!value)}
+                onPress={() => handleStartTrip(Number(speed))}
               />
               <MyButton
                 label="Trip Reset"
@@ -260,16 +347,18 @@ function RenderRow({
   title,
   unit,
   value,
+  editable = true,
 }: {
   title: string;
   unit: string;
   value?: string;
+  editable?: boolean;
 }) {
   return (
     <View style={styles.sectionContainer}>
       <MyText style={{width: '50%'}}>{title}</MyText>
       <View style={{width: '50%', paddingHorizontal: 15}}>
-        <MyInput value={value} />
+        <MyInput value={value} editable={editable} />
         <MyText text={unit} fontFamily="NotoSans-Regular" />
       </View>
     </View>
