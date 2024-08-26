@@ -41,6 +41,7 @@ export default function Trips() {
   const [elapsedTime, setElapsedTime] = useState<string>('0.00');
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
   const distanceRef = useRef(0);
   const handleSwitchPress = (index: number) => {
     setSelectedSwitch(index === selectedSwitch ? selectedSwitch : index); // Toggle selection
@@ -53,6 +54,8 @@ export default function Trips() {
       }
     };
   }, []);
+
+  useEffect(() => console.log(fuelManagementData), [fuelManagementData]);
 
   const handleStartTrip = (speed: number) => {
     console.log('Speed', speed);
@@ -76,11 +79,11 @@ export default function Trips() {
           distanceRef.current = Number(speed) * elapsedTimeInHours; // Incremental distance calculation
           setDisplayDistance(distanceRef.current); // Update displayed distance
           setElapsedTime(elapsedTimeInHours.toFixed(2)); // Update displayed elapsed time
-          console.log(elapsedTimeInHours.toFixed(2)); // Log updated elapsed time
+          // console.log(elapsedTimeInHours.toFixed(2)); // Log updated elapsed time
 
           return prevStartTime;
         });
-      }, 1000); // Update every second
+      }, 999); // Update every second
     }
     SetValue(!value);
   };
@@ -232,7 +235,10 @@ export default function Trips() {
                   <MyText size={16}>Fuel Used</MyText>
                 </View>
                 <View style={styles.boxes}>
-                  <RenderColumn label={1} value={455} />
+                  <RenderColumn
+                    label={1}
+                    value={fuelManagementData.total_fuel_burned}
+                  />
                   <RenderColumn label={2} value={455} />
                   <RenderColumn label={3} value={455} />
                   <RenderColumn label={4} value={455} />

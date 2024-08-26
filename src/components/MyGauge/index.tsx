@@ -72,7 +72,12 @@ const styles = (theme?: MyTheme) =>
       alignItems: 'center',
       justifyContent: 'center',
     },
-    name: {position: 'absolute', bottom: 49, right: 45},
+    name: {
+      position: 'absolute',
+      bottom: 39,
+      right: 35,
+      width: 80,
+    },
     textBox: {
       flexDirection: 'row',
       justifyContent: 'center',

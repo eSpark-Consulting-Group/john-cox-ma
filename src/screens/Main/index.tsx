@@ -143,7 +143,7 @@ export default function Main() {
                     <MyGauge
                       key={item.id}
                       value={item.fuel ? +item.fuel : 0}
-                      name={item.name}
+                      name={`FMM1\n${item.position}`}
                     />
                   ))
                 ) : (
@@ -159,7 +159,7 @@ export default function Main() {
                     <MyGauge
                       key={item.id}
                       value={item.fuel ? +item.fuel : 0}
-                      name={item.name}
+                      name={`FMM1\n${item.position}`}
                     />
                   ))
                 ) : (
