@@ -18,17 +18,7 @@ const initialState: {
   enginesData2: EngineData[];
   setProvision: SetState;
   provision: ProvisionData;
-  fuelManagementData: {
-    distance_to_empty: number;
-    remaining_fuel: number;
-    total_fuel_burned: number;
-  };
-  fuelManagementData2: {
-    distance_to_empty: number;
-    remaining_fuel: number;
-    total_fuel_burned: number;
-  };
-  speed: string;
+  speed: string | number;
   getTimerValue: () => number;
 } = {
   enginesData1: [],
@@ -37,16 +27,6 @@ const initialState: {
   provision: {
     timesp1: false,
     timesp2: false,
-  },
-  fuelManagementData: {
-    distance_to_empty: 0,
-    remaining_fuel: 0,
-    total_fuel_burned: 0,
-  },
-  fuelManagementData2: {
-    distance_to_empty: 0,
-    remaining_fuel: 0,
-    total_fuel_burned: 0,
   },
   speed: '0',
   getTimerValue: () => 0,
@@ -57,34 +37,13 @@ export const useSocket = () => useContext(SocketContext);
 function SocketProvider({children}: {children: React.ReactNode}) {
   const [enginesData1, setEnginesData1] = useState<EngineData[]>([]);
   const [enginesData2, setEnginesData2] = useState<EngineData[]>([]);
-  const [speed, setSpeed] = useState('0');
-  const [fuelManagementData, setFuelManagementData] = useState({
-    distance_to_empty: 0,
-    remaining_fuel: 0,
-    total_fuel_burned: 0,
-  });
-  const [fuelManagementData2, setFuelManagementData2] = useState({
-    distance_to_empty: 0,
-    remaining_fuel: 0,
-    total_fuel_burned: 0,
-  });
-  const engine1Ref = useRef<EngineData[]>([]);
-  const engine2Ref = useRef<EngineData[]>([]);
-  const fuelDataRef = useRef({
-    distance_to_empty: 0,
-    remaining_fuel: 0,
-    total_fuel_burned: 0,
-  });
-  const fuelDataRef2 = useRef({
-    distance_to_empty: 0,
-    remaining_fuel: 0,
-    total_fuel_burned: 0,
-  });
+  const [speed, setSpeed] = useState<number | string>('0');
   const [provision, setProvision] = useState<ProvisionData>({
     timesp1: false,
     timesp2: false,
   });
-
+  const engine1Ref = useRef<EngineData[]>([]);
+  const engine2Ref = useRef<EngineData[]>([]);
   const timer = useRef(0);
   const interval = useRef<NodeJS.Timeout>();
 
@@ -107,20 +66,17 @@ function SocketProvider({children}: {children: React.ReactNode}) {
         startTimer();
       }
       console.log('WebSocket connection opened for : ', domain);
-      // console.log('engines data fr 2: ', enginesData2);
     };
 
     ws.onmessage = e => {
       try {
         const jsonData: SocketJSON = JSON.parse(e.data);
-        const sensors = jsonData.data.SensorData;
         const enginesData = getEnginesData(jsonData);
 
         if (domain === 'timesp1.local') {
-          handleTimesp1Data(sensors, enginesData, jsonData);
+          handleTimesp1Data(enginesData);
         } else if (domain === 'timesp2.local') {
-          // console.log('engines data for 2 ye aya : ', enginesData);
-          handleTimesp2Data(sensors, enginesData, jsonData);
+          handleTimesp2Data(enginesData);
         }
       } catch (error) {
         console.log(error);
@@ -146,20 +102,11 @@ function SocketProvider({children}: {children: React.ReactNode}) {
     };
   };
 
-  const handleTimesp1Data = (
-    sensors: {engine_id: string; fuel: string | undefined; speed: string}[],
-    enginesData: EngineData[],
-    jsonData: SocketJSON,
-  ) => {
-    if (sensors.length) {
-      setSpeed(sensors[0].speed);
+  const handleTimesp1Data = (enginesData: EngineData[]) => {
+    if (enginesData1[0]?.SensorData?.speed! > 0) {
+      setSpeed(enginesData1[0]?.SensorData?.speed!);
     } else {
       setSpeed('0');
-    }
-    const fuelMGT = getFuelMGT(jsonData);
-    if (JSON.stringify(fuelDataRef.current) !== JSON.stringify(fuelMGT)) {
-      fuelDataRef.current = fuelMGT;
-      setFuelManagementData(fuelMGT);
     }
     if (JSON.stringify(engine1Ref.current) !== JSON.stringify(enginesData)) {
       engine1Ref.current = enginesData;
@@ -167,17 +114,7 @@ function SocketProvider({children}: {children: React.ReactNode}) {
     }
   };
 
-  const handleTimesp2Data = (
-    sensors: {engine_id: string; fuel: string | undefined; speed: string}[],
-    enginesData: EngineData[],
-    jsonData: SocketJSON,
-  ) => {
-    const fuelMGT = getFuelMGT(jsonData);
-    if (JSON.stringify(fuelDataRef2.current) !== JSON.stringify(fuelMGT)) {
-      fuelDataRef2.current = fuelMGT;
-      setFuelManagementData2(fuelMGT);
-      // console.log(fuelManagementData2);
-    }
+  const handleTimesp2Data = (enginesData: EngineData[]) => {
     if (JSON.stringify(engine2Ref.current) !== JSON.stringify(enginesData)) {
       engine2Ref.current = enginesData;
       setEnginesData2(enginesData);
@@ -224,8 +161,6 @@ function SocketProvider({children}: {children: React.ReactNode}) {
       value={{
         enginesData1,
         setProvision,
-        fuelManagementData,
-        fuelManagementData2,
         speed,
         enginesData2,
         provision,

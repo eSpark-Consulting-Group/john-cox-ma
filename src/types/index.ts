@@ -134,29 +134,81 @@ export type DisplayBoxProps = {
   fontFamily?: Fonts;
 };
 
-export type EngineData = {
-  id: string;
-  name: string;
+export type FuelManagementData = {
+  id: number;
+  engine_id: number;
+  distance_to_empty: number;
+  remaining_fuel: number;
+  total_fuel_burned: number;
+};
+
+export type SensorDataProps = {
+  id: number;
+  engine_id: number;
   fuel: string | undefined;
+  speed: number;
+  temperature_return: string;
+  temperature_supply: string;
+  timestamp_unix: string;
+};
+
+export type EngineData = {
+  id: number;
+  name: string;
   enabled: '1' | '0';
-  position: string;
-  volume_per_cycle: string;
   engine_type: string;
   fuel_type: string;
+  position: string;
+  volume_per_cycle: string;
+  FuelManagement?: FuelManagementData;
+  SensorData?: SensorDataProps;
 };
 
 export type SocketJSON = {
   data: {
     Engines: EngineData[];
-    SensorData: {
-      engine_id: string;
-      fuel: string | undefined;
-      speed: string;
-    }[];
-    FuelManagement: {
-      remaining_fuel: string;
-      distance_to_empty: string;
-      total_fuel_burned: string;
-    }[];
   };
 };
+
+// ```
+// "data": {
+//         "Engines": [
+//             {
+//                 "id": "1",
+//                 "name": "Engine M1",
+//                 "enabled": "1",
+//                 "engine_type": "Type 1",
+//                 "fuel_type": "Type 1",
+//                 "position": "P0.500000",
+//                 "volume_per_cycle": "0.5",
+//                 "FuelManagement": {
+//                     "id": "1",
+//                     "engine_id": "1",
+//                     "distance_to_empty": "200",
+//                     "remaining_fuel": "50",
+//                     "total_fuel_burned": "100"
+//                 },
+//                 "SensorData": {
+//                     "id": "10",
+//                     "engine_id": "1",
+//                     "fuel": "18.609697",
+//                     "speed": "75.245766",
+//                     "temperature_return": "33.029606",
+//                     "temperature_supply": "25.658394",
+//                     "timestamp_unix": "1"
+//                 }
+//             },
+//             {
+//                 "id": "2",
+//                 "name": "Engine M2",
+//                 "enabled": "0",
+//                 "engine_type": "Type 2",
+//                 "fuel_type": "Type 2",
+//                 "position": "P1.000000",
+//                 "volume_per_cycle": "1.0",
+//                 "FuelManagement": {},
+//                 "SensorData": {}
+//             }
+//         ]
+//     }
+// ```
