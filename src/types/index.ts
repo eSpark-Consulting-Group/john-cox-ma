@@ -66,7 +66,7 @@ export interface MyInputProps {
   onFocus?: () => void;
   size?: number;
   placeholder?: string;
-  value?: string;
+  value?: string | number | any;
   editable?: boolean;
 }
 

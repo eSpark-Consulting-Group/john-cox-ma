@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {Modal, ScrollView, StyleSheet, View} from 'react-native';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -23,13 +23,7 @@ type TripsScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 
 export default function Trips() {
   const theme = useTheme() as MyTheme;
-  const {
-    enginesData1,
-    // fuelManagementData,
-    // fuelManagementData2,
-    speed,
-    enginesData2,
-  } = useSocket();
+  const {enginesData1, speed, enginesData2} = useSocket();
   const navigation = useNavigation<TripsScreenProps['navigation']>();
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [warningVisible, setWarningVisible] = useState(false);
@@ -48,6 +42,16 @@ export default function Trips() {
   const handleSwitchPress = (index: number) => {
     setSelectedSwitch(index === selectedSwitch ? selectedSwitch : index); // Toggle selection
   };
+
+  const initialFuelData = useMemo(() => {
+    if (!startTime) return [0, 0, 0, 0];
+    return [
+      enginesData1[0]?.FuelManagement.total_fuel_burned || 0,
+      enginesData1[1]?.FuelManagement.total_fuel_burned || 0,
+      enginesData2[0]?.FuelManagement.total_fuel_burned || 0,
+      enginesData2[1]?.FuelManagement.total_fuel_burned || 0,
+    ];
+  }, [startTime, enginesData1, enginesData2]);
 
   useEffect(() => {
     return () => {
@@ -105,7 +109,7 @@ export default function Trips() {
 
           return prevStartTime;
         });
-      }, 999); // Update every second
+      }, 4999); // Update every second
     }
     SetValue(!value);
   };
@@ -257,31 +261,14 @@ export default function Trips() {
                   <MyText size={16}>Fuel Used</MyText>
                 </View>
                 <View style={styles.boxes}>
-                  <RenderColumn
-                    label={1}
-                    value={enginesData1[0]?.FuelManagement.total_fuel_burned}
-                  />
-                  <RenderColumn
-                    label={2}
-                    value={enginesData1[1]?.FuelManagement.total_fuel_burned}
-                  />
-                  <RenderColumn
-                    label={3}
-                    value={enginesData2[0]?.FuelManagement.total_fuel_burned}
-                  />
-                  <RenderColumn
-                    label={4}
-                    value={enginesData2[1]?.FuelManagement.total_fuel_burned}
-                  />
+                  <RenderColumn label={1} value={fuelUsed[0]} />
+                  <RenderColumn label={2} value={fuelUsed[1]} />
+                  <RenderColumn label={3} value={fuelUsed[2]} />
+                  <RenderColumn label={4} value={fuelUsed[3]} />
                   <RenderColumn
                     label={'Total'}
                     value={
-                      Number(
-                        enginesData1[0]?.FuelManagement.total_fuel_burned,
-                      ) +
-                      (enginesData1[1]?.FuelManagement.total_fuel_burned
-                        ? enginesData1[1]?.FuelManagement.total_fuel_burned
-                        : 0)
+                      fuelUsed[0] + fuelUsed[1] + fuelUsed[2] + fuelUsed[3]
                     }
                   />
                 </View>
@@ -304,7 +291,14 @@ export default function Trips() {
                 value={Number(speed).toFixed(3)}
                 unit="knots"
               />
-              <RenderRow title="Efficiency" unit="Gal/N.Mile" />
+              <RenderRow
+                title="Efficiency"
+                unit="Gal/N.Mile"
+                value={
+                  (fuelUsed[0] + fuelUsed[1] + fuelUsed[2] + fuelUsed[3]) /
+                  displayDistance
+                }
+              />
             </MyCard>
             <GapView length={30} />
             <View style={{flexDirection: 'row', gap: 20}}>
@@ -398,7 +392,7 @@ function RenderRow({
 }: {
   title: string;
   unit: string;
-  value?: string;
+  value?: string | number;
   editable?: boolean;
 }) {
   return (
