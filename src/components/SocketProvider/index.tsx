@@ -8,14 +8,18 @@ import {
   useRef,
   useState,
 } from 'react';
-import {EngineData, SocketJSON} from '../../types';
-import {getEnginesData, getFuelMGT} from './socket.helper';
+import {EngineData, FuelManagementData, SocketJSON} from '../../types';
+import {getEnginesData} from './socket.helper';
+import {fuelData} from '../../constants';
+
 type ProvisionData = {timesp1: boolean; timesp2: boolean};
 type SetState = Dispatch<SetStateAction<ProvisionData>>;
 
 const initialState: {
   enginesData1: EngineData[];
   enginesData2: EngineData[];
+  fuelMgtData?: FuelManagementData[];
+  fuelMgtData2?: FuelManagementData[];
   setProvision: SetState;
   provision: ProvisionData;
   speed: string | number;
@@ -23,6 +27,8 @@ const initialState: {
 } = {
   enginesData1: [],
   enginesData2: [],
+  fuelMgtData: [],
+  fuelMgtData2: [],
   setProvision: () => {},
   provision: {
     timesp1: false,
@@ -31,12 +37,15 @@ const initialState: {
   speed: '0',
   getTimerValue: () => 0,
 };
+
 const SocketContext = createContext(initialState);
 export const useSocket = () => useContext(SocketContext);
 
 function SocketProvider({children}: {children: React.ReactNode}) {
   const [enginesData1, setEnginesData1] = useState<EngineData[]>([]);
   const [enginesData2, setEnginesData2] = useState<EngineData[]>([]);
+  // const [fuelMgtData, setfuelMgtData] = useState<FuelManagementData[]>([]);
+  // const [fuelMgtData2, setfuelMgtData2] = useState<FuelManagementData[]>([]);
   const [speed, setSpeed] = useState<number | string>('0');
   const [provision, setProvision] = useState<ProvisionData>({
     timesp1: false,
@@ -44,6 +53,8 @@ function SocketProvider({children}: {children: React.ReactNode}) {
   });
   const engine1Ref = useRef<EngineData[]>([]);
   const engine2Ref = useRef<EngineData[]>([]);
+  // const fuleData1Ref = useRef<FuelManagementData[]>([]);
+  // const fuleData2Ref = useRef<FuelManagementData[]>([]);
   const timer = useRef(0);
   const interval = useRef<NodeJS.Timeout>();
 
@@ -61,7 +72,7 @@ function SocketProvider({children}: {children: React.ReactNode}) {
     const ws = new WebSocket(`wss://${domain}/ws`);
 
     ws.onopen = () => {
-      if (domain === 'timesp1.local' || 'timesp2.local') {
+      if (domain === 'timesp1.local' || domain === 'timesp2.local') {
         clearInterval(interval.current);
         startTimer();
       }
@@ -71,7 +82,18 @@ function SocketProvider({children}: {children: React.ReactNode}) {
     ws.onmessage = e => {
       try {
         const jsonData: SocketJSON = JSON.parse(e.data);
-        const enginesData = getEnginesData(jsonData);
+        // console.log('jsonData=====>>>>>', jsonData);
+
+        const enginesData = jsonData.data.Engines;
+        const speedCheck = jsonData.data.Engines[0].SensorData.speed;
+        // console.log('main engines data: =======', enginesData);
+        // console.log('main engines Speed: =======', speedCheck);
+
+        if (!enginesData || enginesData.length === 0) {
+          console.log('No engine data or empty array received');
+          ws.close();
+          return;
+        }
 
         if (domain === 'timesp1.local') {
           handleTimesp1Data(enginesData);
@@ -79,7 +101,7 @@ function SocketProvider({children}: {children: React.ReactNode}) {
           handleTimesp2Data(enginesData);
         }
       } catch (error) {
-        console.log(error);
+        console.log('Error during WebSocket message processing:', error);
         ws.close();
       }
     };
@@ -103,14 +125,18 @@ function SocketProvider({children}: {children: React.ReactNode}) {
   };
 
   const handleTimesp1Data = (enginesData: EngineData[]) => {
-    if (enginesData1[0]?.SensorData?.speed! > 0) {
-      setSpeed(enginesData1[0]?.SensorData?.speed!);
+    if (enginesData[0]?.SensorData?.speed!) {
+      setSpeed(enginesData[0]?.SensorData?.speed!);
     } else {
       setSpeed('0');
     }
-    if (JSON.stringify(engine1Ref.current) !== JSON.stringify(enginesData)) {
+    if (JSON.stringify(engine1Ref.current) != JSON.stringify(enginesData)) {
+      console.log(engine1Ref.current);
+      console.log('different======================================');
+      console.log(enginesData);
       engine1Ref.current = enginesData;
       setEnginesData1(enginesData);
+      // console.log(enginesData);
     }
   };
 
@@ -156,13 +182,14 @@ function SocketProvider({children}: {children: React.ReactNode}) {
       }
     })();
   }, [provision.timesp2]);
+
   return (
     <SocketContext.Provider
       value={{
         enginesData1,
+        enginesData2,
         setProvision,
         speed,
-        enginesData2,
         provision,
         getTimerValue,
       }}>

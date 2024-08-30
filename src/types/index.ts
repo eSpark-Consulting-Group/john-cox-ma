@@ -124,7 +124,7 @@ export type MyCheckboxProps = {
 };
 
 export type DisplayBoxProps = {
-  value: string;
+  value: string | number;
   width?: number;
   paddingHorizontal?: number;
   paddingVertical?: number;
@@ -160,8 +160,8 @@ export type EngineData = {
   fuel_type: string;
   position: string;
   volume_per_cycle: string;
-  FuelManagement?: FuelManagementData;
-  SensorData?: SensorDataProps;
+  FuelManagement: FuelManagementData;
+  SensorData: SensorDataProps;
 };
 
 export type SocketJSON = {

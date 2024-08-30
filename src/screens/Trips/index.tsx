@@ -25,8 +25,8 @@ export default function Trips() {
   const theme = useTheme() as MyTheme;
   const {
     enginesData1,
-    fuelManagementData,
-    fuelManagementData2,
+    // fuelManagementData,
+    // fuelManagementData2,
     speed,
     enginesData2,
   } = useSocket();
@@ -39,7 +39,9 @@ export default function Trips() {
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [displayDistance, setDisplayDistance] = useState(0);
   const [elapsedTime, setElapsedTime] = useState<string>('0.00');
+  const [fuelUsed, setFuelUsed] = useState<number[]>([]);
 
+  const [initialFuel, setInitialFuel] = useState<number[]>([]);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const distanceRef = useRef(0);
@@ -55,7 +57,9 @@ export default function Trips() {
     };
   }, []);
 
-  useEffect(() => console.log(fuelManagementData), [fuelManagementData]);
+  console.log('in trips - check speed ---- ', speed);
+
+  // useEffect(() => console.log(fuelManagementData), [fuelManagementData]);
 
   const handleStartTrip = (speed: number) => {
     console.log('Speed', speed);
@@ -66,10 +70,17 @@ export default function Trips() {
       distanceRef.current = 0; // Reset distance when stopping
       setDisplayDistance(0);
       setElapsedTime('0.00');
+      setFuelUsed([]);
     } else {
       const now = new Date();
       setStartTime(now);
-
+      const initialFuelData = [
+        enginesData1[0]?.FuelManagement.total_fuel_burned || 0,
+        enginesData1[1]?.FuelManagement.total_fuel_burned || 0,
+        enginesData2[0]?.FuelManagement.total_fuel_burned || 0,
+        enginesData2[1]?.FuelManagement.total_fuel_burned || 0,
+      ];
+      setInitialFuel(initialFuelData);
       intervalRef.current = setInterval(() => {
         setStartTime(prevStartTime => {
           const currentTime = new Date();
@@ -79,7 +90,18 @@ export default function Trips() {
           distanceRef.current = Number(speed) * elapsedTimeInHours; // Incremental distance calculation
           setDisplayDistance(distanceRef.current); // Update displayed distance
           setElapsedTime(elapsedTimeInHours.toFixed(2)); // Update displayed elapsed time
-          // console.log(elapsedTimeInHours.toFixed(2)); // Log updated elapsed time
+          // Calculate and update fuel used
+          const updatedFuelUsed = initialFuelData.map((initialFuel, index) => {
+            const currentFuel = [
+              enginesData1[0]?.FuelManagement.total_fuel_burned || 0,
+              enginesData1[1]?.FuelManagement.total_fuel_burned || 0,
+              enginesData2[0]?.FuelManagement.total_fuel_burned || 0,
+              enginesData2[1]?.FuelManagement.total_fuel_burned || 0,
+            ][index];
+            return currentFuel - initialFuel;
+          });
+
+          setFuelUsed(updatedFuelUsed);
 
           return prevStartTime;
         });
@@ -237,12 +259,31 @@ export default function Trips() {
                 <View style={styles.boxes}>
                   <RenderColumn
                     label={1}
-                    value={fuelManagementData.total_fuel_burned}
+                    value={enginesData1[0]?.FuelManagement.total_fuel_burned}
                   />
-                  <RenderColumn label={2} value={455} />
-                  <RenderColumn label={3} value={455} />
-                  <RenderColumn label={4} value={455} />
-                  <RenderColumn label={'Total'} value={455} />
+                  <RenderColumn
+                    label={2}
+                    value={enginesData1[1]?.FuelManagement.total_fuel_burned}
+                  />
+                  <RenderColumn
+                    label={3}
+                    value={enginesData2[0]?.FuelManagement.total_fuel_burned}
+                  />
+                  <RenderColumn
+                    label={4}
+                    value={enginesData2[1]?.FuelManagement.total_fuel_burned}
+                  />
+                  <RenderColumn
+                    label={'Total'}
+                    value={
+                      Number(
+                        enginesData1[0]?.FuelManagement.total_fuel_burned,
+                      ) +
+                      (enginesData1[1]?.FuelManagement.total_fuel_burned
+                        ? enginesData1[1]?.FuelManagement.total_fuel_burned
+                        : 0)
+                    }
+                  />
                 </View>
               </View>
             </MyCard>
@@ -382,7 +423,7 @@ function RenderColumn({label, value}: {label: number | string; value: number}) {
         size={15}
       />
       <DisplayBox
-        value="455"
+        value={value || '00'}
         textColor={theme.colors.primary}
         fontFamily="CrimsonText-Bold"
       />
