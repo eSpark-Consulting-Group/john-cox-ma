@@ -130,7 +130,7 @@ export default function Main() {
     return () => clearTimeout(timer); // Cleanup timer on component unmount
   }, [showLoader]);
 
-  console.log(speed);
+  // console.log(speed);
 
   return (
     <MyCanvas>

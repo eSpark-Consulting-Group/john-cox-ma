@@ -85,7 +85,7 @@ function SocketProvider({children}: {children: React.ReactNode}) {
         // console.log('jsonData=====>>>>>', jsonData);
 
         const enginesData = jsonData.data.Engines;
-        const speedCheck = jsonData.data.Engines[0].SensorData.speed;
+        // const speedCheck = jsonData.data.Engines[0].SensorData.speed;
         // console.log('main engines data: =======', enginesData);
         // console.log('main engines Speed: =======', speedCheck);
 
@@ -131,12 +131,8 @@ function SocketProvider({children}: {children: React.ReactNode}) {
       setSpeed('0');
     }
     if (JSON.stringify(engine1Ref.current) != JSON.stringify(enginesData)) {
-      console.log(engine1Ref.current);
-      console.log('different======================================');
-      console.log(enginesData);
       engine1Ref.current = enginesData;
       setEnginesData1(enginesData);
-      // console.log(enginesData);
     }
   };
 

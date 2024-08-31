@@ -15,7 +15,7 @@ import {
   MySwitch,
   MyText,
 } from '../../components';
-import {MyTheme} from '../../types';
+import {EngineData, MyTheme} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
 import {useSocket} from '../../components/SocketProvider';
 
@@ -33,86 +33,89 @@ export default function Trips() {
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [displayDistance, setDisplayDistance] = useState(0);
   const [elapsedTime, setElapsedTime] = useState<string>('0.00');
-  const [fuelUsed, setFuelUsed] = useState<number[]>([]);
+  const [initialFuelData, setInitialFuelData] = useState([0, 0, 0, 0]);
+  const [fuelUsed, setFuelUsed] = useState([0, 0, 0, 0]);
 
-  const [initialFuel, setInitialFuel] = useState<number[]>([]);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef1 = useRef<NodeJS.Timeout | null>(null);
 
   const distanceRef = useRef(0);
   const handleSwitchPress = (index: number) => {
     setSelectedSwitch(index === selectedSwitch ? selectedSwitch : index); // Toggle selection
   };
 
-  const initialFuelData = useMemo(() => {
-    if (!startTime) return [0, 0, 0, 0];
-    return [
-      enginesData1[0]?.FuelManagement.total_fuel_burned || 0,
-      enginesData1[1]?.FuelManagement.total_fuel_burned || 0,
-      enginesData2[0]?.FuelManagement.total_fuel_burned || 0,
-      enginesData2[1]?.FuelManagement.total_fuel_burned || 0,
-    ];
-  }, [startTime, enginesData1, enginesData2]);
-
   useEffect(() => {
     return () => {
-      if (intervalRef.current) {
+      if (intervalRef.current && intervalRef1.current) {
         clearInterval(intervalRef.current);
+        clearInterval(intervalRef1.current);
       }
     };
   }, []);
 
-  console.log('in trips - check speed ---- ', speed);
+  useEffect(() => {
+    if (!intervalRef1.current && value) {
+      intervalRef1.current = setInterval(() => {
+        const newFuelBurn =
+          enginesData1[0]?.FuelManagement.total_fuel_burned || 0;
+        const fuelBurn = [initialFuelData[0] - newFuelBurn, 0, 0, 0];
+        setFuelUsed(fuelBurn);
+        console.log('old::: ', initialFuelData[0]);
+        console.log(
+          'new::: ',
+          enginesData1[0]?.FuelManagement.total_fuel_burned,
+        );
 
-  // useEffect(() => console.log(fuelManagementData), [fuelManagementData]);
+        console.log('Updated fuel burn:', fuelBurn);
+      }, 4999);
+    } else {
+      setFuelUsed([0, 0, 0, 0]); // Reset fuel used when trip ends
+    }
 
-  const handleStartTrip = (speed: number) => {
-    console.log('Speed', speed);
+    return () => {
+      if (intervalRef1.current) {
+        clearInterval(intervalRef1.current);
+        intervalRef1.current = null;
+      }
+    };
+  }, [enginesData1, value]);
+
+  function handleStartTrip(speed: number, enginesData1: EngineData[]) {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
       setStartTime(null);
-      distanceRef.current = 0; // Reset distance when stopping
+      distanceRef.current = 0;
       setDisplayDistance(0);
       setElapsedTime('0.00');
-      setFuelUsed([]);
     } else {
       const now = new Date();
       setStartTime(now);
-      const initialFuelData = [
+
+      const initialFuel = [
         enginesData1[0]?.FuelManagement.total_fuel_burned || 0,
-        enginesData1[1]?.FuelManagement.total_fuel_burned || 0,
-        enginesData2[0]?.FuelManagement.total_fuel_burned || 0,
-        enginesData2[1]?.FuelManagement.total_fuel_burned || 0,
+        0,
+        0,
+        0,
       ];
-      setInitialFuel(initialFuelData);
+      setInitialFuelData(initialFuel);
+
       intervalRef.current = setInterval(() => {
         setStartTime(prevStartTime => {
           const currentTime = new Date();
           const elapsedTimeInHours =
-            (currentTime.getTime() - prevStartTime!.getTime()) / 3600000; // Convert ms to hours
+            (currentTime.getTime() - prevStartTime!.getTime()) / 3600000;
 
-          distanceRef.current = Number(speed) * elapsedTimeInHours; // Incremental distance calculation
-          setDisplayDistance(distanceRef.current); // Update displayed distance
-          setElapsedTime(elapsedTimeInHours.toFixed(2)); // Update displayed elapsed time
-          // Calculate and update fuel used
-          const updatedFuelUsed = initialFuelData.map((initialFuel, index) => {
-            const currentFuel = [
-              enginesData1[0]?.FuelManagement.total_fuel_burned || 0,
-              enginesData1[1]?.FuelManagement.total_fuel_burned || 0,
-              enginesData2[0]?.FuelManagement.total_fuel_burned || 0,
-              enginesData2[1]?.FuelManagement.total_fuel_burned || 0,
-            ][index];
-            return currentFuel - initialFuel;
-          });
-
-          setFuelUsed(updatedFuelUsed);
+          distanceRef.current = Number(speed) * elapsedTimeInHours;
+          setDisplayDistance(distanceRef.current);
+          setElapsedTime(elapsedTimeInHours.toFixed(2));
 
           return prevStartTime;
         });
       }, 4999); // Update every second
     }
     SetValue(!value);
-  };
+  }
   const formatDate = (date: Date | null) => {
     if (!date) return '';
     const options: Intl.DateTimeFormatOptions = {
@@ -261,15 +264,23 @@ export default function Trips() {
                   <MyText size={16}>Fuel Used</MyText>
                 </View>
                 <View style={styles.boxes}>
-                  <RenderColumn label={1} value={fuelUsed[0]} />
-                  <RenderColumn label={2} value={fuelUsed[1]} />
-                  <RenderColumn label={3} value={fuelUsed[2]} />
-                  <RenderColumn label={4} value={fuelUsed[3]} />
+                  {fuelUsed.map((fuel, index) => (
+                    <RenderColumn
+                      key={index}
+                      // title={(index + 1).toString()}
+                      // unit="Gals"
+                      value={Number(fuel.toFixed(2))}
+                      label={index + 1} // editable={false}
+                    />
+                  ))}
                   <RenderColumn
                     label={'Total'}
-                    value={
-                      fuelUsed[0] + fuelUsed[1] + fuelUsed[2] + fuelUsed[3]
-                    }
+                    value={(
+                      fuelUsed[0] +
+                      fuelUsed[1] +
+                      fuelUsed[2] +
+                      fuelUsed[3]
+                    ).toFixed(2)}
                   />
                 </View>
               </View>
@@ -288,16 +299,16 @@ export default function Trips() {
               />
               <RenderRow
                 title="Average Speed"
-                value={Number(speed).toFixed(3)}
+                value={value ? Number(speed).toFixed(3) : 0}
                 unit="knots"
               />
               <RenderRow
                 title="Efficiency"
                 unit="Gal/N.Mile"
-                value={
+                value={(
                   (fuelUsed[0] + fuelUsed[1] + fuelUsed[2] + fuelUsed[3]) /
                   displayDistance
-                }
+                ).toFixed(3)}
               />
             </MyCard>
             <GapView length={30} />
@@ -305,7 +316,7 @@ export default function Trips() {
               <MyButton
                 label={value ? 'End Trip' : 'Start Trip'}
                 width={80}
-                onPress={() => handleStartTrip(Number(speed))}
+                onPress={() => handleStartTrip(Number(speed), enginesData1)}
               />
               <MyButton
                 label="Trip Reset"
@@ -406,7 +417,13 @@ function RenderRow({
   );
 }
 
-function RenderColumn({label, value}: {label: number | string; value: number}) {
+function RenderColumn({
+  label,
+  value,
+}: {
+  label: number | string;
+  value: number | string;
+}) {
   const theme = useTheme() as MyTheme;
   return (
     <View style={styles.column}>
