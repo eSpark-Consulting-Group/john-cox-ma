@@ -18,6 +18,7 @@ import {
 import {EngineData, MyTheme} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
 import {useSocket} from '../../components/SocketProvider';
+import useUpdateEffect from '../../hooks/useUpdateEffect';
 
 type TripsScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 
@@ -29,12 +30,30 @@ export default function Trips() {
   const [warningVisible, setWarningVisible] = useState(false);
   const [resetVisible, setResetVisible] = useState(false);
   const [selectedSwitch, setSelectedSwitch] = useState<number>(1); // Stores the currently selected switch index
-  const [value, SetValue] = useState(false);
+  const [tripStarted, setTripStarted] = useState(false); //xxx
+  const [tripEnded, setTripEnded] = useState(false); //xxx
+  const [tripName, setTripName] = useState<string>('');
+  const [nameInput, setNameInput] = useState<string>('');
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [displayDistance, setDisplayDistance] = useState(0);
   const [elapsedTime, setElapsedTime] = useState<string>('0.00');
   const [initialFuelData, setInitialFuelData] = useState([0, 0, 0, 0]);
   const [fuelUsed, setFuelUsed] = useState([0, 0, 0, 0]);
+  const [tripData, setTripData] = useState<{
+    name: string;
+    startingTime: Date | null;
+    distanceCovered: number;
+    tripTime: string;
+    fuelConsumption: any;
+    tripEfficiency: number | undefined;
+  }>({
+    name: '',
+    startingTime: null,
+    distanceCovered: 0,
+    tripTime: '0.00',
+    fuelConsumption: [0, 0, 0, 0], // Assuming fuelConsumption is an array
+    tripEfficiency: 0,
+  });
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const intervalRef1 = useRef<NodeJS.Timeout | null>(null);
@@ -44,6 +63,22 @@ export default function Trips() {
     setSelectedSwitch(index === selectedSwitch ? selectedSwitch : index); // Toggle selection
   };
 
+  const efficiency = useMemo(() => {
+    if (tripStarted) {
+      console.log('updating Efficiency');
+      console.log('distance:: ===', displayDistance);
+
+      return (
+        (fuelUsed[0] + fuelUsed[1] + fuelUsed[2] + fuelUsed[3]) /
+        displayDistance
+      );
+    }
+  }, [fuelUsed[0], fuelUsed[1], fuelUsed[2], fuelUsed[3], displayDistance]);
+
+  useEffect(
+    () => console.log('efficiency updated=====', efficiency),
+    [efficiency],
+  );
   useEffect(() => {
     return () => {
       if (intervalRef.current && intervalRef1.current) {
@@ -53,8 +88,53 @@ export default function Trips() {
     };
   }, []);
 
+  function handleSetTripData() {
+    setTripData({
+      name: tripName,
+      startingTime: startTime,
+      distanceCovered: displayDistance,
+      tripTime: elapsedTime,
+      fuelConsumption: fuelUsed,
+      tripEfficiency: efficiency,
+    });
+    console.log('=========trip data=======');
+  }
+
+  useUpdateEffect(
+    () => console.log('trip data==============', tripData),
+    [tripData],
+  );
+  // useEffect(() => {
+  //   console.log('trip ended ===', tripEnded);
+  //   // handleSetTripData();
+  //   console.log({
+  //     name: tripName,
+  //     startingTime: startTime,
+  //     distanceCovered: displayDistance,
+  //     tripTime: elapsedTime,
+  //     fuelCOnsumption: fuelUsed,
+  //   });
+  // }, [tripEnded]);
+
+  // useEffect(() => {
+  //   console.log('========TIMELY trip data updating ===', tripEnded); //IGNORE THE TRIP ENDED FOR NOW
+  //   console.log({
+  //     name: tripName,
+  //     startingTime: startTime,
+  //     distanceCovered: displayDistance,
+  //     tripTime: elapsedTime,
+  //     fuelCOnsumption: fuelUsed,
+  //   });
+  // }, [tripName, startTime, displayDistance, elapsedTime, fuelUsed]);
+
+  useUpdateEffect(() => {
+    console.log('trip started ====', tripStarted);
+    setTripEnded(!tripStarted);
+  }, [tripStarted]);
+
   useEffect(() => {
-    if (!intervalRef1.current && value) {
+    if (!intervalRef1.current && tripStarted) {
+      //xxx
       intervalRef1.current = setInterval(() => {
         const newFuelBurn =
           enginesData1[0]?.FuelManagement.total_fuel_burned || 0;
@@ -78,17 +158,26 @@ export default function Trips() {
         intervalRef1.current = null;
       }
     };
-  }, [enginesData1, value]);
+  }, [enginesData1, tripStarted]); //xxx
 
   function handleStartTrip(speed: number, enginesData1: EngineData[]) {
     if (intervalRef.current) {
+      //log values
+      handleSetTripData();
+      //end trip
+      setTripEnded(true);
+
       clearInterval(intervalRef.current);
       intervalRef.current = null;
+
+      //clear values
+      setNameInput('');
       setStartTime(null);
       distanceRef.current = 0;
       setDisplayDistance(0);
       setElapsedTime('0.00');
     } else {
+      setTripName(nameInput);
       const now = new Date();
       setStartTime(now);
 
@@ -114,7 +203,7 @@ export default function Trips() {
         });
       }, 4999); // Update every second
     }
-    SetValue(!value);
+    setTripStarted(tripStarted => !tripStarted); //xxx
   }
   const formatDate = (date: Date | null) => {
     if (!date) return '';
@@ -239,7 +328,13 @@ export default function Trips() {
               <GapView length={5} />
               <TripSection label="Trip Name">
                 <View style={styles.inputContainer}>
-                  <MyInput placeholder="Ente Trip Name" />
+                  <MyInput
+                    placeholder="Enter Trip Name"
+                    onChange={text => {
+                      setNameInput(text);
+                    }}
+                    value={tripStarted && tripName}
+                  />
                 </View>
               </TripSection>
               <GapView length={5} />
@@ -299,22 +394,19 @@ export default function Trips() {
               />
               <RenderRow
                 title="Average Speed"
-                value={value ? Number(speed).toFixed(3) : 0}
+                value={tripStarted ? Number(speed).toFixed(3) : 0} //xxx
                 unit="knots"
               />
               <RenderRow
                 title="Efficiency"
                 unit="Gal/N.Mile"
-                value={(
-                  (fuelUsed[0] + fuelUsed[1] + fuelUsed[2] + fuelUsed[3]) /
-                  displayDistance
-                ).toFixed(3)}
+                value={efficiency ? efficiency.toFixed(2) : '00'}
               />
             </MyCard>
             <GapView length={30} />
             <View style={{flexDirection: 'row', gap: 20}}>
               <MyButton
-                label={value ? 'End Trip' : 'Start Trip'}
+                label={tripStarted ? 'End Trip' : 'Start Trip'} //xxx
                 width={80}
                 onPress={() => handleStartTrip(Number(speed), enginesData1)}
               />

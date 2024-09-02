@@ -47,6 +47,7 @@ export default function Main() {
     enginesData2[0]?.FuelManagement.total_fuel_burned,
     enginesData2[1]?.FuelManagement.total_fuel_burned,
   ]);
+
   const remainingFuel = useMemo(() => {
     return (
       Number(enginesData1[0]?.FuelManagement.remaining_fuel || 0) +
@@ -60,6 +61,7 @@ export default function Main() {
     enginesData2[0]?.FuelManagement.remaining_fuel,
     enginesData2[1]?.FuelManagement.remaining_fuel,
   ]);
+
   const distanceToEmpty = useMemo(() => {
     return (
       Number(enginesData1[0]?.FuelManagement.distance_to_empty || 0) +
