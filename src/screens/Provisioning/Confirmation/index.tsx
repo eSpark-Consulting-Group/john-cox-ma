@@ -21,7 +21,6 @@ export default function Confirmation() {
   const navigation = useNavigation<ConfirmationScreenProps['navigation']>();
   return (
     <MyCanvas>
-      <MyText>dvhsdvbfhvb</MyText>
       <View style={styles.main}>
         <MyHeader />
         <View style={styles.wrapper}>
@@ -33,9 +32,10 @@ export default function Confirmation() {
           <GapView length={85} />
           <View
             style={{
-              width: '50%',
               justifyContent: 'space-between',
               flexDirection: 'row',
+              alignItems: 'center',
+              gap: 10,
             }}>
             <MyButton
               label="NO"

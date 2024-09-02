@@ -170,6 +170,16 @@ export type SocketJSON = {
   };
 };
 
+export interface TripData {
+  name: string;
+  startingTime: Date | null;
+  endingTime: Date | null;
+  distanceCovered: number;
+  tripTime: string;
+  fuelConsumption: number[];
+  tripEfficiency: number | undefined;
+}
+
 // ```
 // "data": {
 //         "Engines": [

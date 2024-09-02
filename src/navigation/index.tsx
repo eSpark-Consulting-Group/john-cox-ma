@@ -26,6 +26,7 @@ const RootStack = createNativeStackNavigator<RootStackParamsList>();
 
 export default function RootNav() {
   useEffect(() => {}, []);
+
   return (
     <Provider store={store}>
       <SocketProvider>
