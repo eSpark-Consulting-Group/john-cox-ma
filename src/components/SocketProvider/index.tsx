@@ -8,15 +8,10 @@ import {
   useState,
 } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import SystemSetting from 'react-native-system-setting'; // Import the library
 import {NetworkInfo} from 'react-native-network-info';
-
-import {EngineData, FuelManagementData, SocketJSON} from '../../types';
-import {getEnginesData} from './socket.helper';
-import {fuelData} from '../../constants';
 import {Alert, NativeModules} from 'react-native';
 
-const {WifiModule} = NativeModules;
+import {EngineData, FuelManagementData, SocketJSON} from '../../types';
 
 type ProvisionData = {timesp1: boolean; timesp2: boolean};
 type SetState = Dispatch<SetStateAction<ProvisionData>>;
