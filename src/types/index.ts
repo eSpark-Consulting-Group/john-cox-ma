@@ -170,15 +170,18 @@ export type SocketJSON = {
   };
 };
 
-export interface TripData {
+export type TripData = {
+  id: 1 | 2 | 3;
   name: string;
+  tripStarted: boolean;
+  tripEnded: boolean;
   startingTime: Date | null;
-  endingTime: Date | null;
   distanceCovered: number;
   tripTime: string;
-  fuelConsumption: number[];
+  intitalFuel: number[];
+  fuelConsumption: number[]; // assuming it's an array of numbers
   tripEfficiency: number | undefined;
-}
+};
 
 // ```
 // "data": {

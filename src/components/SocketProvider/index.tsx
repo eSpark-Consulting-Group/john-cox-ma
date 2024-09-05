@@ -1,4 +1,3 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   Dispatch,
   SetStateAction,
@@ -8,9 +7,16 @@ import {
   useRef,
   useState,
 } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import SystemSetting from 'react-native-system-setting'; // Import the library
+import {NetworkInfo} from 'react-native-network-info';
+
 import {EngineData, FuelManagementData, SocketJSON} from '../../types';
 import {getEnginesData} from './socket.helper';
 import {fuelData} from '../../constants';
+import {Alert, NativeModules} from 'react-native';
+
+const {WifiModule} = NativeModules;
 
 type ProvisionData = {timesp1: boolean; timesp2: boolean};
 type SetState = Dispatch<SetStateAction<ProvisionData>>;
@@ -24,6 +30,7 @@ const initialState: {
   provision: ProvisionData;
   speed: string | number;
   getTimerValue: () => number;
+  reconnect: boolean;
 } = {
   enginesData1: [],
   enginesData2: [],
@@ -36,6 +43,7 @@ const initialState: {
   },
   speed: '0',
   getTimerValue: () => 0,
+  reconnect: false,
 };
 
 const SocketContext = createContext(initialState);
@@ -44,6 +52,7 @@ export const useSocket = () => useContext(SocketContext);
 function SocketProvider({children}: {children: React.ReactNode}) {
   const [enginesData1, setEnginesData1] = useState<EngineData[]>([]);
   const [enginesData2, setEnginesData2] = useState<EngineData[]>([]);
+  const [reconnect, setReconnect] = useState(false); // Declare and initialize reconnect state
   // const [fuelMgtData, setfuelMgtData] = useState<FuelManagementData[]>([]);
   // const [fuelMgtData2, setfuelMgtData2] = useState<FuelManagementData[]>([]);
   const [speed, setSpeed] = useState<number | string>('0');
@@ -57,6 +66,8 @@ function SocketProvider({children}: {children: React.ReactNode}) {
   // const fuleData2Ref = useRef<FuelManagementData[]>([]);
   const timer = useRef(0);
   const interval = useRef<NodeJS.Timeout>();
+  const [retryCount, setRetryCount] = useState(0);
+  const maxRetries = 5;
 
   const startTimer = () => {
     interval.current = setInterval(async () => {
@@ -65,11 +76,17 @@ function SocketProvider({children}: {children: React.ReactNode}) {
     }, 1000);
   };
 
+  useEffect(() => {
+    NetworkInfo.getIPAddress().then(ipAddress => {
+      console.log(ipAddress);
+    });
+  }, []);
+
   const getTimerValue = () => timer.current;
 
   const getSocketData = (domain: string) => {
     console.log('=====WEB SOCKET START======');
-    const ws = new WebSocket(`wss://${domain}/ws`);
+    const ws = new WebSocket(`ws://${domain}/ws`);
 
     ws.onopen = () => {
       if (domain === 'timesp1.local' || domain === 'timesp2.local') {
@@ -77,6 +94,7 @@ function SocketProvider({children}: {children: React.ReactNode}) {
         startTimer();
       }
       console.log('WebSocket connection opened for : ', domain);
+      setRetryCount(0); // Reset retry count on successful connection
     };
 
     ws.onmessage = e => {
@@ -112,6 +130,9 @@ function SocketProvider({children}: {children: React.ReactNode}) {
 
     ws.onclose = e => {
       const {reason} = e;
+      if (e.code === 1006) {
+        handleReconnect();
+      }
       console.log('WebSocket connection closed:', e.code, reason);
       if (
         !reason ||
@@ -143,6 +164,32 @@ function SocketProvider({children}: {children: React.ReactNode}) {
     }
   };
 
+  const handleReconnect = async () => {
+    if (retryCount < maxRetries) {
+      try {
+        const enable = await SystemSetting.isWifiEnabled();
+        if (enable) {
+          WifiModule.toggleWifi(false);
+          setTimeout(async () => {
+            setRetryCount(prevCount => prevCount + 1);
+            console.log(`Reconnecting: Attempt ${retryCount + 1}`);
+          }, 5000); // Wait 5 seconds before turning Wi-Fi back on
+        }
+      } catch (error) {
+        console.error('Failed to toggle Wi-Fi:', error);
+        Alert.alert(
+          'Error',
+          'Cannot toggle Wi-Fi. Please check your permissions.',
+        );
+      }
+    } else {
+      Alert.alert(
+        'Error',
+        'Cannot connect to the WebSocket server. Please check your connection.',
+      );
+    }
+  };
+
   useEffect(() => {
     (async () => {
       try {
@@ -154,14 +201,19 @@ function SocketProvider({children}: {children: React.ReactNode}) {
         if (isProvisioned) {
           const data = JSON.parse(isProvisioned);
           if (data.timesp1) {
-            getSocketData('timesp1.local');
+            if (retryCount < maxRetries) {
+              getSocketData('timesp1.local');
+            }
           }
         }
       } catch (error) {
         console.log(`error: ${error}`);
       }
+      return () => {
+        setRetryCount(0);
+      };
     })();
-  }, [provision.timesp1]);
+  }, [provision.timesp1, retryCount]);
 
   useEffect(() => {
     (async () => {
@@ -170,14 +222,16 @@ function SocketProvider({children}: {children: React.ReactNode}) {
         if (isProvisioned) {
           const data = JSON.parse(isProvisioned);
           if (data.timesp2) {
-            getSocketData('timesp2.local');
+            if (retryCount < maxRetries) {
+              getSocketData('timesp2.local');
+            }
           }
         }
       } catch (error) {
         console.log(`error: ${error}`);
       }
     })();
-  }, [provision.timesp2]);
+  }, [provision.timesp2, retryCount]);
 
   return (
     <SocketContext.Provider
@@ -188,6 +242,7 @@ function SocketProvider({children}: {children: React.ReactNode}) {
         speed,
         provision,
         getTimerValue,
+        reconnect,
       }}>
       {children}
     </SocketContext.Provider>

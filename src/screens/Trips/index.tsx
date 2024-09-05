@@ -15,7 +15,7 @@ import {
   MySwitch,
   MyText,
 } from '../../components';
-import {EngineData, MyTheme} from '../../types';
+import {EngineData, MyTheme, TripData} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
 import {useSocket} from '../../components/SocketProvider';
 import useUpdateEffect from '../../hooks/useUpdateEffect';
@@ -47,20 +47,7 @@ export default function Trips() {
     [selectedSwitch],
   );
 
-  const [trips, setTrips] = useState<
-    {
-      id: 1 | 2 | 3;
-      name: string;
-      tripStarted: boolean;
-      tripEnded: boolean;
-      startingTime: Date | null;
-      distanceCovered: number;
-      tripTime: string;
-      intitalFuel: number[];
-      fuelConsumption: number[]; // assuming it's an array of numbers
-      tripEfficiency: number | undefined;
-    }[]
-  >([
+  const [trips, setTrips] = useState<TripData[]>([
     {
       id: 1,
       name: '',
@@ -104,7 +91,7 @@ export default function Trips() {
     null,
     null,
     null,
-  ]); //fule Data keliye
+  ]); //fuel Data keliye
 
   const distanceRefs = useRef([0, 0, 0, 0]); // distance cal for each eng
 
@@ -112,13 +99,16 @@ export default function Trips() {
   const efficiency = useMemo(() => {
     if (trips[selectedSwitch - 1].tripStarted) {
       console.log('updating Efficiency');
-      return (
-        (trips[selectedSwitch - 1].fuelConsumption[0] +
-          trips[selectedSwitch - 1].fuelConsumption[1] +
-          trips[selectedSwitch - 1].fuelConsumption[2] +
-          trips[selectedSwitch - 1].fuelConsumption[3]) /
-        trips[selectedSwitch - 1].distanceCovered
-      );
+      const totalfuel =
+        trips[selectedSwitch - 1].fuelConsumption[0] +
+        trips[selectedSwitch - 1].fuelConsumption[1] +
+        trips[selectedSwitch - 1].fuelConsumption[2] +
+        trips[selectedSwitch - 1].fuelConsumption[3];
+
+      const eff = totalfuel / trips[selectedSwitch - 1].distanceCovered;
+      console.log('eff', eff);
+
+      return eff;
     }
   }, [
     trips[selectedSwitch - 1].distanceCovered,
@@ -126,14 +116,47 @@ export default function Trips() {
     selectedSwitch,
   ]);
 
+  const speedEfficiency = useMemo(() => {
+    const totalFuelBurned1 =
+      Number(enginesData1[0]?.FuelManagement.total_fuel_burned || 0) +
+      Number(enginesData1[1]?.FuelManagement.total_fuel_burned || 0);
+    const totalFuelBurned2 =
+      Number(enginesData2[0]?.FuelManagement.total_fuel_burned || 0) +
+      Number(enginesData2[1]?.FuelManagement.total_fuel_burned || 0);
+
+    const totalSpeed1 =
+      Number(enginesData1[0]?.SensorData.speed || 0) +
+      Number(enginesData1[1]?.SensorData.speed || 0);
+    const totalSpeed2 =
+      Number(enginesData2[0]?.SensorData.speed || 0) +
+      Number(enginesData2[1]?.SensorData.speed || 0);
+
+    const totalFuelBurned = totalFuelBurned1 + totalFuelBurned2;
+    const totalSpeed = totalSpeed1 + totalSpeed2;
+
+    // Efficiency in knots per gallon
+    return totalFuelBurned > 0 ? totalSpeed / totalFuelBurned : 0;
+  }, [
+    enginesData1[0]?.FuelManagement.total_fuel_burned,
+    enginesData1[1]?.FuelManagement.total_fuel_burned,
+    enginesData2[0]?.FuelManagement.total_fuel_burned,
+    enginesData2[1]?.FuelManagement.total_fuel_burned,
+    enginesData1[0]?.SensorData.speed,
+    enginesData1[1]?.SensorData.speed,
+    enginesData2[0]?.SensorData.speed,
+    enginesData2[1]?.SensorData.speed,
+  ]);
+
   useEffect(() => {
     const updatedTrips = [...trips];
     updatedTrips[selectedSwitch - 1] = {
       ...updatedTrips[selectedSwitch - 1],
-      tripEfficiency: efficiency,
+      tripEfficiency: speedEfficiency,
     };
+    console.log('asdas', speedEfficiency);
+
     setTrips(updatedTrips);
-  }, [efficiency]);
+  }, [speedEfficiency]);
 
   useEffect(() => {
     return () => {
@@ -166,21 +189,33 @@ export default function Trips() {
     // setTripEnded(!tripStarted);
   }, [trips[selectedSwitch - 1].tripStarted, selectedSwitch]);
 
+  //observe data for all engines
+  useEffect(() => {
+    // console.log('Engine 1:', enginesData1);
+    // console.log('Engine 2:', enginesData2);
+    // trips[selectedSwitch - 1].fuelConsumption
+    console.log(
+      '🚀 ~ useEffect ~ trips[selectedSwitch - 1].fuelConsumption:',
+      trips[selectedSwitch - 1].fuelConsumption,
+    );
+  }, [enginesData1, enginesData2]);
+
   //fuel wala data handle krrhe
   useEffect(() => {
     if (
       intervalRefs1.current[selectedSwitch - 1] == null &&
       trips[selectedSwitch - 1].tripStarted == true
     ) {
+      console.log(
+        '🚀 ~ intervalRefs1.current[selectedSwitch-1]=setInterval ~ intervalRefs1:',
+        intervalRefs1.current[selectedSwitch - 1],
+      );
+
       intervalRefs1.current[selectedSwitch - 1] = setInterval(() => {
         const newFuelBurn =
-          enginesData1[0]?.FuelManagement.total_fuel_burned || 0;
+          enginesData1[0]?.FuelManagement.total_fuel_burned || 0; //? tank 1
+        enginesData1[1]?.FuelManagement.total_fuel_burned;
 
-        console.log('initial fuel data=====', trips[0].intitalFuel);
-        console.log(
-          'new fuel data=====',
-          enginesData1[0]?.FuelManagement.total_fuel_burned,
-        );
         const updatedTrips = [...trips];
         updatedTrips[selectedSwitch - 1].fuelConsumption[0] =
           trips[selectedSwitch - 1].intitalFuel[0] - newFuelBurn;
@@ -201,7 +236,7 @@ export default function Trips() {
     };
   }, [enginesData1, tripStarted]); //selected switch dalna hey
 
-  console.log('///////', trips[1]);
+  console.log('Chala', intervalRefs);
 
   function handleStartTrip(
     id: 1 | 2 | 3,
@@ -211,7 +246,6 @@ export default function Trips() {
     if (intervalRefs.current[id - 1] && id) {
       clearInterval(intervalRefs.current[id - 1]!);
       intervalRefs.current[id - 1] = null;
-
       //clear values
       setNameInput('');
       setStartTime(null);
@@ -232,13 +266,13 @@ export default function Trips() {
         tripEnded: true,
         intitalFuel: [0, 0, 0, 0],
       };
-
       setTrips(updatedTrips);
     } else {
+      console.log('Start Trip');
+
       setTripName(nameInput);
       const now = new Date();
       setStartTime(now);
-
       const initialFuel = [
         enginesData1[0]?.FuelManagement.total_fuel_burned || 0,
         0,
@@ -262,7 +296,6 @@ export default function Trips() {
       setTrips(updatedTrips);
       intervalRefs.current[id - 1] = setInterval(() => {
         console.log('--->', elapsedTime);
-
         setStartTime(prevStartTime => {
           const currentTime = new Date();
           const elapsedTimeInHours =
@@ -278,6 +311,7 @@ export default function Trips() {
     }
     setTripStarted(tripStarted => !tripStarted); //xxx
   }
+
   //updating distance and run time
   useEffect(() => {
     console.log('trip distance and time updating for trip ', selectedSwitch);
@@ -326,6 +360,7 @@ export default function Trips() {
       return () => clearTimeout(timer);
     }
   }, [warningVisible]);
+
   useEffect(() => {
     if (resetVisible) {
       const timer = setTimeout(() => {
@@ -500,8 +535,8 @@ export default function Trips() {
                 title="Efficiency"
                 unit="Gal/N.Mile"
                 value={
-                  trips[selectedSwitch - 1].tripStarted && efficiency
-                    ? efficiency.toFixed(2)
+                  trips[selectedSwitch - 1].tripStarted && speedEfficiency
+                    ? speedEfficiency.toFixed(2)
                     : '00'
                 }
               />

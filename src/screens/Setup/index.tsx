@@ -26,6 +26,7 @@ export default function Setup() {
   const navigation = useNavigation<SetupScreenProps['navigation']>();
   const {enginesData1} = useSocket();
   const [config, setConfig] = useState(enginesData1);
+
   const onPress = (index: number) => {
     const allConfig = [...config];
     allConfig[index] = {
@@ -34,6 +35,7 @@ export default function Setup() {
     };
     setConfig(allConfig);
   };
+
   const onPositionSelect = (value: string, index: number) => {
     const allConfig = [...config];
     allConfig[index] = {
@@ -109,7 +111,7 @@ export default function Setup() {
                       }}
                       isActive={item.enabled === '0' ? false : true}
                       zIndex={58 - count}
-                      egnineId={item.id}
+                      egnineId={item.id.toString()}
                       onPress={() => onPress(index)}
                       status
                       value={item.position}
@@ -180,7 +182,6 @@ export default function Setup() {
             }}
             gradient
           />
-
           <GapView length={70} />
           <MyFooter />
         </KeyboardAvoidingView>

@@ -3,6 +3,7 @@ import {ScrollView, StyleSheet, TouchableOpacity, View} from 'react-native';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {Ionicons} from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {
   MyButton,
@@ -19,7 +20,6 @@ import {MyTheme} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
 import {useSocket} from '../../components/SocketProvider';
 import NauticalMile from './NauticalMilte';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type MainScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 
@@ -34,6 +34,7 @@ export default function Main() {
     timesp1: false,
     timesp2: false,
   });
+
   const sumOfBurn = useMemo(() => {
     return (
       Number(enginesData1[0]?.FuelManagement.total_fuel_burned || 0) +
@@ -60,6 +61,37 @@ export default function Main() {
     enginesData1[1]?.FuelManagement.remaining_fuel,
     enginesData2[0]?.FuelManagement.remaining_fuel,
     enginesData2[1]?.FuelManagement.remaining_fuel,
+  ]);
+
+  const speedEfficiency = useMemo(() => {
+    const totalFuelBurned1 =
+      Number(enginesData1[0]?.FuelManagement.total_fuel_burned || 0) +
+      Number(enginesData1[1]?.FuelManagement.total_fuel_burned || 0);
+    const totalFuelBurned2 =
+      Number(enginesData2[0]?.FuelManagement.total_fuel_burned || 0) +
+      Number(enginesData2[1]?.FuelManagement.total_fuel_burned || 0);
+
+    const totalSpeed1 =
+      Number(enginesData1[0]?.SensorData.speed || 0) +
+      Number(enginesData1[1]?.SensorData.speed || 0);
+    const totalSpeed2 =
+      Number(enginesData2[0]?.SensorData.speed || 0) +
+      Number(enginesData2[1]?.SensorData.speed || 0);
+
+    const totalFuelBurned = totalFuelBurned1 + totalFuelBurned2;
+    const totalSpeed = totalSpeed1 + totalSpeed2;
+
+    // Efficiency in knots per gallon
+    return totalFuelBurned > 0 ? totalSpeed / totalFuelBurned : 0;
+  }, [
+    enginesData1[0]?.FuelManagement.total_fuel_burned,
+    enginesData1[1]?.FuelManagement.total_fuel_burned,
+    enginesData2[0]?.FuelManagement.total_fuel_burned,
+    enginesData2[1]?.FuelManagement.total_fuel_burned,
+    enginesData1[0]?.SensorData.speed,
+    enginesData1[1]?.SensorData.speed,
+    enginesData2[0]?.SensorData.speed,
+    enginesData2[1]?.SensorData.speed,
   ]);
 
   const distanceToEmpty = useMemo(() => {
@@ -132,8 +164,6 @@ export default function Main() {
     return () => clearTimeout(timer); // Cleanup timer on component unmount
   }, [showLoader]);
 
-  // console.log(speed);
-
   return (
     <MyCanvas>
       <ScrollView
@@ -194,7 +224,11 @@ export default function Main() {
                   enginesData1.map((item, index) => (
                     <MyGauge
                       key={item.id}
-                      value={item.SensorData!.fuel ? +item.SensorData!.fuel : 0}
+                      value={
+                        item?.SensorData?.fuel
+                          ? Number(item?.SensorData?.fuel)
+                          : 0
+                      }
                       name={`FMM1\n${item.position}`}
                     />
                   ))
@@ -212,7 +246,11 @@ export default function Main() {
                   enginesData2.map((item, index) => (
                     <MyGauge
                       key={item.id}
-                      value={item.SensorData!.fuel ? +item.SensorData!.fuel : 0}
+                      value={
+                        item?.SensorData?.fuel
+                          ? Number(item?.SensorData?.fuel)
+                          : 0
+                      }
                       name={`FMM1\n${item.position}`}
                     />
                   ))
@@ -229,7 +267,7 @@ export default function Main() {
                 <MyBox
                   label="Efficiency"
                   text="Speed"
-                  value={speed}
+                  value={speedEfficiency.toFixed(2)}
                   unit="Knots"
                   width={'50%'}
                   gap={22}
@@ -277,7 +315,6 @@ export default function Main() {
                 width={'70%'}
               />
             </View>
-
             <GapView length={40} />
             <View style={styles().buttons}>
               {buttonsData.map((item, index) => (
