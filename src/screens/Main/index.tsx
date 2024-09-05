@@ -71,15 +71,9 @@ export default function Main() {
       Number(enginesData2[0]?.FuelManagement.total_fuel_burned || 0) +
       Number(enginesData2[1]?.FuelManagement.total_fuel_burned || 0);
 
-    const totalSpeed1 =
-      Number(enginesData1[0]?.SensorData.speed || 0) +
-      Number(enginesData1[1]?.SensorData.speed || 0);
-    const totalSpeed2 =
-      Number(enginesData2[0]?.SensorData.speed || 0) +
-      Number(enginesData2[1]?.SensorData.speed || 0);
+    const totalSpeed = Number(enginesData1[0]?.SensorData.speed || 0);
 
     const totalFuelBurned = totalFuelBurned1 + totalFuelBurned2;
-    const totalSpeed = totalSpeed1 + totalSpeed2;
 
     // Efficiency in knots per gallon
     return totalFuelBurned > 0 ? totalSpeed / totalFuelBurned : 0;

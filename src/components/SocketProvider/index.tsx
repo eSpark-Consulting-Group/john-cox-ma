@@ -167,14 +167,10 @@ function SocketProvider({children}: {children: React.ReactNode}) {
   const handleReconnect = async () => {
     if (retryCount < maxRetries) {
       try {
-        const enable = await SystemSetting.isWifiEnabled();
-        if (enable) {
-          WifiModule.toggleWifi(false);
-          setTimeout(async () => {
-            setRetryCount(prevCount => prevCount + 1);
-            console.log(`Reconnecting: Attempt ${retryCount + 1}`);
-          }, 5000); // Wait 5 seconds before turning Wi-Fi back on
-        }
+        setTimeout(async () => {
+          setRetryCount(prevCount => prevCount + 1);
+          console.log(`Reconnecting: Attempt ${retryCount + 1}`);
+        }, 5000); // Wait 5 seconds before turning Wi-Fi back on
       } catch (error) {
         console.error('Failed to toggle Wi-Fi:', error);
         Alert.alert(
