@@ -89,7 +89,7 @@ function SocketProvider({children}: {children: React.ReactNode}) {
         startTimer();
       }
       console.log('WebSocket connection opened for : ', domain);
-      setRetryCount(0); // Reset retry count on successful connection
+      // setRetryCount(0); // Reset retry count on successful connection
     };
 
     ws.onmessage = e => {
@@ -126,7 +126,8 @@ function SocketProvider({children}: {children: React.ReactNode}) {
     ws.onclose = e => {
       const {reason} = e;
       if (e.code === 1006) {
-        handleReconnect();
+        // getSocketData(domain);
+        console.log('idher');
       }
       console.log('WebSocket connection closed:', e.code, reason);
       if (
@@ -213,7 +214,7 @@ function SocketProvider({children}: {children: React.ReactNode}) {
         if (isProvisioned) {
           const data = JSON.parse(isProvisioned);
           if (data.timesp2) {
-            if (retryCount < maxRetries) {
+            if (retryCount < 1) {
               getSocketData('timesp2.local');
             }
           }
@@ -222,7 +223,7 @@ function SocketProvider({children}: {children: React.ReactNode}) {
         console.log(`error: ${error}`);
       }
     })();
-  }, [provision.timesp2, retryCount]);
+  }, [provision.timesp2]);
 
   return (
     <SocketContext.Provider

@@ -144,7 +144,7 @@ export default function Trips() {
       ...updatedTrips[selectedSwitch - 1],
       tripEfficiency: speedEfficiency,
     };
-    console.log('asdas', speedEfficiency);
+    // console.log('asdas', speedEfficiency);
 
     setTrips(updatedTrips);
   }, [speedEfficiency]);
@@ -176,16 +176,16 @@ export default function Trips() {
   }, [trips[selectedSwitch - 1].tripStarted, selectedSwitch]);
 
   //observe data for all engines
-  useEffect(() => {
-    console.log(
-      '🚀 ~ useEffect ~ trips[selectedSwitch - 1].fuelConsumption:',
-      trips[selectedSwitch - 1].fuelConsumption,
-    );
-  }, [enginesData1, enginesData2]);
+  // useEffect(() => {
+  //   console.log(
+  //     '🚀 ~ useEffect ~ trips[selectedSwitch - 1].fuelConsumption:',
+  //     trips[selectedSwitch - 1].fuelConsumption,
+  //   );
+  // }, [enginesData1, enginesData2]);
 
-  useEffect(() => {
-    console.log('🚀 ~ Trips ~ trips:', trips);
-  }, [trips]);
+  // useEffect(() => {
+  //   console.log('🚀 ~ Trips ~ trips:', trips);
+  // }, [trips]);
 
   // Update the ref whenever engine data changes
   useEffect(() => {
@@ -237,7 +237,7 @@ export default function Trips() {
           );
           return updatedTrips;
         });
-      }, 4999); // Update every 5 seconds
+      }, 999); // Update every 5 seconds
     } else {
       if (intervalRefs1.current[selectedSwitch - 1]) {
         clearInterval(intervalRefs1.current[selectedSwitch - 1]!);
@@ -322,25 +322,27 @@ export default function Trips() {
             const currentTime = new Date();
             const elapsedTimeInHours =
               (currentTime.getTime() - currentTrip.startingTime.getTime()) /
-              3600000;
+              60000; // time in minutes
 
-            const newDistance = speed * elapsedTimeInHours;
+            const truncatedElapsedTimeInHours =
+              Math.floor(elapsedTimeInHours * 10) / 10;
+            const newDistance = speed * truncatedElapsedTimeInHours;
 
             updatedTrips[id - 1] = {
               ...currentTrip,
               distanceCovered: newDistance,
-              tripTime: elapsedTimeInHours.toFixed(2),
+              tripTime: truncatedElapsedTimeInHours.toString(),
             };
 
             if (id === selectedSwitch) {
               setDisplayDistance(newDistance);
-              setElapsedTime(elapsedTimeInHours.toFixed(2));
+              setElapsedTime(truncatedElapsedTimeInHours.toString());
             }
           }
 
           return updatedTrips;
         });
-      }, 5000); // Every 5 seconds
+      }, 999); // Changed to 999 milliseconds (Every ~1 second)
     }
 
     setTripStarted(prevTripStarted => !prevTripStarted);
