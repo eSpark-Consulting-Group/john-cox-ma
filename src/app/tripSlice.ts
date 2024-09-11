@@ -7,10 +7,11 @@ interface Trip {
   elapsedTime: string;
   initialFuelData: number[];
   fuelUsed: number[];
+  efficiency: number;
 }
 
-interface TripsState {
-  trips: {
+export interface TripsState {
+  Trips: {
     1: Trip;
     2: Trip;
     3: Trip;
@@ -18,7 +19,7 @@ interface TripsState {
 }
 
 const initialState: TripsState = {
-  trips: {
+  Trips: {
     1: {
       name: '',
       startTime: null,
@@ -26,6 +27,7 @@ const initialState: TripsState = {
       elapsedTime: '',
       initialFuelData: [],
       fuelUsed: [],
+      efficiency: 0,
     },
     2: {
       name: '',
@@ -34,6 +36,7 @@ const initialState: TripsState = {
       elapsedTime: '',
       initialFuelData: [],
       fuelUsed: [],
+      efficiency: 0,
     },
     3: {
       name: '',
@@ -42,73 +45,75 @@ const initialState: TripsState = {
       elapsedTime: '',
       initialFuelData: [],
       fuelUsed: [],
+      efficiency: 0,
     },
   },
 };
 
 const tripsSlice = createSlice({
-  name: 'trips',
+  name: 'Trips',
   initialState,
   reducers: {
     setTrip: (
       state,
-      action: {payload: {tripId: keyof TripsState['trips']; data: TripsState}},
+      action: {payload: {tripId: keyof TripsState['Trips']; data: TripsState}},
     ) => {
       const {tripId, data} = action.payload;
-      state.trips[tripId] = data.trips[tripId];
+      state.Trips[tripId] = data.Trips[tripId];
     },
     setTripName: (
       state,
-      action: {payload: {tripId: keyof TripsState['trips']; name: string}},
+      action: {payload: {tripId: keyof TripsState['Trips']; name: string}},
     ) => {
       const {tripId, name} = action.payload;
-      state.trips[tripId].name = name;
+      state.Trips[tripId].name = name;
     },
     startTrip: (
       state,
-      action: {payload: {tripId: keyof TripsState['trips']; startTime: Date}},
+      action: {payload: {tripId: keyof TripsState['Trips']; startTime: Date}},
     ) => {
       const {tripId, startTime} = action.payload;
-      state.trips[tripId].startTime = startTime;
+      state.Trips[tripId].startTime = startTime;
     },
     updateDistance: (
       state,
-      action: {payload: {tripId: keyof TripsState['trips']; distance: number}},
+      action: {payload: {tripId: keyof TripsState['Trips']; distance: number}},
     ) => {
       const {tripId, distance} = action.payload;
-      state.trips[tripId].displayDistance = distance;
+      state.Trips[tripId].displayDistance = distance;
     },
     updateElapsedTime: (
       state,
       action: {
-        payload: {tripId: keyof TripsState['trips']; elapsedTime: string};
+        payload: {tripId: keyof TripsState['Trips']; elapsedTime: string};
       },
     ) => {
       const {tripId, elapsedTime} = action.payload;
-      state.trips[tripId].elapsedTime = elapsedTime;
+      state.Trips[tripId].elapsedTime = elapsedTime;
     },
     setInitialFuelData: (
       state,
       action: {
-        payload: {tripId: keyof TripsState['trips']; initialFuelData: number[]};
+        payload: {tripId: keyof TripsState['Trips']; initialFuelData: number[]};
       },
     ) => {
       const {tripId, initialFuelData} = action.payload;
-      state.trips[tripId].initialFuelData = initialFuelData;
+      state.Trips[tripId].initialFuelData = initialFuelData;
     },
     updateFuelUsed: (
       state,
       action: {
-        payload: {tripId: keyof TripsState['trips']; fuelUsed: number[]};
+        payload: {tripId: keyof TripsState['Trips']; fuelUsed: number[]};
       },
     ) => {
       const {tripId, fuelUsed} = action.payload;
-      state.trips[tripId].fuelUsed = fuelUsed;
+      state.Trips[tripId].fuelUsed = fuelUsed;
     },
   },
 });
 
 export const {
+  setTrip,
   setTripName,
   startTrip,
   updateDistance,

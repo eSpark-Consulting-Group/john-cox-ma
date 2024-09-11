@@ -173,8 +173,8 @@ export type SocketJSON = {
 export type TripData = {
   id: 1 | 2 | 3;
   name: string;
-  tripStarted: boolean;
-  tripEnded: boolean;
+  tripStarted?: boolean;
+  tripEnded?: boolean;
   startingTime: Date | null;
   distanceCovered: number;
   tripTime: string;

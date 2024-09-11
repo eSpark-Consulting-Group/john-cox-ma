@@ -19,6 +19,9 @@ import {EngineData, MyTheme, TripData} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
 import {useSocket} from '../../components/SocketProvider';
 import useUpdateEffect from '../../hooks/useUpdateEffect';
+import store, {RootState} from '../../app/store';
+import {setTrip, TripsState} from '../../app/tripSlice';
+import {useDispatch, useSelector} from 'react-redux';
 
 type TripsScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 
@@ -32,11 +35,11 @@ export default function Trips() {
   const [tripStarted, setTripStarted] = useState(false); //xxx
   const [tripName, setTripName] = useState<string>('');
   const [nameInput, setNameInput] = useState<string>('');
-  const [startTime, setStartTime] = useState<Date | null>(null);
   const [displayDistance, setDisplayDistance] = useState(0);
   const [elapsedTime, setElapsedTime] = useState<string>('0.00');
-  const [fuelUsed, setFuelUsed] = useState([0, 0, 0, 0]);
   const [selectedSwitch, setSelectedSwitch] = useState<1 | 2 | 3>(1); // Stores the currently selected switch index
+  const dispatch = useDispatch();
+  const currentTrips = useSelector((state: RootState) => state.trip.Trips);
 
   const handleSwitchPress = (index: 1 | 2 | 3) => {
     setSelectedSwitch(index);
@@ -95,27 +98,6 @@ export default function Trips() {
   const latestEngineDataRef = useRef({enginesData1, enginesData2});
 
   const distanceRefs = useRef([0, 0, 0, 0]); // distance cal for each eng
-
-  //eff cal
-  // const efficiency = useMemo(() => {
-  //   if (trips[selectedSwitch - 1].tripStarted) {
-  //     console.log('updating Efficiency');
-  //     const totalfuel =
-  //       trips[selectedSwitch - 1].fuelConsumption[0] +
-  //       trips[selectedSwitch - 1].fuelConsumption[1] +
-  //       trips[selectedSwitch - 1].fuelConsumption[2] +
-  //       trips[selectedSwitch - 1].fuelConsumption[3];
-
-  //     const eff = totalfuel / trips[selectedSwitch - 1].distanceCovered;
-  //     console.log('eff', eff);
-
-  //     return eff;
-  //   }
-  // }, [
-  //   trips[selectedSwitch - 1].distanceCovered,
-  //   trips[selectedSwitch - 1].fuelConsumption,
-  //   selectedSwitch,
-  // ]);
 
   const speedEfficiency = useMemo(() => {
     const totalFuelBurned1 =
@@ -269,9 +251,38 @@ export default function Trips() {
     };
   }
 
+  function store_data(id: 1 | 2 | 3, trips: any[]) {
+    console.log('storing this trip: ', trips[id - 1]);
+
+    dispatch(
+      setTrip({
+        tripId: id,
+        data: {
+          Trips: {
+            ...currentTrips, // Spread existing trip data to maintain other trips
+            [id]: {
+              name: trips[id - 1].name,
+              startTime: trips[id - 1].startingTime?.toISOString(),
+              displayDistance: trips[id - 1].distanceCovered,
+              elapsedTime: trips[id - 1].tripTime,
+              fuelUsed: trips[id - 1].fuelConsumption,
+              efficiency: trips[id - 1].tripEfficiency,
+            },
+          },
+        },
+      }),
+    );
+  }
+
+  useEffect(() => {
+    console.log('From store====', currentTrips);
+  }, [currentTrips]);
+
   function handleStartTrip(id: 1 | 2 | 3, speed: number) {
     // Check if the trip is already running (stop and reset if so)
     if (intervalRefs.current[id - 1]) {
+      //storing to redux
+      store_data(id, trips);
       // Clear interval to stop trip tracking
       clearInterval(intervalRefs.current[id - 1]!);
       intervalRefs.current[id - 1] = null;
