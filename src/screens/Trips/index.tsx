@@ -1,10 +1,10 @@
 import React, {useEffect, useMemo, useRef, useState} from 'react';
-import {Modal, ScrollView, StyleSheet, View} from 'react-native';
+import {ScrollView, StyleSheet, View} from 'react-native';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {useDispatch, useSelector} from 'react-redux';
 
 import {
-  DisplayBox,
   GapView,
   MyButton,
   MyCanvas,
@@ -15,13 +15,20 @@ import {
   MySwitch,
   MyText,
 } from '../../components';
-import {EngineData, MyTheme, TripData} from '../../types';
+import {MyTheme, TripData} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
 import {useSocket} from '../../components/SocketProvider';
 import useUpdateEffect from '../../hooks/useUpdateEffect';
-import store, {RootState} from '../../app/store';
-import {setTrip, startTrip, TripsState} from '../../app/tripSlice';
-import {useDispatch, useSelector} from 'react-redux';
+import {RootState} from '../../app/store';
+import {endTrip, setTrip, startTrip} from '../../app/tripSlice';
+import {
+  RenderModal,
+  TripSection,
+  RenderRow,
+  RenderColumn,
+} from './Trips_components';
+import {formatDate, formatTime} from './utils';
+import {styles} from './styles';
 
 type TripsScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 
@@ -34,60 +41,11 @@ export default function Trips() {
   const [resetVisible, setResetVisible] = useState(false);
   const [tripStarted, setTripStarted] = useState(false); //xxx
   const [nameInput, setNameInput] = useState<string>('');
-  const [displayDistance, setDisplayDistance] = useState(0);
-  const [elapsedTime, setElapsedTime] = useState<string>('0.00');
   const [selectedSwitch, setSelectedSwitch] = useState<1 | 2 | 3>(1); // Stores the currently selected switch index
 
   const dispatch = useDispatch();
   const currentTrips = useSelector((state: RootState) => state.trip.Trips);
-
-  const handleSwitchPress = (index: 1 | 2 | 3) => {
-    setSelectedSwitch(index);
-  };
-
-  useEffect(
-    () => console.log('selected Trip:: ', selectedSwitch),
-    [selectedSwitch],
-  );
-
-  const [trips, setTrips] = useState<TripData[]>([
-    {
-      id: 1,
-      name: '',
-      tripStarted: false,
-      tripEnded: false,
-      startingTime: null, // set to null initially
-      distanceCovered: 0,
-      tripTime: '0.00',
-      initialFuel: [0, 0, 0, 0],
-      fuelConsumption: [0, 0, 0, 0],
-      tripEfficiency: 0,
-    },
-    {
-      id: 2,
-      name: '',
-      tripStarted: false,
-      tripEnded: false,
-      startingTime: null, // set to null initially
-      distanceCovered: 0,
-      tripTime: '0.00',
-      initialFuel: [0, 0, 0, 0],
-      fuelConsumption: [0, 0, 0, 0],
-      tripEfficiency: 0,
-    },
-    {
-      id: 3,
-      name: '',
-      tripStarted: false,
-      tripEnded: false,
-      startingTime: null, // set to null initially
-      distanceCovered: 0,
-      tripTime: '0.00',
-      initialFuel: [0, 0, 0, 0],
-      fuelConsumption: [0, 0, 0, 0],
-      tripEfficiency: 0,
-    },
-  ]);
+  const [trips, setTrips] = useState<TripData[]>(Object.values(currentTrips));
 
   const intervalRefs = useRef<Array<NodeJS.Timeout | null>>([null, null, null]); // main data set
   const intervalRefs1 = useRef<Array<NodeJS.Timeout | null>>([
@@ -96,9 +54,118 @@ export default function Trips() {
     null,
   ]); //fuel Data keliye
   const latestEngineDataRef = useRef({enginesData1, enginesData2});
-
   const distanceRefs = useRef([0, 0, 0, 0]); // distance cal for each eng
 
+  const handleSwitchPress = (index: 1 | 2 | 3) => {
+    setSelectedSwitch(index);
+  };
+
+  // initial trip data store in redux
+  function startingTripInStore(
+    tripId: 1 | 2 | 3,
+    name: string,
+    startTime: Date,
+    initialFuelData: number[],
+  ) {
+    console.log('starting trip in store');
+    dispatch(startTrip({tripId, name, startTime, initialFuelData}));
+  }
+
+  function endingTripInStore(tripId: 1 | 2 | 3) {
+    console.log('ending trip in store');
+    dispatch(endTrip({tripId}));
+  }
+
+  useEffect(() => {
+    console.log('From store====', currentTrips);
+  }, [startTrip, currentTrips, selectedSwitch]);
+
+  function handleStartTrip(id: 1 | 2 | 3, speed: number) {
+    // Check if the trip is already running (stop and reset if so)
+    if (intervalRefs.current[id - 1]) {
+      //storing to redux
+      // store_data(id, trips);
+      endingTripInStore(id);
+      // Clear interval to stop trip tracking
+      clearInterval(intervalRefs.current[id - 1]!);
+      intervalRefs.current[id - 1] = null;
+      setNameInput('');
+
+      // Reset trip state
+      const updatedTrips = [...trips];
+      updatedTrips[id - 1] = resetTripState(id);
+      setTrips(updatedTrips);
+
+      // Clear distance and time tracking
+      distanceRefs.current[id - 1] = 0;
+    } else {
+      // Start a new trip
+
+      const now = new Date();
+
+      const initialFuel = [
+        enginesData1[0]?.FuelManagement.total_fuel_burned || 0,
+        enginesData1[1]?.FuelManagement.total_fuel_burned || 0,
+        enginesData2[0]?.FuelManagement.total_fuel_burned || 0,
+        enginesData2[1]?.FuelManagement.total_fuel_burned || 0,
+      ];
+
+      startingTripInStore(id, nameInput, now, initialFuel);
+
+      const updatedTrips = [...trips];
+      updatedTrips[id - 1] = {
+        ...updatedTrips[id - 1],
+        name: nameInput,
+        startingTime: now,
+        distanceCovered: 0,
+        tripTime: '0.00',
+        fuelConsumption: [0, 0, 0, 0],
+        initialFuel: initialFuel,
+        tripEfficiency: 0,
+        tripStarted: true,
+        tripEnded: false,
+      };
+      setTrips(updatedTrips);
+
+      // Start interval to track time and distance
+      intervalRefs.current[id - 1] = setInterval(() => {
+        setTrips(prevTrips => {
+          const updatedTrips = [...prevTrips];
+          const currentTrip = updatedTrips[id - 1];
+
+          if (currentTrip.startingTime) {
+            const currentTime = new Date();
+            const elapsedTimeInHours =
+              (currentTime.getTime() - currentTrip.startingTime.getTime()) /
+              60000; // time in minutes
+
+            const truncatedElapsedTimeInHours =
+              Math.floor(elapsedTimeInHours * 10) / 10;
+            const newDistance = speed * truncatedElapsedTimeInHours;
+
+            updatedTrips[id - 1] = {
+              ...currentTrip,
+              distanceCovered: newDistance,
+              tripTime: truncatedElapsedTimeInHours.toString(),
+            };
+          }
+
+          return updatedTrips;
+        });
+      }, 999); // Changed to 999 milliseconds (Every ~1 second)
+    }
+
+    setTripStarted(prevTripStarted => !prevTripStarted);
+  }
+
+  useEffect(
+    () => console.log('selected Trip:: ', selectedSwitch),
+    [selectedSwitch],
+  );
+
+  useEffect(() => {
+    console.log('trips already existing :', trips);
+  }, []);
   const speedEfficiency = useMemo(() => {
     const totalFuelBurned1 =
       Number(enginesData1[0]?.FuelManagement.total_fuel_burned || 0) +
@@ -156,18 +223,6 @@ export default function Trips() {
     };
     // setTripEnded(!tripStarted);
   }, [trips[selectedSwitch - 1].tripStarted, selectedSwitch]);
-
-  //observe data for all engines
-  // useEffect(() => {
-  //   console.log(
-  //     '🚀 ~ useEffect ~ trips[selectedSwitch - 1].fuelConsumption:',
-  //     trips[selectedSwitch - 1].fuelConsumption,
-  //   );
-  // }, [enginesData1, enginesData2]);
-
-  // useEffect(() => {
-  //   console.log('🚀 ~ Trips ~ trips:', trips);
-  // }, [trips]);
 
   // Update the ref whenever engine data changes
   useEffect(() => {
@@ -251,148 +306,6 @@ export default function Trips() {
     };
   }
 
-  function store_data(id: 1 | 2 | 3, trips: any[]) {
-    console.log('storing this trip: ', trips[id - 1]);
-
-    dispatch(
-      setTrip({
-        tripId: id,
-        data: {
-          Trips: {
-            ...currentTrips, // Spread existing trip data to maintain other trips
-            [id]: {
-              // tripName: trips[id - 1].name,
-              startingTime: trips[id - 1].startingTime?.toISOString(),
-              distanceCovered: trips[id - 1].distanceCovered,
-              elapsedTime: trips[id - 1].tripTime,
-              fuelConsumption: trips[id - 1].fuelConsumption,
-              tripEfficiency: trips[id - 1].tripEfficiency,
-            },
-          },
-        },
-      }),
-    );
-  }
-
-  function startingTripInStore(
-    tripId: 1 | 2 | 3,
-    name: string,
-    startTime: Date,
-    initialFuelData: number[],
-  ) {
-    dispatch(startTrip({tripId, name, startTime, initialFuelData}));
-  }
-
-  useEffect(() => {
-    console.log('From store====', currentTrips);
-  }, [startTrip, currentTrips, selectedSwitch]);
-
-  function handleStartTrip(id: 1 | 2 | 3, speed: number) {
-    // Check if the trip is already running (stop and reset if so)
-    if (intervalRefs.current[id - 1]) {
-      //storing to redux
-      // store_data(id, trips);
-
-      // Clear interval to stop trip tracking
-      clearInterval(intervalRefs.current[id - 1]!);
-      intervalRefs.current[id - 1] = null;
-      setNameInput('');
-
-      // Reset trip state
-      const updatedTrips = [...trips];
-      updatedTrips[id - 1] = resetTripState(id);
-      setTrips(updatedTrips);
-
-      // Clear distance and time tracking
-      distanceRefs.current[id - 1] = 0;
-      setDisplayDistance(0);
-      setElapsedTime('0.00');
-    } else {
-      // Start a new trip
-      // settingTripNameInStore(id, nameInput);
-
-      const now = new Date();
-
-      const initialFuel = [
-        enginesData1[0]?.FuelManagement.total_fuel_burned || 0,
-        enginesData1[1]?.FuelManagement.total_fuel_burned || 0,
-        enginesData2[0]?.FuelManagement.total_fuel_burned || 0,
-        enginesData2[1]?.FuelManagement.total_fuel_burned || 0,
-      ];
-
-      startingTripInStore(id, nameInput, now, initialFuel);
-
-      const updatedTrips = [...trips];
-      updatedTrips[id - 1] = {
-        ...updatedTrips[id - 1],
-        name: nameInput,
-        startingTime: now,
-        distanceCovered: 0,
-        tripTime: '0.00',
-        fuelConsumption: [0, 0, 0, 0],
-        initialFuel: initialFuel,
-        tripEfficiency: 0,
-        tripStarted: true,
-        tripEnded: false,
-      };
-      setTrips(updatedTrips);
-
-      // Start interval to track time and distance
-      intervalRefs.current[id - 1] = setInterval(() => {
-        setTrips(prevTrips => {
-          const updatedTrips = [...prevTrips];
-          const currentTrip = updatedTrips[id - 1];
-
-          if (currentTrip.startingTime) {
-            const currentTime = new Date();
-            const elapsedTimeInHours =
-              (currentTime.getTime() - currentTrip.startingTime.getTime()) /
-              60000; // time in minutes
-
-            const truncatedElapsedTimeInHours =
-              Math.floor(elapsedTimeInHours * 10) / 10;
-            const newDistance = speed * truncatedElapsedTimeInHours;
-
-            updatedTrips[id - 1] = {
-              ...currentTrip,
-              distanceCovered: newDistance,
-              tripTime: truncatedElapsedTimeInHours.toString(),
-            };
-
-            if (id === selectedSwitch) {
-              setDisplayDistance(newDistance);
-              setElapsedTime(truncatedElapsedTimeInHours.toString());
-            }
-          }
-
-          return updatedTrips;
-        });
-      }, 999); // Changed to 999 milliseconds (Every ~1 second)
-    }
-
-    setTripStarted(prevTripStarted => !prevTripStarted);
-  }
-
-  const formatDate = (date: Date | null) => {
-    if (!date) return '';
-    const options: Intl.DateTimeFormatOptions = {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    };
-    return date.toLocaleDateString(undefined, options);
-  };
-
-  const formatTime = (date: Date | null) => {
-    if (!date) return '';
-    const options: Intl.DateTimeFormatOptions = {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-    };
-    return date.toLocaleTimeString(undefined, options);
-  };
-
   useEffect(() => {
     if (warningVisible) {
       const timer = setTimeout(() => {
@@ -415,6 +328,41 @@ export default function Trips() {
       return () => clearTimeout(timer);
     }
   }, [resetVisible]);
+
+  // function store_data(id: 1 | 2 | 3, trips: any[]) {
+  //   console.log('storing this trip: ', trips[id - 1]);
+
+  //   dispatch(
+  //     setTrip({
+  //       tripId: id,
+  //       data: {
+  //         Trips: {
+  //           ...currentTrips, // Spread existing trip data to maintain other trips
+  //           [id]: {
+  //             // tripName: trips[id - 1].name,
+  //             startingTime: trips[id - 1].startingTime?.toISOString(),
+  //             distanceCovered: trips[id - 1].distanceCovered,
+  //             elapsedTime: trips[id - 1].tripTime,
+  //             fuelConsumption: trips[id - 1].fuelConsumption,
+  //             tripEfficiency: trips[id - 1].tripEfficiency,
+  //           },
+  //         },
+  //       },
+  //     }),
+  //   );
+  // }
+
+  //observe data for all engines
+  // useEffect(() => {
+  //   console.log(
+  //     '🚀 ~ useEffect ~ trips[selectedSwitch - 1].fuelConsumption:',
+  //     trips[selectedSwitch - 1].fuelConsumption,
+  //   );
+  // }, [enginesData1, enginesData2]);
+
+  // useEffect(() => {
+  //   console.log('🚀 ~ Trips ~ trips:', trips);
+  // }, [trips]);
 
   return (
     <MyCanvas>
@@ -642,200 +590,3 @@ export default function Trips() {
     </MyCanvas>
   );
 }
-
-interface RenderModalProps {
-  visible: boolean;
-  type: 'warning' | 'reset';
-  onClose?: () => void;
-}
-function RenderModal({visible, type, onClose}: RenderModalProps) {
-  const theme = useTheme() as MyTheme;
-
-  const renderContent = () => {
-    if (type === 'warning') {
-      return (
-        <View
-          style={[
-            styles.modalContent,
-            {backgroundColor: theme.colors.background},
-          ]}>
-          <MyText size={24} textColor={'#B81106'}>
-            Warning:
-          </MyText>
-          <MyText
-            size={24}
-            textColor={theme.colors.secondary}
-            style={{textAlign: 'center'}}>
-            Trip ! Data will be reset!
-          </MyText>
-        </View>
-      );
-    } else if (type === 'reset') {
-      return (
-        <View
-          style={[
-            styles.modalContent,
-            {backgroundColor: theme.colors.background},
-          ]}>
-          <MyText
-            size={36}
-            textColor={theme.colors.primary}
-            style={{textAlign: 'center', lineHeight: 38}}>
-            Reset Successful!
-          </MyText>
-        </View>
-      );
-    }
-  };
-
-  return (
-    <Modal visible={visible} animationType="slide" transparent>
-      <View style={styles.modalContainer}>{renderContent()}</View>
-    </Modal>
-  );
-}
-
-function RenderRow({
-  title,
-  unit,
-  value,
-  editable = true,
-}: {
-  title: string;
-  unit: string;
-  value?: string | number;
-  editable?: boolean;
-}) {
-  return (
-    <View style={styles.sectionContainer}>
-      <MyText style={{width: '50%'}}>{title}</MyText>
-      <View style={{width: '50%', paddingHorizontal: 15}}>
-        <MyInput value={value} editable={editable} />
-        <MyText text={unit} fontFamily="NotoSans-Regular" />
-      </View>
-    </View>
-  );
-}
-
-function RenderColumn({
-  label,
-  value,
-}: {
-  label: number | string;
-  value: number | string;
-}) {
-  const theme = useTheme() as MyTheme;
-  return (
-    <View style={styles.column}>
-      <MyText
-        text={label.toString()}
-        fontFamily="AnonymousPro-Regular"
-        style={{paddingBottom: 5}}
-        size={15}
-      />
-      <DisplayBox
-        value={value || '00'}
-        textColor={theme.colors.primary}
-        fontFamily="CrimsonText-Bold"
-      />
-      <MyText text={'gal'} />
-    </View>
-  );
-}
-
-function TripSection({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <View style={styles.sectionContainer}>
-      <MyText size={18}>{label}</MyText>
-      {children}
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  screen: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  titleContainer: {
-    width: '90%',
-  },
-  title: {
-    alignSelf: 'flex-start',
-    paddingBottom: 10,
-  },
-  sectionContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-  },
-  switchContainer: {
-    flexDirection: 'row',
-    gap: 2,
-    width: '50%',
-    alignItems: 'center',
-    justifyContent: 'space-evenly',
-  },
-  inputContainer: {
-    width: '50%',
-    paddingHorizontal: 15,
-    alignItems: 'center',
-    gap: 5,
-  },
-  button: {width: 130, alignSelf: 'center'},
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'transparent',
-  },
-  modalContent: {
-    width: '100%',
-    marginTop: 25,
-    height: '48%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 15,
-    paddingHorizontal: 40,
-  },
-  confirmation: {
-    width: '100%',
-    alignItems: 'center',
-    textAlign: 'center',
-  },
-  inner: {
-    width: '70%',
-    alignItems: 'center',
-    gap: 20,
-  },
-  confirmationMessage: {textAlign: 'center', paddingBottom: 5, lineHeight: 30},
-  buttonRow: {
-    flexDirection: 'row',
-    width: '90%',
-    alignItems: 'center',
-    justifyContent: 'space-evenly',
-  },
-  rowButtons: {fontSize: 18, paddingHorizontal: 10},
-  column: {
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  card2: {flexDirection: 'row', width: '100%'},
-  innercard2: {
-    justifyContent: 'space-between',
-    flexGrow: 1,
-    height: 50,
-  },
-  boxes: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    gap: 5,
-  },
-});

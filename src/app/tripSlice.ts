@@ -15,7 +15,6 @@ const initialState: TripsState = {
       id: 1,
       name: '',
       tripStarted: false,
-      tripEnded: false,
       startingTime: null, // set to null initially
       distanceCovered: 0,
       tripTime: '0.00',
@@ -27,7 +26,6 @@ const initialState: TripsState = {
       id: 2,
       name: '',
       tripStarted: false,
-      tripEnded: false,
       startingTime: null, // set to null initially
       distanceCovered: 0,
       tripTime: '0.00',
@@ -39,7 +37,6 @@ const initialState: TripsState = {
       id: 3,
       name: '',
       tripStarted: false,
-      tripEnded: false,
       startingTime: null, // set to null initially
       distanceCovered: 0,
       tripTime: '0.00',
@@ -80,9 +77,9 @@ const tripsSlice = createSlice({
       },
     ) => {
       const {tripId} = action.payload;
-      state.Trips[tripId].tripEnded = true;
       state.Trips[tripId].tripStarted = false;
       //yehan se filesystem mein log krwana hey data
+      state.Trips[tripId] = initialState.Trips[tripId];
     },
     setTrip: (
       state,
