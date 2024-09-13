@@ -178,7 +178,7 @@ export type TripData = {
   startingTime: Date | null;
   distanceCovered: number;
   tripTime: string;
-  intitalFuel: number[];
+  initialFuel: number[];
   fuelConsumption: number[]; // assuming it's an array of numbers
   tripEfficiency: number | undefined;
 };

@@ -1,51 +1,51 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
-
-interface Trip {
-  name: string;
-  startTime: Date | null;
-  displayDistance: number;
-  elapsedTime: string;
-  initialFuelData: number[];
-  fuelUsed: number[];
-  efficiency: number;
-}
+import {TripData} from '../types';
 
 export interface TripsState {
   Trips: {
-    1: Trip;
-    2: Trip;
-    3: Trip;
+    1: TripData;
+    2: TripData;
+    3: TripData;
   };
 }
 
 const initialState: TripsState = {
   Trips: {
     1: {
+      id: 1,
       name: '',
-      startTime: null,
-      displayDistance: 0,
-      elapsedTime: '',
-      initialFuelData: [],
-      fuelUsed: [],
-      efficiency: 0,
+      tripStarted: false,
+      tripEnded: false,
+      startingTime: null, // set to null initially
+      distanceCovered: 0,
+      tripTime: '0.00',
+      initialFuel: [0, 0, 0, 0],
+      fuelConsumption: [0, 0, 0, 0],
+      tripEfficiency: 0,
     },
     2: {
+      id: 2,
       name: '',
-      startTime: null,
-      displayDistance: 0,
-      elapsedTime: '',
-      initialFuelData: [],
-      fuelUsed: [],
-      efficiency: 0,
+      tripStarted: false,
+      tripEnded: false,
+      startingTime: null, // set to null initially
+      distanceCovered: 0,
+      tripTime: '0.00',
+      initialFuel: [0, 0, 0, 0],
+      fuelConsumption: [0, 0, 0, 0],
+      tripEfficiency: 0,
     },
     3: {
+      id: 3,
       name: '',
-      startTime: null,
-      displayDistance: 0,
-      elapsedTime: '',
-      initialFuelData: [],
-      fuelUsed: [],
-      efficiency: 0,
+      tripStarted: false,
+      tripEnded: false,
+      startingTime: null, // set to null initially
+      distanceCovered: 0,
+      tripTime: '0.00',
+      initialFuel: [0, 0, 0, 0],
+      fuelConsumption: [0, 0, 0, 0],
+      tripEfficiency: 0,
     },
   },
 };
@@ -54,6 +54,36 @@ const tripsSlice = createSlice({
   name: 'Trips',
   initialState,
   reducers: {
+    startTrip: (
+      state,
+      action: {
+        payload: {
+          tripId: keyof TripsState['Trips'];
+          name: string;
+          startTime: Date;
+          initialFuelData: number[];
+        };
+      },
+    ) => {
+      const {tripId, name, startTime, initialFuelData} = action.payload;
+      state.Trips[tripId].tripStarted = true;
+      state.Trips[tripId].name = name;
+      state.Trips[tripId].startingTime = startTime;
+      state.Trips[tripId].initialFuel = initialFuelData;
+    },
+    endTrip: (
+      state,
+      action: {
+        payload: {
+          tripId: keyof TripsState['Trips'];
+        };
+      },
+    ) => {
+      const {tripId} = action.payload;
+      state.Trips[tripId].tripEnded = true;
+      state.Trips[tripId].tripStarted = false;
+      //yehan se filesystem mein log krwana hey data
+    },
     setTrip: (
       state,
       action: {payload: {tripId: keyof TripsState['Trips']; data: TripsState}},
@@ -64,6 +94,6 @@ const tripsSlice = createSlice({
   },
 });
 
-export const {setTrip} = tripsSlice.actions;
+export const {setTrip, startTrip, endTrip} = tripsSlice.actions;
 
 export default tripsSlice.reducer;

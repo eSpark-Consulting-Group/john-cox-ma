@@ -20,7 +20,7 @@ import {RootStackParamsList} from '../../types/navigationParams';
 import {useSocket} from '../../components/SocketProvider';
 import useUpdateEffect from '../../hooks/useUpdateEffect';
 import store, {RootState} from '../../app/store';
-import {setTrip, TripsState} from '../../app/tripSlice';
+import {setTrip, startTrip, TripsState} from '../../app/tripSlice';
 import {useDispatch, useSelector} from 'react-redux';
 
 type TripsScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
@@ -33,11 +33,11 @@ export default function Trips() {
   const [warningVisible, setWarningVisible] = useState(false);
   const [resetVisible, setResetVisible] = useState(false);
   const [tripStarted, setTripStarted] = useState(false); //xxx
-  const [tripName, setTripName] = useState<string>('');
   const [nameInput, setNameInput] = useState<string>('');
   const [displayDistance, setDisplayDistance] = useState(0);
   const [elapsedTime, setElapsedTime] = useState<string>('0.00');
   const [selectedSwitch, setSelectedSwitch] = useState<1 | 2 | 3>(1); // Stores the currently selected switch index
+
   const dispatch = useDispatch();
   const currentTrips = useSelector((state: RootState) => state.trip.Trips);
 
@@ -59,7 +59,7 @@ export default function Trips() {
       startingTime: null, // set to null initially
       distanceCovered: 0,
       tripTime: '0.00',
-      intitalFuel: [0, 0, 0, 0],
+      initialFuel: [0, 0, 0, 0],
       fuelConsumption: [0, 0, 0, 0],
       tripEfficiency: 0,
     },
@@ -71,7 +71,7 @@ export default function Trips() {
       startingTime: null, // set to null initially
       distanceCovered: 0,
       tripTime: '0.00',
-      intitalFuel: [0, 0, 0, 0],
+      initialFuel: [0, 0, 0, 0],
       fuelConsumption: [0, 0, 0, 0],
       tripEfficiency: 0,
     },
@@ -83,7 +83,7 @@ export default function Trips() {
       startingTime: null, // set to null initially
       distanceCovered: 0,
       tripTime: '0.00',
-      intitalFuel: [0, 0, 0, 0],
+      initialFuel: [0, 0, 0, 0],
       fuelConsumption: [0, 0, 0, 0],
       tripEfficiency: 0,
     },
@@ -203,7 +203,7 @@ export default function Trips() {
 
           const updatedFuelConsumption = newFuelBurn.map(
             (currentFuel, index) => {
-              const initialFuel = Number(currentTrip.intitalFuel[index]);
+              const initialFuel = Number(currentTrip.initialFuel[index]);
               return currentFuel - initialFuel;
             },
           );
@@ -247,7 +247,7 @@ export default function Trips() {
       tripEfficiency: 0,
       tripStarted: false,
       tripEnded: true,
-      intitalFuel: [0, 0, 0, 0],
+      initialFuel: [0, 0, 0, 0],
     };
   }
 
@@ -261,12 +261,12 @@ export default function Trips() {
           Trips: {
             ...currentTrips, // Spread existing trip data to maintain other trips
             [id]: {
-              name: trips[id - 1].name,
-              startTime: trips[id - 1].startingTime?.toISOString(),
-              displayDistance: trips[id - 1].distanceCovered,
+              // tripName: trips[id - 1].name,
+              startingTime: trips[id - 1].startingTime?.toISOString(),
+              distanceCovered: trips[id - 1].distanceCovered,
               elapsedTime: trips[id - 1].tripTime,
-              fuelUsed: trips[id - 1].fuelConsumption,
-              efficiency: trips[id - 1].tripEfficiency,
+              fuelConsumption: trips[id - 1].fuelConsumption,
+              tripEfficiency: trips[id - 1].tripEfficiency,
             },
           },
         },
@@ -274,15 +274,25 @@ export default function Trips() {
     );
   }
 
+  function startingTripInStore(
+    tripId: 1 | 2 | 3,
+    name: string,
+    startTime: Date,
+    initialFuelData: number[],
+  ) {
+    dispatch(startTrip({tripId, name, startTime, initialFuelData}));
+  }
+
   useEffect(() => {
     console.log('From store====', currentTrips);
-  }, [currentTrips]);
+  }, [startTrip, currentTrips, selectedSwitch]);
 
   function handleStartTrip(id: 1 | 2 | 3, speed: number) {
     // Check if the trip is already running (stop and reset if so)
     if (intervalRefs.current[id - 1]) {
       //storing to redux
-      store_data(id, trips);
+      // store_data(id, trips);
+
       // Clear interval to stop trip tracking
       clearInterval(intervalRefs.current[id - 1]!);
       intervalRefs.current[id - 1] = null;
@@ -299,14 +309,18 @@ export default function Trips() {
       setElapsedTime('0.00');
     } else {
       // Start a new trip
-      setTripName(nameInput);
+      // settingTripNameInStore(id, nameInput);
+
       const now = new Date();
+
       const initialFuel = [
         enginesData1[0]?.FuelManagement.total_fuel_burned || 0,
         enginesData1[1]?.FuelManagement.total_fuel_burned || 0,
         enginesData2[0]?.FuelManagement.total_fuel_burned || 0,
         enginesData2[1]?.FuelManagement.total_fuel_burned || 0,
       ];
+
+      startingTripInStore(id, nameInput, now, initialFuel);
 
       const updatedTrips = [...trips];
       updatedTrips[id - 1] = {
@@ -316,7 +330,7 @@ export default function Trips() {
         distanceCovered: 0,
         tripTime: '0.00',
         fuelConsumption: [0, 0, 0, 0],
-        intitalFuel: initialFuel,
+        initialFuel: initialFuel,
         tripEfficiency: 0,
         tripStarted: true,
         tripEnded: false,
@@ -489,7 +503,6 @@ export default function Trips() {
                     onChange={text => {
                       setNameInput(text);
                     }}
-                    // value={tripStarted && tripName}
                     value={
                       trips[selectedSwitch - 1].tripStarted &&
                       trips[selectedSwitch - 1].name

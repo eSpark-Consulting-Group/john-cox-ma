@@ -138,7 +138,7 @@ export default function Main() {
   //loader pe timer aur refresh lagana he
   const fetchProvisionedDevices = async () => {
     const currentProvision = await AsyncStorage.getItem('provisionedDevices');
-    console.log(currentProvision);
+    console.log('curr prov: ', currentProvision);
     const provisionedDevices = currentProvision
       ? JSON.parse(currentProvision)
       : {timesp1: false, timesp2: false};
