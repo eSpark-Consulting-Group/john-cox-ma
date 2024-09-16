@@ -1,3 +1,5 @@
+import {TripData} from '../../../types';
+
 export const formatDate = (date: Date | null) => {
   if (!date) return '';
   const options: Intl.DateTimeFormatOptions = {

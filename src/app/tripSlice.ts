@@ -81,16 +81,23 @@ const tripsSlice = createSlice({
       //yehan se filesystem mein log krwana hey data
       state.Trips[tripId] = initialState.Trips[tripId];
     },
-    setTrip: (
-      state,
-      action: {payload: {tripId: keyof TripsState['Trips']; data: TripsState}},
-    ) => {
-      const {tripId, data} = action.payload;
-      state.Trips[tripId] = data.Trips[tripId];
-    },
+    // updateTrip: (
+    //   state,
+    //   action: {
+    //     payload: {
+    //       tripId: keyof TripsState['Trips'];
+    //       tripTime: string;
+    //       distanceCovered: number;
+    //     };
+    //   },
+    // ) => {
+    //   const {tripId, tripTime, distanceCovered} = action.payload;
+    //   state.Trips[tripId].tripTime = tripTime;
+    //   state.Trips[tripId].distanceCovered = distanceCovered;
+    // },
   },
 });
 
-export const {setTrip, startTrip, endTrip} = tripsSlice.actions;
+export const {startTrip, endTrip} = tripsSlice.actions;
 
 export default tripsSlice.reducer;

@@ -20,7 +20,7 @@ import {RootStackParamsList} from '../../types/navigationParams';
 import {useSocket} from '../../components/SocketProvider';
 import useUpdateEffect from '../../hooks/useUpdateEffect';
 import {RootState} from '../../app/store';
-import {endTrip, setTrip, startTrip} from '../../app/tripSlice';
+import {endTrip, startTrip} from '../../app/tripSlice';
 import {
   RenderModal,
   TripSection,
@@ -76,13 +76,49 @@ export default function Trips() {
     dispatch(endTrip({tripId}));
   }
 
+  function continueRunningTrip(currentTrip: TripData, speed: string | number) {
+    if (currentTrip.tripStarted) {
+      console.log('Trip is already running');
+      intervalRefs.current[selectedSwitch - 1] = setInterval(() => {
+        setTrips(prevTrips => {
+          const updatedTrips = [...prevTrips];
+
+          const currentTime = new Date();
+          const elapsedTimeInHours =
+            (currentTime.getTime() - currentTrip.startingTime!.getTime()) /
+            60000; // time in minutes
+
+          const truncatedElapsedTimeInHours =
+            Math.floor(elapsedTimeInHours * 10) / 10;
+          const newDistance = Number(speed) * truncatedElapsedTimeInHours;
+
+          updatedTrips[selectedSwitch - 1] = {
+            ...currentTrip,
+            distanceCovered: newDistance,
+            tripTime: truncatedElapsedTimeInHours.toString(),
+          };
+
+          return updatedTrips;
+        });
+      }, 999);
+      return;
+    } else {
+      console.log('trip needs to be started');
+    }
+  }
+
+  useEffect(
+    () => continueRunningTrip(currentTrips[selectedSwitch], speed),
+    [selectedSwitch],
+  );
+
   useEffect(() => {
     console.log('From store====', currentTrips);
   }, [startTrip, currentTrips, selectedSwitch]);
 
   function handleStartTrip(id: 1 | 2 | 3, speed: number) {
     // Check if the trip is already running (stop and reset if so)
-    if (intervalRefs.current[id - 1]) {
+    if (currentTrips[id].tripStarted) {
       //storing to redux
       // store_data(id, trips);
       endingTripInStore(id);
