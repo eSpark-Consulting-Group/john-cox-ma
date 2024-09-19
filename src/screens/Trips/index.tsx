@@ -357,7 +357,7 @@ export default function Trips() {
   useEffect(() => {
     if (resetVisible) {
       const timer = setTimeout(() => {
-        handleStartTrip(selectedSwitch, Number(speed));
+        handleStartTrip(selectedSwitch, Number(speed)); // should reset all trips -  should not start any trip  - to be changed
         setResetVisible(false);
         setShowConfirmation(false);
       }, 2000);
