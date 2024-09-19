@@ -204,17 +204,18 @@ export default function Trips() {
   }, []);
   const speedEfficiency = useMemo(() => {
     const totalFuelBurned1 =
-      Number(enginesData1[0]?.FuelManagement.total_fuel_burned || 0) +
-      Number(enginesData1[1]?.FuelManagement.total_fuel_burned || 0);
+      Number(trips[selectedSwitch - 1].fuelConsumption[0] || 0) +
+      Number(trips[selectedSwitch - 1].fuelConsumption[1] || 0);
     const totalFuelBurned2 =
-      Number(enginesData2[0]?.FuelManagement.total_fuel_burned || 0) +
-      Number(enginesData2[1]?.FuelManagement.total_fuel_burned || 0);
+      Number(trips[selectedSwitch - 1].fuelConsumption[2] || 0) +
+      Number(trips[selectedSwitch - 1].fuelConsumption[3] || 0);
 
-    const totalSpeed = Number(enginesData1[0]?.SensorData.speed || 0);
     const totalFuelBurned = totalFuelBurned1 + totalFuelBurned2;
 
-    // Efficiency in knots per gallon
-    return totalFuelBurned > 0 ? totalSpeed / totalFuelBurned : 0;
+    // Efficiency in gallon per nautical mile
+    return totalFuelBurned > 0
+      ? distanceRefs.current[selectedSwitch - 1] / totalFuelBurned //to be changed
+      : 0;
   }, [
     enginesData1[0]?.FuelManagement.total_fuel_burned,
     enginesData1[1]?.FuelManagement.total_fuel_burned,
