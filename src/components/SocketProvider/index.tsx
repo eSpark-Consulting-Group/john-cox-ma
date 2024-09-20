@@ -185,11 +185,13 @@ function SocketProvider({children}: {children: React.ReactNode}) {
   useEffect(() => {
     (async () => {
       try {
-        const isProvisioned = await AsyncStorage.getItem('provisionedDevices');
+        let isProvisioned = await AsyncStorage.getItem('provisionedDevices');
         const prevTime = await AsyncStorage.getItem('timer');
         if (prevTime) {
           timer.current = +prevTime;
         }
+        isProvisioned = JSON.stringify({timesp1: true, timesp2: false});
+        console.log(isProvisioned, '>>>>>>');
         if (isProvisioned) {
           const data = JSON.parse(isProvisioned);
           if (data.timesp1) {

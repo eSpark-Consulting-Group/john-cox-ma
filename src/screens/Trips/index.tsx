@@ -3,6 +3,7 @@ import {ScrollView, StyleSheet, View} from 'react-native';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useDispatch, useSelector} from 'react-redux';
+import BackgroundService from 'react-native-background-actions';
 
 import {
   GapView,
@@ -29,6 +30,7 @@ import {
 } from './Trips_components';
 import {formatDate, formatTime} from './utils';
 import {styles} from './styles';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type TripsScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 
@@ -115,83 +117,148 @@ export default function Trips() {
   useEffect(() => {
     console.log('From store====', currentTrips);
   }, [startTrip, currentTrips, selectedSwitch]);
+  const options = {
+    taskName: 'Example',
+    taskTitle: 'ExampleTask title',
+    taskDesc: 'ExampleTask description',
+    taskIcon: {
+      name: 'ic_launcher',
+      type: 'mipmap',
+    },
+    color: '#ff00ff',
+    parameters: {
+      delay: 1000,
+    },
+  };
+  // async function handleStartTrip(id: 1 | 2 | 3, speed: number) {
+  //   // Check if the trip is already running (stop and reset if so)
+  //   if (currentTrips[id].tripStarted) {
+  //     //storing to redux
+  //     // store_data(id, trips);
+  //     endingTripInStore(id);
+  //     // Clear interval to stop trip tracking
+  //     clearInterval(intervalRefs.current[id - 1]!);
+  //     intervalRefs.current[id - 1] = null;
+  //     setNameInput('');
 
-  function handleStartTrip(id: 1 | 2 | 3, speed: number) {
-    // Check if the trip is already running (stop and reset if so)
-    if (currentTrips[id].tripStarted) {
-      //storing to redux
-      // store_data(id, trips);
-      endingTripInStore(id);
-      // Clear interval to stop trip tracking
-      clearInterval(intervalRefs.current[id - 1]!);
-      intervalRefs.current[id - 1] = null;
-      setNameInput('');
+  //     // Reset trip state
+  //     const updatedTrips = [...trips];
+  //     updatedTrips[id - 1] = resetTripState(id);
+  //     setTrips(updatedTrips);
 
-      // Reset trip state
-      const updatedTrips = [...trips];
-      updatedTrips[id - 1] = resetTripState(id);
-      setTrips(updatedTrips);
+  //     // Clear distance and time tracking
+  //     distanceRefs.current[id - 1] = 0;
+  //   } else {
+  //     // Start a new trip
 
-      // Clear distance and time tracking
-      distanceRefs.current[id - 1] = 0;
-    } else {
-      // Start a new trip
+  //     const now = new Date();
 
-      const now = new Date();
+  //     const initialFuel = [
+  //       enginesData1[0]?.FuelManagement.total_fuel_burned || 0,
+  //       enginesData1[1]?.FuelManagement.total_fuel_burned || 0,
+  //       enginesData2[0]?.FuelManagement.total_fuel_burned || 0,
+  //       enginesData2[1]?.FuelManagement.total_fuel_burned || 0,
+  //     ];
 
-      const initialFuel = [
-        enginesData1[0]?.FuelManagement.total_fuel_burned || 0,
-        enginesData1[1]?.FuelManagement.total_fuel_burned || 0,
-        enginesData2[0]?.FuelManagement.total_fuel_burned || 0,
-        enginesData2[1]?.FuelManagement.total_fuel_burned || 0,
-      ];
+  //     startingTripInStore(id, nameInput, now, initialFuel);
 
-      startingTripInStore(id, nameInput, now, initialFuel);
+  //     const updatedTrips = [...trips];
+  //     updatedTrips[id - 1] = {
+  //       ...updatedTrips[id - 1],
+  //       name: nameInput,
+  //       startingTime: now,
+  //       distanceCovered: 0,
+  //       tripTime: '0.00',
+  //       fuelConsumption: [0, 0, 0, 0],
+  //       initialFuel: initialFuel,
+  //       tripEfficiency: 0,
+  //       tripStarted: true,
+  //       tripEnded: false,
+  //     };
+  //     setTrips(updatedTrips);
 
-      const updatedTrips = [...trips];
-      updatedTrips[id - 1] = {
-        ...updatedTrips[id - 1],
-        name: nameInput,
-        startingTime: now,
-        distanceCovered: 0,
-        tripTime: '0.00',
-        fuelConsumption: [0, 0, 0, 0],
-        initialFuel: initialFuel,
-        tripEfficiency: 0,
-        tripStarted: true,
-        tripEnded: false,
-      };
-      setTrips(updatedTrips);
+  //     // Start interval to track time and distance
+  //     intervalRefs.current[id - 1] = setInterval(() => {
+  //       setTrips(prevTrips => {
+  //         const updatedTrips = [...prevTrips];
+  //         const currentTrip = updatedTrips[id - 1];
 
-      // Start interval to track time and distance
-      intervalRefs.current[id - 1] = setInterval(() => {
-        setTrips(prevTrips => {
-          const updatedTrips = [...prevTrips];
-          const currentTrip = updatedTrips[id - 1];
+  //         if (currentTrip.startingTime) {
+  //           const currentTime = new Date();
+  //           const elapsedTimeInHours =
+  //             (currentTime.getTime() - currentTrip.startingTime.getTime()) /
+  //             60000; // time in minutes
 
-          if (currentTrip.startingTime) {
-            const currentTime = new Date();
-            const elapsedTimeInHours =
-              (currentTime.getTime() - currentTrip.startingTime.getTime()) /
-              60000; // time in minutes
+  //           const truncatedElapsedTimeInHours =
+  //             Math.floor(elapsedTimeInHours * 10) / 10;
+  //           const newDistance = speed * truncatedElapsedTimeInHours;
 
-            const truncatedElapsedTimeInHours =
-              Math.floor(elapsedTimeInHours * 10) / 10;
-            const newDistance = speed * truncatedElapsedTimeInHours;
+  //           updatedTrips[id - 1] = {
+  //             ...currentTrip,
+  //             distanceCovered: newDistance,
+  //             tripTime: truncatedElapsedTimeInHours.toString(),
+  //           };
+  //         }
 
-            updatedTrips[id - 1] = {
-              ...currentTrip,
-              distanceCovered: newDistance,
-              tripTime: truncatedElapsedTimeInHours.toString(),
-            };
-          }
+  //         return updatedTrips;
+  //       });
+  //       console.log(
+  //         '<<<<<<=============== Trip chal rahi h ===============>>>>>',
+  //         initialFuel,
+  //       );
+  //     }, 999); // Changed to 999 milliseconds (Every ~1 second)
+  //   }
 
-          return updatedTrips;
-        });
-      }, 999); // Changed to 999 milliseconds (Every ~1 second)
+  //   setTripStarted(prevTripStarted => !prevTripStarted);
+  //   while (true) {
+  //     await new Promise(resolve => setTimeout(resolve, 10000000)); // Adjust the interval if needed
+  //   }
+  // }
+  const speedt = 20;
+  let t = 0;
+  let inter: NodeJS.Timeout;
+  console.log('=====================>>>>>>>>>>>>>>>>>>>>>>>>>');
+  useEffect(() => {
+    const getDistance = async () => {
+      const a = await AsyncStorage.getItem('distance');
+      console.log(a, '>>>>>>>>>>>>>>>>>>>>>>>>>>');
+    };
+    getDistance();
+  }, []);
+  async function handleStartTrip(id: 1 | 2 | 3, speed: number) {
+    let s = speedt;
+    const a = await AsyncStorage.getItem('distance');
+    if (a && +a > 40) {
+      console.log('Stop ho gaya');
+      const i = await AsyncStorage.getItem('inter');
+      console.log(i);
+      if (i) {
+        clearInterval(JSON.parse(i));
+      }
+      await AsyncStorage.removeItem("distance")
+      await BackgroundService.stop();
+      return;
     }
+    inter = setInterval(async () => {
+      t++;
+      s = s + speedt;
+      await AsyncStorage.setItem('distance', s.toString());
+      const a = await AsyncStorage.getItem('distance');
+      console.log(a, '>>>>>>>>>>>>>>>>>>>>>>>>>>');
+      console.log(
+        ' <<<<<<====== Trip chal rahi hai ======>>>>>> ',
+        t,
+        '====',
+        s,
+      );
+    }, 1000);
+    console.log(JSON.stringify(inter), '>>>>>>>>>>>>>INTER');
+    await AsyncStorage.setItem('inter', JSON.stringify(inter));
 
-    setTripStarted(prevTripStarted => !prevTripStarted);
+    while (BackgroundService.isRunning()) {
+      console.log('Infinite loop chala');
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Adjust the interval if needed
+    }
   }
 
   useEffect(
@@ -353,17 +420,17 @@ export default function Trips() {
     }
   }, [warningVisible]);
 
-  useEffect(() => {
-    if (resetVisible) {
-      const timer = setTimeout(() => {
-        handleStartTrip(selectedSwitch, Number(speed));
-        setResetVisible(false);
-        setShowConfirmation(false);
-      }, 2000);
+  // useEffect(() => {
+  //   if (resetVisible) {
+  //     const timer = setTimeout(() => {
+  //       handleStartTrip(selectedSwitch, Number(speed));
+  //       setResetVisible(false);
+  //       setShowConfirmation(false);
+  //     }, 2000);
 
-      return () => clearTimeout(timer);
-    }
-  }, [resetVisible]);
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [resetVisible]);
 
   // function store_data(id: 1 | 2 | 3, trips: any[]) {
   //   console.log('storing this trip: ', trips[id - 1]);
@@ -597,8 +664,12 @@ export default function Trips() {
                     : 'Start Trip'
                 } //xxx
                 width={80}
-                onPress={() => {
-                  handleStartTrip(selectedSwitch, Number(speed));
+                onPress={async () => {
+                  await BackgroundService.start(
+                    () => handleStartTrip(selectedSwitch, Number(speed)),
+                    options,
+                  );
+                  // handleStartTrip(selectedSwitch, Number(speed));
                   console.log('startinf trip for tab ::', selectedSwitch);
                 }}
               />
