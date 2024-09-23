@@ -1,4 +1,4 @@
-import {
+import React, {
   Dispatch,
   SetStateAction,
   createContext,
@@ -8,48 +8,39 @@ import {
   useState,
 } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {NetworkInfo} from 'react-native-network-info';
-import {Alert, NativeModules} from 'react-native';
+import Zeroconf, {Service} from 'react-native-zeroconf';
+import {Alert} from 'react-native';
 
-import {EngineData, FuelManagementData, SocketJSON} from '../../types';
+import {EngineData, SocketJSON} from '../../types';
 
 type ProvisionData = {timesp1: boolean; timesp2: boolean};
 type SetState = Dispatch<SetStateAction<ProvisionData>>;
 
-const initialState: {
-  enginesData1: EngineData[];
-  enginesData2: EngineData[];
-  fuelMgtData?: FuelManagementData[];
-  fuelMgtData2?: FuelManagementData[];
-  setProvision: SetState;
-  provision: ProvisionData;
-  speed: string | number;
-  getTimerValue: () => number;
-  reconnect: boolean;
-} = {
-  enginesData1: [],
-  enginesData2: [],
-  fuelMgtData: [],
-  fuelMgtData2: [],
-  setProvision: () => {},
+const zeroconf = new Zeroconf();
+
+const initialState = {
+  enginesData1: [] as EngineData[],
+  enginesData2: [] as EngineData[],
+  setProvision: (() => {}) as SetState,
   provision: {
     timesp1: false,
     timesp2: false,
   },
-  speed: '0',
+  speed: '0' as string | number,
   getTimerValue: () => 0,
-  reconnect: false,
 };
 
 const SocketContext = createContext(initialState);
 export const useSocket = () => useContext(SocketContext);
 
 function SocketProvider({children}: {children: React.ReactNode}) {
+  const [serviceFound, setServiceFound] = useState<{
+    host: string;
+    port: number;
+  } | null>(null);
+  const [resolvedService, setResolvedService] = useState<Service | null>(null);
   const [enginesData1, setEnginesData1] = useState<EngineData[]>([]);
   const [enginesData2, setEnginesData2] = useState<EngineData[]>([]);
-  const [reconnect, setReconnect] = useState(false); // Declare and initialize reconnect state
-  // const [fuelMgtData, setfuelMgtData] = useState<FuelManagementData[]>([]);
-  // const [fuelMgtData2, setfuelMgtData2] = useState<FuelManagementData[]>([]);
   const [speed, setSpeed] = useState<number | string>('0');
   const [provision, setProvision] = useState<ProvisionData>({
     timesp1: false,
@@ -57,64 +48,96 @@ function SocketProvider({children}: {children: React.ReactNode}) {
   });
   const engine1Ref = useRef<EngineData[]>([]);
   const engine2Ref = useRef<EngineData[]>([]);
-  // const fuleData1Ref = useRef<FuelManagementData[]>([]);
-  // const fuleData2Ref = useRef<FuelManagementData[]>([]);
   const timer = useRef(0);
-  const interval = useRef<NodeJS.Timeout>();
+  const interval = useRef<NodeJS.Timeout | null>(null);
   const [retryCount, setRetryCount] = useState(0);
-  const maxRetries = 5;
+  const maxRetries = 1;
+  const wsRef = useRef<WebSocket | null>(null);
 
-  const startTimer = () => {
-    interval.current = setInterval(async () => {
-      timer.current++;
-      await AsyncStorage.setItem('timer', timer.current.toString());
-    }, 1000);
-  };
-
+  // Initialize Zeroconf and set up event listeners
   useEffect(() => {
-    NetworkInfo.getIPAddress().then(ipAddress => {
-      console.log(ipAddress);
-    });
-  }, []);
+    const onStart = () => {
+      console.log('Zeroconf scan started.');
+    };
 
-  const getTimerValue = () => timer.current;
+    const onFound = (serviceName: string) => {
+      console.log('Service found:', serviceName);
+    };
 
-  const getSocketData = (domain: string) => {
-    console.log('=====WEB SOCKET START======');
-    const ws = new WebSocket(`ws://${domain}/ws`);
+    const onResolved = (service: Service) => {
+      console.log('Service resolved:', service);
+      // Check if this is the service we are looking for
+      if (service.name === 'timesp1' && service.addresses.length > 0) {
+        setResolvedService(service);
+        const host = service.addresses[0];
+        const port = service.port;
+        setServiceFound({host, port});
+        getSocketData(host, port);
+      }
+    };
+
+    const onError = (err: Error) => {
+      console.error('Zeroconf error:', err.message);
+    };
+
+    zeroconf.on('start', onStart);
+    zeroconf.on('found', onFound);
+    zeroconf.on('resolved', onResolved);
+    zeroconf.on('error', onError);
+
+    // Start scanning
+    zeroconf.scan('websocket', 'tcp', 'local.');
+
+    // Cleanup function
+    return () => {
+      zeroconf.removeListener('start', onStart);
+      zeroconf.removeListener('found', onFound);
+      zeroconf.removeListener('resolved', onResolved);
+      zeroconf.removeListener('error', onError);
+      zeroconf.stop();
+    };
+  }, [provision.timesp1]); //  provision.timesp2 removing temp
+
+  // Function to establish WebSocket connection
+  const getSocketData = (host: string, port: number) => {
+    // Prevent multiple WebSocket instances
+    if (wsRef.current) {
+      wsRef.current.close();
+      wsRef.current = null;
+    }
+
+    const wsUrl = `ws://${host}:${port}/ws`;
+    console.log('Connecting to WebSocket at:', wsUrl);
+    const ws = new WebSocket(wsUrl);
+    wsRef.current = ws;
 
     ws.onopen = () => {
-      if (domain === 'timesp1.local' || domain === 'timesp2.local') {
-        clearInterval(interval.current);
-        startTimer();
-      }
-      console.log('WebSocket connection opened for : ', domain);
-      // setRetryCount(0); // Reset retry count on successful connection
+      console.log('WebSocket connection opened for:', host);
+      clearInterval(interval.current!);
+      startTimer();
+      setRetryCount(0); // Reset retry count on successful connection
     };
 
     ws.onmessage = e => {
+      // console.log('WebSocket message received:', e.data);
       try {
         const jsonData: SocketJSON = JSON.parse(e.data);
-        // console.log('jsonData=====>>>>>', jsonData);
 
-        const enginesData = jsonData.data.Engines;
-        // const speedCheck = jsonData.data.Engines[0].SensorData.speed;
-        // console.log('main engines data: =======', enginesData);
-        // console.log('main engines Speed: =======', speedCheck);
-
+        const enginesData = jsonData.Engines;
         if (!enginesData || enginesData.length === 0) {
           console.log('No engine data or empty array received');
           ws.close();
           return;
         }
 
-        if (domain === 'timesp1.local') {
+        if (resolvedService?.name === 'timesp1') {
           handleTimesp1Data(enginesData);
-        } else if (domain === 'timesp2.local') {
-          handleTimesp2Data(enginesData);
+        } else if (resolvedService?.name === 'timesp2.local') {
+          // handleTimesp2Data(enginesData);
+          console.log('removed temporarily');
         }
       } catch (error) {
-        console.log('Error during WebSocket message processing:', error);
+        console.error('Error during WebSocket message processing:', error);
         ws.close();
       }
     };
@@ -124,106 +147,99 @@ function SocketProvider({children}: {children: React.ReactNode}) {
     };
 
     ws.onclose = e => {
-      const {reason} = e;
-      if (e.code === 1006) {
-        // getSocketData(domain);
-        console.log('idher');
-      }
-      console.log('WebSocket connection closed:', e.code, reason);
-      if (
-        !reason ||
-        reason === 'Broken pipe' ||
-        reason === 'Connection reset' ||
-        reason === 'Control frames must be final.'
-      ) {
-        getSocketData(domain);
+      console.log('WebSocket connection closed:', e.code, e.reason);
+      if (e.code !== 1000) {
+        // 1000 = normal closure
+        if (retryCount < maxRetries) {
+          const retryDelay = Math.min(1000 * 2 ** retryCount, 30000); // Exponential backoff up to 30s
+          console.log(
+            `Attempting to reconnect in ${retryDelay / 1000} seconds...`,
+          );
+          setTimeout(() => {
+            setRetryCount(prev => prev + 1);
+            if (serviceFound) {
+              getSocketData(serviceFound.host, serviceFound.port);
+            }
+          }, retryDelay);
+        } else {
+          console.log('some issue');
+        }
       }
     };
   };
 
+  // Function to start the timer
+  const startTimer = () => {
+    interval.current = setInterval(async () => {
+      timer.current++;
+      await AsyncStorage.setItem('timer', timer.current.toString());
+    }, 1000);
+  };
+
+  const getTimerValue = () => timer.current;
+
+  // Handle data for timesp1
   const handleTimesp1Data = (enginesData: EngineData[]) => {
-    if (enginesData[0]?.SensorData?.speed!) {
-      setSpeed(enginesData[0]?.SensorData?.speed!);
+    const currentSpeed = enginesData[0]?.SensorData?.speed;
+
+    if (currentSpeed !== undefined && currentSpeed !== null) {
+      setSpeed(currentSpeed);
     } else {
       setSpeed('0');
     }
-    if (JSON.stringify(engine1Ref.current) != JSON.stringify(enginesData)) {
+
+    if (JSON.stringify(engine1Ref.current) !== JSON.stringify(enginesData)) {
       engine1Ref.current = enginesData;
       setEnginesData1(enginesData);
     }
   };
 
-  const handleTimesp2Data = (enginesData: EngineData[]) => {
-    if (JSON.stringify(engine2Ref.current) !== JSON.stringify(enginesData)) {
-      engine2Ref.current = enginesData;
-      setEnginesData2(enginesData);
-    }
-  };
-
-  const handleReconnect = async () => {
-    if (retryCount < maxRetries) {
-      try {
-        setTimeout(async () => {
-          setRetryCount(prevCount => prevCount + 1);
-          console.log(`Reconnecting: Attempt ${retryCount + 1}`);
-        }, 5000); // Wait 5 seconds before turning Wi-Fi back on
-      } catch (error) {
-        console.error('Failed to toggle Wi-Fi:', error);
-        Alert.alert(
-          'Error',
-          'Cannot toggle Wi-Fi. Please check your permissions.',
-        );
-      }
-    } else {
-      Alert.alert(
-        'Error',
-        'Cannot connect to the WebSocket server. Please check your connection.',
-      );
-    }
-  };
-
   useEffect(() => {
-    (async () => {
+    console.log('Engine data >>>>>>>>>>>>>>>: ', enginesData1, [enginesData1]);
+  });
+  useEffect(() => {
+    console.log('speed >>>>>>>>>>>>>>>: ', speed, [speed]);
+  });
+  // // Handle data for timesp2
+  // const handleTimesp2Data = (enginesData: EngineData[]) => {
+  //   if (JSON.stringify(engine2Ref.current) !== JSON.stringify(enginesData)) {
+  //     engine2Ref.current = enginesData;
+  //     setEnginesData2(enginesData);
+  //   }
+  // };
+
+  // Load initial provisioned devices and timer
+  useEffect(() => {
+    const loadInitialData = async () => {
       try {
         const isProvisioned = await AsyncStorage.getItem('provisionedDevices');
         const prevTime = await AsyncStorage.getItem('timer');
         if (prevTime) {
-          timer.current = +prevTime;
+          timer.current = parseInt(prevTime, 10);
         }
         if (isProvisioned) {
-          const data = JSON.parse(isProvisioned);
-          if (data.timesp1) {
-            if (retryCount < maxRetries) {
-              getSocketData('timesp1.local');
-            }
-          }
+          const data = JSON.parse(isProvisioned) as ProvisionData;
+          setProvision(data);
         }
       } catch (error) {
-        console.log(`error: ${error}`);
+        console.error(`Error loading provisioned devices or timer: ${error}`);
       }
-      return () => {
-        setRetryCount(0);
-      };
-    })();
-  }, [provision.timesp1, retryCount]);
+    };
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const isProvisioned = await AsyncStorage.getItem('provisionedDevices');
-        if (isProvisioned) {
-          const data = JSON.parse(isProvisioned);
-          if (data.timesp2) {
-            if (retryCount < 1) {
-              getSocketData('timesp2.local');
-            }
-          }
-        }
-      } catch (error) {
-        console.log(`error: ${error}`);
-      }
-    })();
-  }, [provision.timesp2]);
+    loadInitialData();
+  }, []);
+
+  // // Handle provision changes
+  // useEffect(() => {
+  //   const handleProvisionChange = () => {
+  //     if (provision.timesp1 || provision.timesp2) {
+  //       // Trigger Zeroconf scan by updating dependency
+  //       setRetryCount(0);
+  //     }
+  //   };
+
+  //   handleProvisionChange();
+  // }, [provision]);
 
   return (
     <SocketContext.Provider
@@ -234,7 +250,6 @@ function SocketProvider({children}: {children: React.ReactNode}) {
         speed,
         provision,
         getTimerValue,
-        reconnect,
       }}>
       {children}
     </SocketContext.Provider>

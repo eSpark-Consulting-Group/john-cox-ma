@@ -165,9 +165,7 @@ export type EngineData = {
 };
 
 export type SocketJSON = {
-  data: {
-    Engines: EngineData[];
-  };
+  Engines: EngineData[];
 };
 
 export type TripData = {
