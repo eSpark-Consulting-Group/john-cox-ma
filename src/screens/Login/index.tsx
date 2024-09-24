@@ -18,11 +18,13 @@ import {
 } from '../../components';
 import {MyTheme} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
+import {useSocket} from '../../components/SocketProvider';
 
 type LoginScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 
 export default function Login() {
   const theme = useTheme() as MyTheme;
+  const {resolvedService1, resolvedService2} = useSocket();
   const navigation = useNavigation<LoginScreenProps['navigation']>();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -36,12 +38,17 @@ export default function Login() {
       setError('');
       setIsLoading(true);
 
-      const domains = ['timesp1.local', 'timesp2.local'];
+      const domains = [
+        `${resolvedService1?.addresses[0]}:${resolvedService1?.port}`,
+        `${resolvedService2?.addresses[0]}:${resolvedService2?.port}`,
+      ];
 
       for (const domain of domains) {
         try {
+          console.log(`http://${domain}/userLogin`);
+
           const response = await axios.post(
-            `https://${domain}/userLogin`,
+            `http://${domain}/userLogin`,
             creds,
           );
           const data = response.data as {token: string};

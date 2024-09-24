@@ -9,7 +9,6 @@ import React, {
 } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Zeroconf, {Service} from 'react-native-zeroconf';
-import {Alert} from 'react-native';
 
 import {EngineData, SocketJSON} from '../../types';
 
@@ -28,6 +27,8 @@ const initialState = {
   },
   speed: '0' as string | number,
   getTimerValue: () => 0,
+  resolvedService1: {} as Service | null,
+  resolvedService2: {} as Service | null,
 };
 
 const SocketContext = createContext(initialState);
@@ -38,7 +39,12 @@ function SocketProvider({children}: {children: React.ReactNode}) {
     host: string;
     port: number;
   } | null>(null);
-  const [resolvedService, setResolvedService] = useState<Service | null>(null);
+  const [resolvedService1, setResolvedService1] = useState<Service | null>(
+    null,
+  );
+  const [resolvedService2, setResolvedService2] = useState<Service | null>(
+    null,
+  );
   const [enginesData1, setEnginesData1] = useState<EngineData[]>([]);
   const [enginesData2, setEnginesData2] = useState<EngineData[]>([]);
   const [speed, setSpeed] = useState<number | string>('0');
@@ -68,7 +74,13 @@ function SocketProvider({children}: {children: React.ReactNode}) {
       console.log('Service resolved:', service);
       // Check if this is the service we are looking for
       if (service.name === 'timesp1' && service.addresses.length > 0) {
-        setResolvedService(service);
+        setResolvedService1(service);
+        const host = service.addresses[0];
+        const port = service.port;
+        setServiceFound({host, port});
+        getSocketData(host, port);
+      } else if (service.name === 'timesp2' && service.addresses.length > 0) {
+        setResolvedService2(service);
         const host = service.addresses[0];
         const port = service.port;
         setServiceFound({host, port});
@@ -130,9 +142,9 @@ function SocketProvider({children}: {children: React.ReactNode}) {
           return;
         }
 
-        if (resolvedService?.name === 'timesp1') {
+        if (resolvedService1?.name == 'timesp1') {
           handleTimesp1Data(enginesData);
-        } else if (resolvedService?.name === 'timesp2.local') {
+        } else if (resolvedService2?.name === 'timesp2.local') {
           // handleTimesp2Data(enginesData);
           console.log('removed temporarily');
         }
@@ -250,6 +262,8 @@ function SocketProvider({children}: {children: React.ReactNode}) {
         speed,
         provision,
         getTimerValue,
+        resolvedService1,
+        resolvedService2,
       }}>
       {children}
     </SocketContext.Provider>
