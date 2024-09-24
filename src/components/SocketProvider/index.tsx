@@ -190,7 +190,7 @@ function SocketProvider({children}: {children: React.ReactNode}) {
         if (prevTime) {
           timer.current = +prevTime;
         }
-        isProvisioned = JSON.stringify({timesp1: true, timesp2: false});
+        isProvisioned = JSON.stringify({timesp1: false, timesp2: false});
         console.log(isProvisioned, '>>>>>>');
         if (isProvisioned) {
           const data = JSON.parse(isProvisioned);

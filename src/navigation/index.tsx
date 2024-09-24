@@ -31,7 +31,7 @@ export default function RootNav() {
     <Provider store={store}>
       <SocketProvider>
         <NavigationContainer theme={DarkTheme}>
-          <RootStack.Navigator initialRouteName="ScanDevices">
+          <RootStack.Navigator initialRouteName="Trips">
             <RootStack.Screen
               name="ScanDevices"
               component={ScanDevices}
