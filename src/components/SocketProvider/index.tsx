@@ -45,6 +45,7 @@ function SocketProvider({children}: {children: React.ReactNode}) {
   const [resolvedService2, setResolvedService2] = useState<Service | null>(
     null,
   );
+  const [serviceName, setServiceName] = useState<string>();
   const [enginesData1, setEnginesData1] = useState<EngineData[]>([]);
   const [enginesData2, setEnginesData2] = useState<EngineData[]>([]);
   const [speed, setSpeed] = useState<number | string>('0');
@@ -73,18 +74,25 @@ function SocketProvider({children}: {children: React.ReactNode}) {
     const onResolved = (service: Service) => {
       console.log('Service resolved:', service);
       // Check if this is the service we are looking for
-      if (service.name === 'timesp1' && service.addresses.length > 0) {
+      if (
+        service.name === 'timesp1' &&
+        service.addresses.length > 0 &&
+        !resolvedService1
+      ) {
+        setServiceName(service.name);
         setResolvedService1(service);
         const host = service.addresses[0];
         const port = service.port;
         setServiceFound({host, port});
-        getSocketData(host, port);
+        getSocketData(host, port, 'timesp1');
       } else if (service.name === 'timesp2' && service.addresses.length > 0) {
+        console.log('setting resolvedService2:  ');
+        setServiceName(service.name);
         setResolvedService2(service);
         const host = service.addresses[0];
         const port = service.port;
         setServiceFound({host, port});
-        getSocketData(host, port);
+        getSocketData(host, port, 'timesp2');
       }
     };
 
@@ -108,10 +116,10 @@ function SocketProvider({children}: {children: React.ReactNode}) {
       zeroconf.removeListener('error', onError);
       zeroconf.stop();
     };
-  }, [provision.timesp1]); //  provision.timesp2 removing temp
+  }, [provision.timesp1, provision.timesp2]);
 
   // Function to establish WebSocket connection
-  const getSocketData = (host: string, port: number) => {
+  const getSocketData = (host: string, port: number, serviceName: string) => {
     // Prevent multiple WebSocket instances
     if (wsRef.current) {
       wsRef.current.close();
@@ -131,7 +139,6 @@ function SocketProvider({children}: {children: React.ReactNode}) {
     };
 
     ws.onmessage = e => {
-      // console.log('WebSocket message received:', e.data);
       try {
         const jsonData: SocketJSON = JSON.parse(e.data);
 
@@ -142,11 +149,10 @@ function SocketProvider({children}: {children: React.ReactNode}) {
           return;
         }
 
-        if (resolvedService1?.name == 'timesp1') {
+        if (serviceName === 'timesp1') {
           handleTimesp1Data(enginesData);
-        } else if (resolvedService2?.name === 'timesp2.local') {
-          // handleTimesp2Data(enginesData);
-          console.log('removed temporarily');
+        } else if (serviceName === 'timesp2') {
+          handleTimesp2Data(enginesData);
         }
       } catch (error) {
         console.error('Error during WebSocket message processing:', error);
@@ -170,7 +176,7 @@ function SocketProvider({children}: {children: React.ReactNode}) {
           setTimeout(() => {
             setRetryCount(prev => prev + 1);
             if (serviceFound) {
-              getSocketData(serviceFound.host, serviceFound.port);
+              getSocketData(serviceFound.host, serviceFound.port, serviceName);
             }
           }, retryDelay);
         } else {
@@ -206,19 +212,28 @@ function SocketProvider({children}: {children: React.ReactNode}) {
     }
   };
 
-  useEffect(() => {
-    console.log('Engine data >>>>>>>>>>>>>>>: ', enginesData1, [enginesData1]);
-  });
+  // useEffect(() => {
+  //   console.log('Engine data 1 >>>>>>>>>>>>>>>: ', enginesData1, [
+  //     enginesData1,
+  //   ]);
+  // });
+  // useEffect(() => {
+  //   console.log('Engine data 2 >>>>>>>>>>>>>>>: ', enginesData2, [
+  //     enginesData2,
+  //   ]);
+  // });
+
   useEffect(() => {
     console.log('speed >>>>>>>>>>>>>>>: ', speed, [speed]);
   });
-  // // Handle data for timesp2
-  // const handleTimesp2Data = (enginesData: EngineData[]) => {
-  //   if (JSON.stringify(engine2Ref.current) !== JSON.stringify(enginesData)) {
-  //     engine2Ref.current = enginesData;
-  //     setEnginesData2(enginesData);
-  //   }
-  // };
+  // Handle data for timesp2
+  const handleTimesp2Data = (enginesData: EngineData[]) => {
+    console.log('############ handling engine 2 data ##########');
+    if (JSON.stringify(engine2Ref.current) !== JSON.stringify(enginesData)) {
+      engine2Ref.current = enginesData;
+      setEnginesData2(enginesData);
+    }
+  };
 
   // Load initial provisioned devices and timer
   useEffect(() => {

@@ -214,7 +214,7 @@ export default function Trips() {
 
     // Efficiency in gallon per nautical mile
     return totalFuelBurned > 0
-      ? distanceRefs.current[selectedSwitch - 1] / totalFuelBurned //to be changed
+      ? totalFuelBurned / distanceRefs.current[selectedSwitch - 1] //to be changed
       : 0;
   }, [
     enginesData1[0]?.FuelManagement.total_fuel_burned,
