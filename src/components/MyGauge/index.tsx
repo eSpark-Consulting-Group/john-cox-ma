@@ -25,7 +25,7 @@ function MyGauge({value = 0, name}: MyGaugeProps) {
         <MyText
           text={name}
           fontFamily="CrimsonText-Bold"
-          size={18}
+          size={14}
           style={styles().name}
         />
         <RNSpeedometer
@@ -52,8 +52,8 @@ function MyGauge({value = 0, name}: MyGaugeProps) {
         />
       </View>
       <View style={styles(theme).textBox}>
-        <MyText fontFamily="NotoSans-Bold" size={30}>
-          {value.toFixed(3)}
+        <MyText fontFamily="NotoSans-Bold" size={26}>
+          {value.toFixed(1)}
         </MyText>
         <MyText fontFamily="NotoSans-Regular" size={18}>
           gal/hr
@@ -72,7 +72,12 @@ const styles = (theme?: MyTheme) =>
       alignItems: 'center',
       justifyContent: 'center',
     },
-    name: {position: 'absolute', bottom: 49, right: 45},
+    name: {
+      position: 'absolute',
+      bottom: 39,
+      right: 35,
+      width: 80,
+    },
     textBox: {
       flexDirection: 'row',
       justifyContent: 'center',

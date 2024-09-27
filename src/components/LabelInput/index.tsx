@@ -23,7 +23,7 @@ function LabelInput({
 }: LabelInputProps) {
   return (
     <View style={styles.main}>
-      <View style={{width: '30%'}}>
+      <View style={{}}>
         <MyText text={text} size={size} />
         {subText && <MyText text={subText} fontFamily="AnonymousPro-Italic" />}
       </View>

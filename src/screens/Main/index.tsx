@@ -1,7 +1,9 @@
-import React, {useEffect, useState} from 'react';
-import {ScrollView, StyleSheet, View} from 'react-native';
+import React, {useEffect, useMemo, useState} from 'react';
+import {ScrollView, StyleSheet, TouchableOpacity, View} from 'react-native';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {Ionicons} from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {
   MyButton,
@@ -18,26 +20,88 @@ import {MyTheme} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
 import {useSocket} from '../../components/SocketProvider';
 import NauticalMile from './NauticalMilte';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type MainScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 
 export default function Main() {
-  const {
-    enginesData1,
-    fuelManagementData,
-    fuelManagementData2,
-    speed,
-    enginesData2,
-  } = useSocket();
+  const {enginesData1, speed, enginesData2, setProvision} = useSocket();
   const theme = useTheme() as MyTheme;
   const navigation = useNavigation<MainScreenProps['navigation']>();
   const [generatorRunning, setGeneratorRunning] = useState<'Yes' | 'No'>('Yes');
   const [confirmation, setConfirmation] = useState(false);
+  const [showLoader, setShowLoader] = useState(true);
   const [prov, setProv] = useState<{timesp1: boolean; timesp2: boolean}>({
     timesp1: false,
     timesp2: false,
   });
+
+  const sumOfBurn = useMemo(() => {
+    return (
+      Number(enginesData1[0]?.FuelManagement.total_fuel_burned || 0) +
+      Number(enginesData1[1]?.FuelManagement.total_fuel_burned || 0) +
+      Number(enginesData2[0]?.FuelManagement.total_fuel_burned || 0) +
+      Number(enginesData2[1]?.FuelManagement.total_fuel_burned || 0)
+    );
+  }, [
+    enginesData1[0]?.FuelManagement.total_fuel_burned,
+    enginesData1[1]?.FuelManagement.total_fuel_burned,
+    enginesData2[0]?.FuelManagement.total_fuel_burned,
+    enginesData2[1]?.FuelManagement.total_fuel_burned,
+  ]);
+
+  const remainingFuel = useMemo(() => {
+    return (
+      Number(enginesData1[0]?.FuelManagement.remaining_fuel || 0) +
+      Number(enginesData1[1]?.FuelManagement.remaining_fuel || 0) +
+      Number(enginesData2[0]?.FuelManagement.remaining_fuel || 0) +
+      Number(enginesData2[1]?.FuelManagement.remaining_fuel || 0)
+    );
+  }, [
+    enginesData1[0]?.FuelManagement.remaining_fuel,
+    enginesData1[1]?.FuelManagement.remaining_fuel,
+    enginesData2[0]?.FuelManagement.remaining_fuel,
+    enginesData2[1]?.FuelManagement.remaining_fuel,
+  ]);
+
+  const speedEfficiency = useMemo(() => {
+    const totalFuelBurned1 =
+      Number(enginesData1[0]?.FuelManagement.total_fuel_burned || 0) +
+      Number(enginesData1[1]?.FuelManagement.total_fuel_burned || 0);
+    const totalFuelBurned2 =
+      Number(enginesData2[0]?.FuelManagement.total_fuel_burned || 0) +
+      Number(enginesData2[1]?.FuelManagement.total_fuel_burned || 0);
+
+    const totalSpeed = Number(enginesData1[0]?.SensorData.speed || 0);
+
+    const totalFuelBurned = totalFuelBurned1 + totalFuelBurned2;
+
+    // Efficiency in knots per gallon
+    return totalFuelBurned > 0 ? totalSpeed / totalFuelBurned : 0;
+  }, [
+    enginesData1[0]?.FuelManagement.total_fuel_burned,
+    enginesData1[1]?.FuelManagement.total_fuel_burned,
+    enginesData2[0]?.FuelManagement.total_fuel_burned,
+    enginesData2[1]?.FuelManagement.total_fuel_burned,
+    enginesData1[0]?.SensorData.speed,
+    enginesData1[1]?.SensorData.speed,
+    enginesData2[0]?.SensorData.speed,
+    enginesData2[1]?.SensorData.speed,
+  ]);
+
+  const distanceToEmpty = useMemo(() => {
+    return (
+      Number(enginesData1[0]?.FuelManagement.distance_to_empty || 0) +
+      Number(enginesData1[1]?.FuelManagement.distance_to_empty || 0) +
+      Number(enginesData2[0]?.FuelManagement.distance_to_empty || 0) +
+      Number(enginesData2[1]?.FuelManagement.distance_to_empty || 0)
+    );
+  }, [
+    enginesData1[0]?.FuelManagement.distance_to_empty,
+    enginesData1[1]?.FuelManagement.distance_to_empty,
+    enginesData2[0]?.FuelManagement.distance_to_empty,
+    enginesData2[1]?.FuelManagement.distance_to_empty,
+  ]);
+
   const toggleGeneratorRunning = () => {
     setGeneratorRunning(generatorRunning === 'Yes' ? 'No' : 'Yes');
   };
@@ -74,7 +138,7 @@ export default function Main() {
   //loader pe timer aur refresh lagana he
   const fetchProvisionedDevices = async () => {
     const currentProvision = await AsyncStorage.getItem('provisionedDevices');
-    console.log(currentProvision);
+    console.log('curr prov: ', currentProvision);
     const provisionedDevices = currentProvision
       ? JSON.parse(currentProvision)
       : {timesp1: false, timesp2: false};
@@ -85,7 +149,14 @@ export default function Main() {
     fetchProvisionedDevices();
   }, []);
 
-  console.log(enginesData1);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowLoader(false);
+      if (showLoader) setProvision({timesp1: true, timesp2: true});
+    }, 7000);
+
+    return () => clearTimeout(timer); // Cleanup timer on component unmount
+  }, [showLoader]);
 
   return (
     <MyCanvas>
@@ -136,18 +207,29 @@ export default function Main() {
         ) : (
           <>
             <GapView length={90} />
+            <TouchableOpacity
+              style={{alignSelf: 'flex-end', paddingRight: '4%'}}
+              onPress={() => setShowLoader(true)}>
+              <Ionicons name="reload" size={24} color={theme.colors.primary} />
+            </TouchableOpacity>
             {prov.timesp1 && (
               <View style={styles().GaugeRow}>
                 {enginesData1.length ? (
                   enginesData1.map((item, index) => (
                     <MyGauge
                       key={item.id}
-                      value={item.fuel ? +item.fuel : 0}
-                      name={item.name}
+                      value={
+                        item?.SensorData?.fuel
+                          ? Number(item?.SensorData?.fuel)
+                          : 0
+                      }
+                      name={`FMM1\n${item.position}`}
                     />
                   ))
-                ) : (
+                ) : showLoader ? (
                   <Loader size="large" />
+                ) : (
+                  <GapView length={10} />
                 )}
               </View>
             )}
@@ -158,12 +240,18 @@ export default function Main() {
                   enginesData2.map((item, index) => (
                     <MyGauge
                       key={item.id}
-                      value={item.fuel ? +item.fuel : 0}
-                      name={item.name}
+                      value={
+                        item?.SensorData?.fuel
+                          ? Number(item?.SensorData?.fuel)
+                          : 0
+                      }
+                      name={`FMM1\n${item.position}`}
                     />
                   ))
-                ) : (
+                ) : showLoader ? (
                   <Loader size="large" />
+                ) : (
+                  <GapView length={10} />
                 )}
               </View>
             )}
@@ -173,7 +261,7 @@ export default function Main() {
                 <MyBox
                   label="Efficiency"
                   text="Speed"
-                  value={speed}
+                  value={speedEfficiency.toFixed(2)}
                   unit="Knots"
                   width={'50%'}
                   gap={22}
@@ -181,10 +269,7 @@ export default function Main() {
                 <View style={styles().fuelBurn}>
                   <MyBox
                     text="Total Fuel Burn"
-                    value={(
-                      fuelManagementData.total_fuel_burned +
-                      fuelManagementData2.total_fuel_burned
-                    ).toString()}
+                    value={sumOfBurn}
                     unit="gal/hr"
                     width={'100%'}
                     gap={1}
@@ -197,10 +282,7 @@ export default function Main() {
                   <MyBox
                     label="Range"
                     text="Fuel Remaining"
-                    value={
-                      fuelManagementData.remaining_fuel +
-                      fuelManagementData2.remaining_fuel
-                    }
+                    value={remainingFuel}
                     unit="gal"
                   />
                 </View>
@@ -222,15 +304,11 @@ export default function Main() {
               </View>
               <MyBox
                 text="Distance to Empty"
-                value={(
-                  fuelManagementData.distance_to_empty +
-                  fuelManagementData2.distance_to_empty
-                ).toString()}
+                value={distanceToEmpty}
                 unit="N.Mile"
                 width={'70%'}
               />
             </View>
-
             <GapView length={40} />
             <View style={styles().buttons}>
               {buttonsData.map((item, index) => (

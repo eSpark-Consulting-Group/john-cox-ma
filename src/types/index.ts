@@ -66,7 +66,8 @@ export interface MyInputProps {
   onFocus?: () => void;
   size?: number;
   placeholder?: string;
-  value?: string;
+  value?: string | number | any;
+  editable?: boolean;
 }
 
 export interface LabelInputProps {
@@ -123,7 +124,7 @@ export type MyCheckboxProps = {
 };
 
 export type DisplayBoxProps = {
-  value: string;
+  value: string | number;
   width?: number;
   paddingHorizontal?: number;
   paddingVertical?: number;
@@ -133,29 +134,49 @@ export type DisplayBoxProps = {
   fontFamily?: Fonts;
 };
 
-export type EngineData = {
-  id: string;
-  name: string;
+export type FuelManagementData = {
+  id: number;
+  engine_id: number;
+  distance_to_empty: number;
+  remaining_fuel: number;
+  total_fuel_burned: number;
+};
+
+export type SensorDataProps = {
+  id: number;
+  engine_id: number;
   fuel: string | undefined;
+  speed: number;
+  temperature_return: string;
+  temperature_supply: string;
+  timestamp_unix: string;
+};
+
+export type EngineData = {
+  id: number;
+  name: string;
   enabled: '1' | '0';
-  position: string;
-  volume_per_cycle: string;
   engine_type: string;
   fuel_type: string;
+  position: string;
+  volume_per_cycle: string;
+  FuelManagement: FuelManagementData;
+  SensorData: SensorDataProps;
 };
 
 export type SocketJSON = {
-  data: {
-    Engines: EngineData[];
-    SensorData: {
-      engine_id: string;
-      fuel: string | undefined;
-      speed: string;
-    }[];
-    FuelManagement: {
-      remaining_fuel: string;
-      distance_to_empty: string;
-      total_fuel_burned: string;
-    }[];
-  };
+  Engines: EngineData[];
+};
+
+export type TripData = {
+  id: 1 | 2 | 3;
+  name: string;
+  tripStarted?: boolean;
+  tripEnded?: boolean;
+  startingTime: Date | null;
+  distanceCovered: number;
+  tripTime: string;
+  initialFuel: number[];
+  fuelConsumption: number[]; // assuming it's an array of numbers
+  tripEfficiency: number | undefined;
 };

@@ -1,5 +1,4 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {
+import React, {
   Dispatch,
   SetStateAction,
   createContext,
@@ -8,122 +7,155 @@ import {
   useRef,
   useState,
 } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Zeroconf, {Service} from 'react-native-zeroconf';
+
 import {EngineData, SocketJSON} from '../../types';
-import {getEnginesData, getFuelMGT} from './socket.helper';
+
 type ProvisionData = {timesp1: boolean; timesp2: boolean};
 type SetState = Dispatch<SetStateAction<ProvisionData>>;
 
-const initialState: {
-  enginesData1: EngineData[];
-  enginesData2: EngineData[];
-  setProvision: SetState;
-  provision: ProvisionData;
-  fuelManagementData: {
-    distance_to_empty: number;
-    remaining_fuel: number;
-    total_fuel_burned: number;
-  };
-  fuelManagementData2: {
-    distance_to_empty: number;
-    remaining_fuel: number;
-    total_fuel_burned: number;
-  };
-  speed: string;
-  getTimerValue: () => number;
-} = {
-  enginesData1: [],
-  enginesData2: [],
-  setProvision: () => {},
+const zeroconf = new Zeroconf();
+
+const initialState = {
+  enginesData1: [] as EngineData[],
+  enginesData2: [] as EngineData[],
+  setProvision: (() => {}) as SetState,
   provision: {
     timesp1: false,
     timesp2: false,
   },
-  fuelManagementData: {
-    distance_to_empty: 0,
-    remaining_fuel: 0,
-    total_fuel_burned: 0,
-  },
-  fuelManagementData2: {
-    distance_to_empty: 0,
-    remaining_fuel: 0,
-    total_fuel_burned: 0,
-  },
-  speed: '0',
+  speed: '0' as string | number,
   getTimerValue: () => 0,
+  resolvedService1: {} as Service | null,
+  resolvedService2: {} as Service | null,
 };
+
 const SocketContext = createContext(initialState);
 export const useSocket = () => useContext(SocketContext);
 
 function SocketProvider({children}: {children: React.ReactNode}) {
+  const [serviceFound, setServiceFound] = useState<{
+    host: string;
+    port: number;
+  } | null>(null);
+  const [resolvedService1, setResolvedService1] = useState<Service | null>(
+    null,
+  );
+  const [resolvedService2, setResolvedService2] = useState<Service | null>(
+    null,
+  );
+  const [serviceName, setServiceName] = useState<string>();
   const [enginesData1, setEnginesData1] = useState<EngineData[]>([]);
   const [enginesData2, setEnginesData2] = useState<EngineData[]>([]);
-  const [speed, setSpeed] = useState('0');
-  const [fuelManagementData, setFuelManagementData] = useState({
-    distance_to_empty: 0,
-    remaining_fuel: 0,
-    total_fuel_burned: 0,
-  });
-  const [fuelManagementData2, setFuelManagementData2] = useState({
-    distance_to_empty: 0,
-    remaining_fuel: 0,
-    total_fuel_burned: 0,
-  });
-  const engine1Ref = useRef<EngineData[]>([]);
-  const engine2Ref = useRef<EngineData[]>([]);
-  const fuelDataRef = useRef({
-    distance_to_empty: 0,
-    remaining_fuel: 0,
-    total_fuel_burned: 0,
-  });
-  const fuelDataRef2 = useRef({
-    distance_to_empty: 0,
-    remaining_fuel: 0,
-    total_fuel_burned: 0,
-  });
+  const [speed, setSpeed] = useState<number | string>('0');
   const [provision, setProvision] = useState<ProvisionData>({
     timesp1: false,
     timesp2: false,
   });
-
+  const engine1Ref = useRef<EngineData[]>([]);
+  const engine2Ref = useRef<EngineData[]>([]);
   const timer = useRef(0);
-  const interval = useRef<NodeJS.Timeout>();
+  const interval = useRef<NodeJS.Timeout | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
+  const maxRetries = 1;
+  const wsRef = useRef<WebSocket | null>(null);
 
-  const startTimer = () => {
-    interval.current = setInterval(async () => {
-      timer.current++;
-      await AsyncStorage.setItem('timer', timer.current.toString());
-    }, 1000);
-  };
+  // Initialize Zeroconf and set up event listeners
+  useEffect(() => {
+    const onStart = () => {
+      console.log('Zeroconf scan started.');
+    };
 
-  const getTimerValue = () => timer.current;
+    const onFound = (serviceName: string) => {
+      console.log('Service found:', serviceName);
+    };
 
-  const getSocketData = (domain: string) => {
-    console.log('=====WEB SOCKET START======');
-    const ws = new WebSocket(`wss://${domain}/ws`);
+    const onResolved = (service: Service) => {
+      console.log('Service resolved:', service);
+      // Check if this is the service we are looking for
+      if (
+        service.name === 'timesp1' &&
+        service.addresses.length > 0 &&
+        !resolvedService1
+      ) {
+        setServiceName(service.name);
+        setResolvedService1(service);
+        const host = service.addresses[0];
+        const port = service.port;
+        setServiceFound({host, port});
+        getSocketData(host, port, 'timesp1');
+      } else if (service.name === 'timesp2' && service.addresses.length > 0) {
+        console.log('setting resolvedService2:  ');
+        setServiceName(service.name);
+        setResolvedService2(service);
+        const host = service.addresses[0];
+        const port = service.port;
+        setServiceFound({host, port});
+        getSocketData(host, port, 'timesp2');
+      }
+    };
+
+    const onError = (err: Error) => {
+      console.error('Zeroconf error:', err.message);
+    };
+
+    zeroconf.on('start', onStart);
+    zeroconf.on('found', onFound);
+    zeroconf.on('resolved', onResolved);
+    zeroconf.on('error', onError);
+
+    // Start scanning
+    zeroconf.scan('websocket', 'tcp', 'local.');
+
+    // Cleanup function
+    return () => {
+      zeroconf.removeListener('start', onStart);
+      zeroconf.removeListener('found', onFound);
+      zeroconf.removeListener('resolved', onResolved);
+      zeroconf.removeListener('error', onError);
+      zeroconf.stop();
+    };
+  }, [provision.timesp1, provision.timesp2]);
+
+  // Function to establish WebSocket connection
+  const getSocketData = (host: string, port: number, serviceName: string) => {
+    // Prevent multiple WebSocket instances
+    if (wsRef.current) {
+      wsRef.current.close();
+      wsRef.current = null;
+    }
+
+    const wsUrl = `ws://${host}:${port}/ws`;
+    console.log('Connecting to WebSocket at:', wsUrl);
+    const ws = new WebSocket(wsUrl);
+    wsRef.current = ws;
 
     ws.onopen = () => {
-      if (domain === 'timesp1.local' || 'timesp2.local') {
-        clearInterval(interval.current);
-        startTimer();
-      }
-      console.log('WebSocket connection opened for : ', domain);
-      // console.log('engines data fr 2: ', enginesData2);
+      console.log('WebSocket connection opened for:', host);
+      clearInterval(interval.current!);
+      startTimer();
+      setRetryCount(0); // Reset retry count on successful connection
     };
 
     ws.onmessage = e => {
       try {
         const jsonData: SocketJSON = JSON.parse(e.data);
-        const sensors = jsonData.data.SensorData;
-        const enginesData = getEnginesData(jsonData);
 
-        if (domain === 'timesp1.local') {
-          handleTimesp1Data(sensors, enginesData, jsonData);
-        } else if (domain === 'timesp2.local') {
-          // console.log('engines data for 2 ye aya : ', enginesData);
-          handleTimesp2Data(sensors, enginesData, jsonData);
+        const enginesData = jsonData.Engines;
+        if (!enginesData || enginesData.length === 0) {
+          console.log('No engine data or empty array received');
+          ws.close();
+          return;
+        }
+
+        if (serviceName === 'timesp1') {
+          handleTimesp1Data(enginesData);
+        } else if (serviceName === 'timesp2') {
+          handleTimesp2Data(enginesData);
         }
       } catch (error) {
-        console.log(error);
+        console.error('Error during WebSocket message processing:', error);
         ws.close();
       }
     };
@@ -133,103 +165,120 @@ function SocketProvider({children}: {children: React.ReactNode}) {
     };
 
     ws.onclose = e => {
-      const {reason} = e;
-      console.log('WebSocket connection closed:', e.code, reason);
-      if (
-        !reason ||
-        reason === 'Broken pipe' ||
-        reason === 'Connection reset' ||
-        reason === 'Control frames must be final.'
-      ) {
-        getSocketData(domain);
+      console.log('WebSocket connection closed:', e.code, e.reason);
+      if (e.code !== 1000) {
+        // 1000 = normal closure
+        if (retryCount < maxRetries) {
+          const retryDelay = Math.min(1000 * 2 ** retryCount, 30000); // Exponential backoff up to 30s
+          console.log(
+            `Attempting to reconnect in ${retryDelay / 1000} seconds...`,
+          );
+          setTimeout(() => {
+            setRetryCount(prev => prev + 1);
+            if (serviceFound) {
+              getSocketData(serviceFound.host, serviceFound.port, serviceName);
+            }
+          }, retryDelay);
+        } else {
+          console.log('some issue');
+        }
       }
     };
   };
 
-  const handleTimesp1Data = (
-    sensors: {engine_id: string; fuel: string | undefined; speed: string}[],
-    enginesData: EngineData[],
-    jsonData: SocketJSON,
-  ) => {
-    if (sensors.length) {
-      setSpeed(sensors[0].speed);
+  // Function to start the timer
+  const startTimer = () => {
+    interval.current = setInterval(async () => {
+      timer.current++;
+      await AsyncStorage.setItem('timer', timer.current.toString());
+    }, 1000);
+  };
+
+  const getTimerValue = () => timer.current;
+
+  // Handle data for timesp1
+  const handleTimesp1Data = (enginesData: EngineData[]) => {
+    const currentSpeed = enginesData[0]?.SensorData?.speed;
+
+    if (currentSpeed !== undefined && currentSpeed !== null) {
+      setSpeed(currentSpeed);
     } else {
       setSpeed('0');
     }
-    const fuelMGT = getFuelMGT(jsonData);
-    if (JSON.stringify(fuelDataRef.current) !== JSON.stringify(fuelMGT)) {
-      fuelDataRef.current = fuelMGT;
-      setFuelManagementData(fuelMGT);
-    }
+
     if (JSON.stringify(engine1Ref.current) !== JSON.stringify(enginesData)) {
       engine1Ref.current = enginesData;
       setEnginesData1(enginesData);
     }
   };
 
-  const handleTimesp2Data = (
-    sensors: {engine_id: string; fuel: string | undefined; speed: string}[],
-    enginesData: EngineData[],
-    jsonData: SocketJSON,
-  ) => {
-    const fuelMGT = getFuelMGT(jsonData);
-    if (JSON.stringify(fuelDataRef2.current) !== JSON.stringify(fuelMGT)) {
-      fuelDataRef2.current = fuelMGT;
-      setFuelManagementData2(fuelMGT);
-      // console.log(fuelManagementData2);
-    }
+  // useEffect(() => {
+  //   console.log('Engine data 1 >>>>>>>>>>>>>>>: ', enginesData1, [
+  //     enginesData1,
+  //   ]);
+  // });
+  // useEffect(() => {
+  //   console.log('Engine data 2 >>>>>>>>>>>>>>>: ', enginesData2, [
+  //     enginesData2,
+  //   ]);
+  // });
+
+  useEffect(() => {
+    console.log('speed >>>>>>>>>>>>>>>: ', speed, [speed]);
+  });
+  // Handle data for timesp2
+  const handleTimesp2Data = (enginesData: EngineData[]) => {
+    console.log('############ handling engine 2 data ##########');
     if (JSON.stringify(engine2Ref.current) !== JSON.stringify(enginesData)) {
       engine2Ref.current = enginesData;
       setEnginesData2(enginesData);
     }
   };
 
+  // Load initial provisioned devices and timer
   useEffect(() => {
-    (async () => {
+    const loadInitialData = async () => {
       try {
         const isProvisioned = await AsyncStorage.getItem('provisionedDevices');
         const prevTime = await AsyncStorage.getItem('timer');
         if (prevTime) {
-          timer.current = +prevTime;
+          timer.current = parseInt(prevTime, 10);
         }
         if (isProvisioned) {
-          const data = JSON.parse(isProvisioned);
-          if (data.timesp1) {
-            getSocketData('timesp1.local');
-          }
+          const data = JSON.parse(isProvisioned) as ProvisionData;
+          setProvision(data);
         }
       } catch (error) {
-        console.log(`error: ${error}`);
+        console.error(`Error loading provisioned devices or timer: ${error}`);
       }
-    })();
-  }, [provision.timesp1]);
+    };
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const isProvisioned = await AsyncStorage.getItem('provisionedDevices');
-        if (isProvisioned) {
-          const data = JSON.parse(isProvisioned);
-          if (data.timesp2) {
-            getSocketData('timesp2.local');
-          }
-        }
-      } catch (error) {
-        console.log(`error: ${error}`);
-      }
-    })();
-  }, [provision.timesp2]);
+    loadInitialData();
+  }, []);
+
+  // // Handle provision changes
+  // useEffect(() => {
+  //   const handleProvisionChange = () => {
+  //     if (provision.timesp1 || provision.timesp2) {
+  //       // Trigger Zeroconf scan by updating dependency
+  //       setRetryCount(0);
+  //     }
+  //   };
+
+  //   handleProvisionChange();
+  // }, [provision]);
+
   return (
     <SocketContext.Provider
       value={{
         enginesData1,
-        setProvision,
-        fuelManagementData,
-        fuelManagementData2,
-        speed,
         enginesData2,
+        setProvision,
+        speed,
         provision,
         getTimerValue,
+        resolvedService1,
+        resolvedService2,
       }}>
       {children}
     </SocketContext.Provider>
