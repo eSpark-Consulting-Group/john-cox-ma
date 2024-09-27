@@ -7,7 +7,7 @@ import {MyCanvas} from '../../components';
 import {SplashIcon} from '../../assets';
 
 export default function Splash() {
-  const [appIsReady, setAppIsReady] = useState(false);
+  const [appIsReady, setAppIsReady] = useState(true);
 
   // Define animation values
   const logoScale = new Animated.Value(0); // Starting scale (0 = invisible)

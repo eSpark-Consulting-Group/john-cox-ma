@@ -3,6 +3,7 @@ import {ScrollView, StyleSheet, View} from 'react-native';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useDispatch, useSelector} from 'react-redux';
+import BackgroundService from 'react-native-background-actions';
 
 import {
   GapView,
@@ -15,12 +16,11 @@ import {
   MySwitch,
   MyText,
 } from '../../components';
-import {MyTheme, TripData} from '../../types';
+import {MyTheme, SocketJSON, TripData} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
 import {useSocket} from '../../components/SocketProvider';
 import useUpdateEffect from '../../hooks/useUpdateEffect';
 import {RootState} from '../../app/store';
-import {endTrip, startTrip} from '../../app/tripSlice';
 import {
   RenderModal,
   TripSection,
@@ -29,6 +29,7 @@ import {
 } from './Trips_components';
 import {formatDate, formatTime} from './utils';
 import {styles} from './styles';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type TripsScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 
@@ -39,14 +40,14 @@ export default function Trips() {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [warningVisible, setWarningVisible] = useState(false);
   const [resetVisible, setResetVisible] = useState(false);
-  const [tripStarted, setTripStarted] = useState(false); //xxx
   const [nameInput, setNameInput] = useState<string>('');
   const [selectedSwitch, setSelectedSwitch] = useState<1 | 2 | 3>(1); // Stores the currently selected switch index
 
   const dispatch = useDispatch();
   const currentTrips = useSelector((state: RootState) => state.trip.Trips);
   const [trips, setTrips] = useState<TripData[]>(Object.values(currentTrips));
-
+  const [tripStarted, setTripStarted] = useState(false);
+  const [totalDistanceCovered, setTotalDistanceCovered] = useState(0);
   const intervalRefs = useRef<Array<NodeJS.Timeout | null>>([null, null, null]); // main data set
   const intervalRefs1 = useRef<Array<NodeJS.Timeout | null>>([
     null,
@@ -54,154 +55,171 @@ export default function Trips() {
     null,
   ]); //fuel Data keliye
   const latestEngineDataRef = useRef({enginesData1, enginesData2});
-  const distanceRefs = useRef([0, 0, 0, 0]); // distance cal for each eng
 
   const handleSwitchPress = (index: 1 | 2 | 3) => {
     setSelectedSwitch(index);
   };
+  const continueTrip = async () => {
+    const tripJSON = await AsyncStorage.getItem('tripData');
+    if (tripJSON) {
+      let CONSTANT_SPEED = 0;
+      if (true) {
+        console.log('=====WEB SOCKET START======');
+        const ws = new WebSocket(`ws://timesp1.local/ws`);
+        sockCon.current = ws;
+        ws.onopen = () => {
+          console.log('WebSocket connection opened for : ', 'timesp2.local');
+        };
 
-  // initial trip data store in redux
-  function startingTripInStore(
-    tripId: 1 | 2 | 3,
-    name: string,
-    startTime: Date,
-    initialFuelData: number[],
-  ) {
-    console.log('starting trip in store');
-    dispatch(startTrip({tripId, name, startTime, initialFuelData}));
-  }
+        ws.onmessage = e => {
+          try {
+            const jsonData: SocketJSON = JSON.parse(e.data);
+            const enginesData = jsonData.Engines;
+            if (!enginesData || enginesData.length === 0) {
+              console.log('No engine data or empty array received');
+              ws.close();
+              return;
+            }
+            console.log({speed2: enginesData[0].SensorData.speed});
+            CONSTANT_SPEED = enginesData[0].SensorData.speed;
+          } catch (error) {
+            console.log('Error during WebSocket message processing:', error);
+            ws.close();
+          }
+        };
 
-  function endingTripInStore(tripId: 1 | 2 | 3) {
-    console.log('ending trip in store');
-    dispatch(endTrip({tripId}));
-  }
+        ws.onerror = e => {
+          console.log('WebSocket error:', e.message);
+        };
 
-  function continueRunningTrip(currentTrip: TripData, speed: string | number) {
-    if (currentTrip.tripStarted) {
-      console.log('Trip is already running');
-      intervalRefs.current[selectedSwitch - 1] = setInterval(() => {
-        setTrips(prevTrips => {
-          const updatedTrips = [...prevTrips];
-
-          const currentTime = new Date();
-          const elapsedTimeInHours =
-            (currentTime.getTime() - currentTrip.startingTime!.getTime()) /
-            60000; // time in minutes
-
-          const truncatedElapsedTimeInHours =
-            Math.floor(elapsedTimeInHours * 10) / 10;
-          const newDistance = Number(speed) * truncatedElapsedTimeInHours;
-
-          updatedTrips[selectedSwitch - 1] = {
-            ...currentTrip,
-            distanceCovered: newDistance,
-            tripTime: truncatedElapsedTimeInHours.toString(),
-          };
-
-          return updatedTrips;
-        });
-      }, 999);
-      return;
-    } else {
-      console.log('trip needs to be started');
+        ws.onclose = e => {
+          const {reason} = e;
+          if (e.code === 1006) {
+            console.log('idher');
+          }
+          console.log('WebSocket connection closed 2:', e.code, reason);
+        };
+      }
+      const tripData = JSON.parse(tripJSON);
+      let totalDistance = tripData.totalDistance;
+      setTotalDistanceCovered(totalDistance);
+      const tripStartRef = setInterval(async () => {
+        const currDistance = calculateDistance(CONSTANT_SPEED);
+        console.log(currDistance);
+        setTotalDistanceCovered(prev => prev + currDistance);
+        totalDistance += currDistance;
+        await AsyncStorage.setItem('tripData', JSON.stringify({totalDistance}));
+      }, 1000);
+      await AsyncStorage.setItem('tripStartRef', JSON.stringify(tripStartRef));
+      while (BackgroundService.isRunning()) {
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Adjust the interval if needed
+      }
     }
-  }
-
-  useEffect(
-    () => continueRunningTrip(currentTrips[selectedSwitch], speed),
-    [selectedSwitch],
-  );
+  };
+  useEffect(() => {
+    (async () => {
+      const tripStartRef = await AsyncStorage.getItem('tripStartRef');
+      if (tripStartRef) {
+        setTripStarted(true);
+        await BackgroundService.stop();
+        clearInterval(JSON.parse(tripStartRef));
+        await AsyncStorage.setItem('closeConn', 'true');
+        await BackgroundService.start(continueTrip, options);
+      }
+    })();
+  }, []);
 
   useEffect(() => {
     console.log('From store====', currentTrips);
-  }, [startTrip, currentTrips, selectedSwitch]);
+  }, [currentTrips, selectedSwitch]);
+  const options = {
+    taskName: 'Example',
+    taskTitle: 'ExampleTask title',
+    taskDesc: 'ExampleTask description',
+    taskIcon: {
+      name: 'ic_launcher',
+      type: 'mipmap',
+    },
+    color: '#ff00ff',
+    parameters: {
+      delay: 1000,
+    },
+  };
 
-  function handleStartTrip(id: 1 | 2 | 3, speed: number) {
-    // Check if the trip is already running (stop and reset if so)
-    if (currentTrips[id].tripStarted) {
-      //storing to redux
-      // store_data(id, trips);
-      endingTripInStore(id);
-      // Clear interval to stop trip tracking
-      clearInterval(intervalRefs.current[id - 1]!);
-      intervalRefs.current[id - 1] = null;
-      setNameInput('');
+  const calculateDistance = (speed: number) => {
+    return speed * (1 / 3600);
+  };
+  const sockCon = useRef<WebSocket>();
+  const startTrip = async (id: 1 | 2 | 3, speed: number) => {
+    let CONSTANT_SPEED = 0;
+    await AsyncStorage.removeItem('closeConn');
+    console.log('=====WEB SOCKET START======');
+    const ws = new WebSocket(`ws://timesp1.local/ws`);
+    sockCon.current = ws;
+    ws.onopen = () => {
+      console.log('WebSocket connection opened for : ', 'timesp1.local');
+    };
 
-      // Reset trip state
-      const updatedTrips = [...trips];
-      updatedTrips[id - 1] = resetTripState(id);
-      setTrips(updatedTrips);
+    ws.onmessage = async e => {
+      try {
+        const jsonData: SocketJSON = JSON.parse(e.data);
+        const enginesData = jsonData.Engines;
+        if (!enginesData || enginesData.length === 0) {
+          console.log('No engine data or empty array received');
+          ws.close();
+          return;
+        }
+        const closeConn = await AsyncStorage.getItem('closeConn');
+        if (closeConn) {
+          ws.close();
+        }
+        console.log({speed: enginesData[0].SensorData.speed});
+        CONSTANT_SPEED = enginesData[0].SensorData.speed;
+      } catch (error) {
+        console.log('Error during WebSocket message processing:', error);
+        ws.close();
+      }
+    };
 
-      // Clear distance and time tracking
-      distanceRefs.current[id - 1] = 0;
-    } else {
-      // Start a new trip
+    ws.onerror = e => {
+      console.log('WebSocket error:', e.message);
+    };
 
-      const now = new Date();
-
-      const initialFuel = [
-        enginesData1[0]?.FuelManagement.total_fuel_burned || 0,
-        enginesData1[1]?.FuelManagement.total_fuel_burned || 0,
-        enginesData2[0]?.FuelManagement.total_fuel_burned || 0,
-        enginesData2[1]?.FuelManagement.total_fuel_burned || 0,
-      ];
-
-      startingTripInStore(id, nameInput, now, initialFuel);
-
-      const updatedTrips = [...trips];
-      updatedTrips[id - 1] = {
-        ...updatedTrips[id - 1],
-        name: nameInput,
-        startingTime: now,
-        distanceCovered: 0,
-        tripTime: '0.00',
-        fuelConsumption: [0, 0, 0, 0],
-        initialFuel: initialFuel,
-        tripEfficiency: 0,
-        tripStarted: true,
-        tripEnded: false,
-      };
-      setTrips(updatedTrips);
-
-      // Start interval to track time and distance
-      intervalRefs.current[id - 1] = setInterval(() => {
-        setTrips(prevTrips => {
-          const updatedTrips = [...prevTrips];
-          const currentTrip = updatedTrips[id - 1];
-
-          if (currentTrip.startingTime) {
-            const currentTime = new Date();
-            const elapsedTimeInHours =
-              (currentTime.getTime() - currentTrip.startingTime.getTime()) /
-              60000; // time in minutes
-
-            const truncatedElapsedTimeInHours =
-              Math.floor(elapsedTimeInHours * 10) / 10;
-            const newDistance = speed * truncatedElapsedTimeInHours;
-
-            updatedTrips[id - 1] = {
-              ...currentTrip,
-              distanceCovered: newDistance,
-              tripTime: truncatedElapsedTimeInHours.toString(),
-            };
-          }
-
-          return updatedTrips;
-        });
-      }, 999); // Changed to 999 milliseconds (Every ~1 second)
+    ws.onclose = e => {
+      const {reason} = e;
+      if (e.code === 1006) {
+        console.log('idher');
+      }
+      console.log('WebSocket connection closed:', e.code, reason);
+    };
+    setTripStarted(true);
+    let totalDistance = 0;
+    const tripStartRef = setInterval(async () => {
+      const currDistance = calculateDistance(CONSTANT_SPEED);
+      setTotalDistanceCovered(prev => prev + currDistance);
+      totalDistance += currDistance;
+      await AsyncStorage.setItem('tripData', JSON.stringify({totalDistance}));
+    }, 1000);
+    await AsyncStorage.setItem('tripStartRef', JSON.stringify(tripStartRef));
+    while (BackgroundService.isRunning()) {
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Adjust the interval if needed
     }
+  };
 
-    setTripStarted(prevTripStarted => !prevTripStarted);
-  }
-
-  useEffect(
-    () => console.log('selected Trip:: ', selectedSwitch),
-    [selectedSwitch],
-  );
-
-  useEffect(() => {
-    console.log('trips already existing :', trips);
-  }, []);
+  const endTrip = async () => {
+    await BackgroundService.stop();
+    const tripStartRef = await AsyncStorage.getItem('tripStartRef');
+    if (sockCon.current) {
+      sockCon.current.close();
+    }
+    if (tripStartRef) {
+      clearInterval(JSON.parse(tripStartRef));
+      setTotalDistanceCovered(0);
+      setTripStarted(false);
+      await AsyncStorage.removeItem('isTripStarted');
+      await AsyncStorage.removeItem('tripStartRef');
+    }
+  };
   const speedEfficiency = useMemo(() => {
     const totalFuelBurned1 =
       Number(trips[selectedSwitch - 1].fuelConsumption[0] || 0) +
@@ -214,7 +232,7 @@ export default function Trips() {
 
     // Efficiency in gallon per nautical mile
     return totalFuelBurned > 0
-      ? totalFuelBurned / distanceRefs.current[selectedSwitch - 1] //to be changed
+      ? totalFuelBurned / Number(totalDistanceCovered) //to be changed
       : 0;
   }, [
     enginesData1[0]?.FuelManagement.total_fuel_burned,
@@ -266,7 +284,7 @@ export default function Trips() {
     if (trips[selectedSwitch - 1].tripStarted == true) {
       latestEngineDataRef.current = {enginesData1, enginesData2};
     }
-  }, [enginesData1, enginesData2, tripStarted]);
+  }, [enginesData1, enginesData2]);
 
   // Fuel consumption calculation effect
   useEffect(() => {
@@ -327,22 +345,6 @@ export default function Trips() {
     };
   }, [selectedSwitch, trips[selectedSwitch - 1].tripStarted]); // Removed enginesData1 and enginesData2 from here
 
-  // Utility function to reset a trip's state
-  function resetTripState(id: 1 | 2 | 3): TripData {
-    return {
-      id, // Ensure the id is included
-      name: '',
-      startingTime: null,
-      distanceCovered: 0,
-      tripTime: '0.00',
-      fuelConsumption: [0, 0, 0, 0],
-      tripEfficiency: 0,
-      tripStarted: false,
-      tripEnded: true,
-      initialFuel: [0, 0, 0, 0],
-    };
-  }
-
   useEffect(() => {
     if (warningVisible) {
       const timer = setTimeout(() => {
@@ -354,17 +356,17 @@ export default function Trips() {
     }
   }, [warningVisible]);
 
-  useEffect(() => {
-    if (resetVisible) {
-      const timer = setTimeout(() => {
-        handleStartTrip(selectedSwitch, Number(speed)); // should reset all trips -  should not start any trip  - to be changed
-        setResetVisible(false);
-        setShowConfirmation(false);
-      }, 2000);
+  // useEffect(() => {
+  //   if (resetVisible) {
+  //     const timer = setTimeout(() => {
+  //       handleStartTrip(selectedSwitch, Number(speed));
+  //       setResetVisible(false);
+  //       setShowConfirmation(false);
+  //     }, 2000);
 
-      return () => clearTimeout(timer);
-    }
-  }, [resetVisible]);
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [resetVisible]);
 
   // function store_data(id: 1 | 2 | 3, trips: any[]) {
   //   console.log('storing this trip: ', trips[id - 1]);
@@ -551,11 +553,12 @@ export default function Trips() {
                 title="Total Distance"
                 unit="N.Mile"
                 value={
-                  trips[selectedSwitch - 1].tripStarted
-                    ? Number(trips[selectedSwitch - 1].distanceCovered).toFixed(
-                        2,
-                      )
-                    : '0.00'
+                  Number(totalDistanceCovered).toFixed(5)
+                  // trips[selectedSwitch - 1].tripStarted
+                  //   ? Number(trips[selectedSwitch - 1].distanceCovered).toFixed(
+                  //       2,
+                  //     )
+                  //   : '0.00'
                 }
               />
               <RenderRow
@@ -592,15 +595,18 @@ export default function Trips() {
             <GapView length={30} />
             <View style={{flexDirection: 'row', gap: 20}}>
               <MyButton
-                label={
-                  trips[selectedSwitch - 1].tripStarted
-                    ? 'End Trip'
-                    : 'Start Trip'
-                } //xxx
+                label={tripStarted ? 'End Trip' : 'Start Trip'}
                 width={80}
-                onPress={() => {
-                  handleStartTrip(selectedSwitch, Number(speed));
-                  console.log('startinf trip for tab ::', selectedSwitch);
+                onPress={async () => {
+                  if (!tripStarted) {
+                    // handleStartTrip(selectedSwitch, Number(speed));
+                    await BackgroundService.start(
+                      () => startTrip(selectedSwitch, Number(speed)),
+                      options,
+                    );
+                  } else {
+                    endTrip();
+                  }
                 }}
               />
               <MyButton
