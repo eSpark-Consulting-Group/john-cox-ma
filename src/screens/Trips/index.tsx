@@ -1,8 +1,7 @@
-import React, {useEffect, useMemo, useRef, useState} from 'react';
-import {ScrollView, StyleSheet, View} from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
+import {ScrollView, View} from 'react-native';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {useDispatch, useSelector} from 'react-redux';
 import BackgroundService from 'react-native-background-actions';
 
 import {
@@ -26,6 +25,7 @@ import {
 } from './Trips_components';
 import {styles} from './styles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useSocket} from '../../components/SocketProvider';
 
 type TripsScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 
@@ -37,6 +37,7 @@ export default function Trips() {
   const [resetVisible, setResetVisible] = useState(false);
   const [nameInput, setNameInput] = useState<string>('');
   const [selectedSwitch, setSelectedSwitch] = useState<1 | 2 | 3>(1); // Stores the currently selected switch index
+  const {resolvedService1, resolvedService2} = useSocket();
 
   const [tripStarted, setTripStarted] = useState(false);
   const [allTripData, setAllTripData] = useState({
@@ -54,12 +55,17 @@ export default function Trips() {
     const newConn = await AsyncStorage.getItem('newConn');
     if (tripJSON) {
       if (!newConn) {
-        console.log('=====WEB SOCKET START======');
-        const ws = new WebSocket(`ws://timesp1.local/ws`);
+        console.log('TRIPS====== =====WEB SOCKET START======');
+        const ws = new WebSocket(
+          `ws://${resolvedService1?.addresses[0]}:${resolvedService1?.port}/ws`,
+        );
         sockCon.current = ws;
         ws.onopen = async () => {
           await AsyncStorage.setItem('newConn', 'true');
-          console.log('WebSocket connection opened for : ', 'timesp1.local');
+          console.log(
+            'TRIPS====== WebSocket connection opened for : ',
+            `${resolvedService1?.addresses[0]}:${resolvedService1?.port}`,
+          );
         };
 
         ws.onmessage = async e => {
@@ -72,7 +78,7 @@ export default function Trips() {
             const jsonData: SocketJSON = JSON.parse(e.data);
             const enginesData = jsonData.Engines;
             if (!enginesData || enginesData.length === 0) {
-              console.log('No engine data or empty array received');
+              console.log('TRIPS====== No engine data or empty array received');
               ws.close();
               return;
             }
@@ -94,21 +100,28 @@ export default function Trips() {
               );
             }
           } catch (error) {
-            console.log('Error during WebSocket message processing:', error);
+            console.log(
+              'TRIPS====== Error during WebSocket message processing:',
+              error,
+            );
             ws.close();
           }
         };
 
         ws.onerror = e => {
-          console.log('WebSocket error:', e.message);
+          console.log('TRIPS====== WebSocket error:', e.message);
         };
 
         ws.onclose = e => {
           const {reason} = e;
           if (e.code === 1006) {
-            console.log('idher');
+            console.log('TRIPS====== idher');
           }
-          console.log('WebSocket connection closed:', e.code, reason);
+          console.log(
+            'TRIPS====== WebSocket connection closed:',
+            e.code,
+            reason,
+          );
         };
       }
       const tripData = JSON.parse(tripJSON);
@@ -181,10 +194,15 @@ export default function Trips() {
     await AsyncStorage.removeItem('closeConn');
     await AsyncStorage.removeItem('newConn');
     console.log('=====WEB SOCKET START======');
-    const ws = new WebSocket(`ws://timesp1.local/ws`);
+    const ws = new WebSocket(
+      `ws://${resolvedService1?.addresses[0]}:${resolvedService1?.port}/ws`,
+    );
     sockCon.current = ws;
     ws.onopen = () => {
-      console.log('WebSocket connection opened for : ', 'timesp1.local');
+      console.log(
+        'TRIPS====== WebSocket connection opened for : ',
+        'timesp1.local',
+      );
     };
 
     ws.onmessage = async e => {
@@ -226,21 +244,24 @@ export default function Trips() {
           setFuelBurned([...currentRemainingFuel, 0, 0]);
         }
       } catch (error) {
-        console.log('Error during WebSocket message processing:', error);
+        console.log(
+          'TRIPS====== Error during WebSocket message processing:',
+          error,
+        );
         ws.close();
       }
     };
 
     ws.onerror = e => {
-      console.log('WebSocket error:', e.message);
+      console.log('TRIPS====== WebSocket error:', e.message);
     };
 
     ws.onclose = e => {
       const {reason} = e;
       if (e.code === 1006) {
-        console.log('idher');
+        console.log('TRIPS====== idher');
       }
-      console.log('WebSocket connection closed:', e.code, reason);
+      console.log('TRIPS====== WebSocket connection closed:', e.code, reason);
     };
     setTripStarted(true);
     let totalDistance = 0;
@@ -281,7 +302,7 @@ export default function Trips() {
       setTripStarted(false);
       await AsyncStorage.removeItem('isTripStarted');
       await AsyncStorage.removeItem('tripStartRef');
-      console.log('Ending trip....');
+      console.log('TRIPS====== Ending trip....');
       setFuelBurned([0, 0, 0, 0]);
     }
   };
@@ -464,7 +485,7 @@ export default function Trips() {
                   {fuelBurned.map((fuel, index) => (
                     <RenderColumn
                       key={'fuel' + index}
-                      value={Number(fuel).toFixed(2)}
+                      value={Number(fuel).toFixed(0)}
                       label={index + 1}
                     />
                   ))}
