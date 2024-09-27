@@ -3,7 +3,7 @@ import {EngineData, FuelManagementData, SocketJSON} from '../../types';
 
 const getFuelMGT = (jsonData: SocketJSON) => {
   // Ensure jsonData.data.Engines is an array and properly mapped
-  const fuelData: FuelManagementData[] = jsonData.data.Engines.map(
+  const fuelData: FuelManagementData[] = jsonData.Engines.map(
     engine => engine.FuelManagement,
   ).filter(Boolean);
 
@@ -27,8 +27,8 @@ const getFuelMGT = (jsonData: SocketJSON) => {
 };
 
 const getEnginesData = (jsonData: SocketJSON): EngineData[] => {
-  const data = jsonData.data.Engines;
-  return jsonData.data.Engines.map(engine => {
+  const data = jsonData.Engines;
+  return jsonData.Engines.map(engine => {
     // const foundData = data.find(s => s.FuelManagement?.engine_id === engine.id);
     return {
       name: engine.name,

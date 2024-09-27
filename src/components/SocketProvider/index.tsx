@@ -228,7 +228,7 @@ function SocketProvider({children}: {children: React.ReactNode}) {
   });
   // Handle data for timesp2
   const handleTimesp2Data = (enginesData: EngineData[]) => {
-    console.log('############ handling engine 2 data ##########');
+    // console.log('############ handling engine 2 data ##########');
     if (JSON.stringify(engine2Ref.current) !== JSON.stringify(enginesData)) {
       engine2Ref.current = enginesData;
       setEnginesData2(enginesData);
@@ -239,11 +239,13 @@ function SocketProvider({children}: {children: React.ReactNode}) {
   useEffect(() => {
     const loadInitialData = async () => {
       try {
-        const isProvisioned = await AsyncStorage.getItem('provisionedDevices');
+        let isProvisioned = await AsyncStorage.getItem('provisionedDevices');
         const prevTime = await AsyncStorage.getItem('timer');
         if (prevTime) {
           timer.current = parseInt(prevTime, 10);
         }
+        isProvisioned = JSON.stringify({timesp1: false, timesp2: false});
+        console.log(isProvisioned, '>>>>>>');
         if (isProvisioned) {
           const data = JSON.parse(isProvisioned) as ProvisionData;
           setProvision(data);
