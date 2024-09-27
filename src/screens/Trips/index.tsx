@@ -16,18 +16,14 @@ import {
   MySwitch,
   MyText,
 } from '../../components';
-import {MyTheme, SocketJSON, TripData} from '../../types';
+import {MyTheme, SocketJSON} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
-import {useSocket} from '../../components/SocketProvider';
-import useUpdateEffect from '../../hooks/useUpdateEffect';
-import {RootState} from '../../app/store';
 import {
   RenderModal,
   TripSection,
   RenderRow,
   RenderColumn,
 } from './Trips_components';
-import {formatDate, formatTime} from './utils';
 import {styles} from './styles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -35,7 +31,6 @@ type TripsScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 
 export default function Trips() {
   const theme = useTheme() as MyTheme;
-  const {enginesData1, speed, enginesData2} = useSocket();
   const navigation = useNavigation<TripsScreenProps['navigation']>();
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [warningVisible, setWarningVisible] = useState(false);
@@ -43,36 +38,37 @@ export default function Trips() {
   const [nameInput, setNameInput] = useState<string>('');
   const [selectedSwitch, setSelectedSwitch] = useState<1 | 2 | 3>(1); // Stores the currently selected switch index
 
-  const dispatch = useDispatch();
-  const currentTrips = useSelector((state: RootState) => state.trip.Trips);
-  const [trips, setTrips] = useState<TripData[]>(Object.values(currentTrips));
   const [tripStarted, setTripStarted] = useState(false);
-  const [totalDistanceCovered, setTotalDistanceCovered] = useState(0);
-  const intervalRefs = useRef<Array<NodeJS.Timeout | null>>([null, null, null]); // main data set
-  const intervalRefs1 = useRef<Array<NodeJS.Timeout | null>>([
-    null,
-    null,
-    null,
-  ]); //fuel Data keliye
-  const latestEngineDataRef = useRef({enginesData1, enginesData2});
+  const [allTripData, setAllTripData] = useState({
+    totalDistance: 0,
+    estimatedTime: 0,
+    speed: 0,
+  });
 
+  const [fuelBurned, setFuelBurned] = useState([0, 0, 0, 0]);
   const handleSwitchPress = (index: 1 | 2 | 3) => {
     setSelectedSwitch(index);
   };
   const continueTrip = async () => {
     const tripJSON = await AsyncStorage.getItem('tripData');
+    const newConn = await AsyncStorage.getItem('newConn');
     if (tripJSON) {
-      let CONSTANT_SPEED = 0;
-      if (true) {
+      if (!newConn) {
         console.log('=====WEB SOCKET START======');
         const ws = new WebSocket(`ws://timesp1.local/ws`);
         sockCon.current = ws;
-        ws.onopen = () => {
-          console.log('WebSocket connection opened for : ', 'timesp2.local');
+        ws.onopen = async () => {
+          await AsyncStorage.setItem('newConn', 'true');
+          console.log('WebSocket connection opened for : ', 'timesp1.local');
         };
 
-        ws.onmessage = e => {
+        ws.onmessage = async e => {
           try {
+            const tripStartRef = await AsyncStorage.getItem('tripStartRef');
+            if (!tripStartRef) {
+              ws.close();
+              return;
+            }
             const jsonData: SocketJSON = JSON.parse(e.data);
             const enginesData = jsonData.data.Engines;
             if (!enginesData || enginesData.length === 0) {
@@ -80,8 +76,23 @@ export default function Trips() {
               ws.close();
               return;
             }
-            console.log({speed2: enginesData[0].SensorData.speed});
-            CONSTANT_SPEED = enginesData[0].SensorData.speed;
+            const vairableSpeed = enginesData[0]?.SensorData?.speed;
+            const allFuel = await AsyncStorage.getItem('initialRemainingFuel');
+            if (allFuel) {
+              const currentRemainingFuel = enginesData.map((e, i) => {
+                const parsedFuel: number[] = JSON.parse(allFuel);
+                const diff = parsedFuel[i] - e.FuelManagement.remaining_fuel;
+                return diff;
+              });
+              const cachedData = {
+                speed: vairableSpeed,
+                fuelBurned: [...currentRemainingFuel, 0, 0],
+              };
+              await AsyncStorage.setItem(
+                'cachedData',
+                JSON.stringify(cachedData),
+              );
+            }
           } catch (error) {
             console.log('Error during WebSocket message processing:', error);
             ws.close();
@@ -97,18 +108,36 @@ export default function Trips() {
           if (e.code === 1006) {
             console.log('idher');
           }
-          console.log('WebSocket connection closed 2:', e.code, reason);
+          console.log('WebSocket connection closed:', e.code, reason);
         };
       }
       const tripData = JSON.parse(tripJSON);
       let totalDistance = tripData.totalDistance;
-      setTotalDistanceCovered(totalDistance);
+      let estimatedTime = tripData.estimatedTime;
+      setAllTripData(prev => ({...prev, estimatedTime, totalDistance}));
       const tripStartRef = setInterval(async () => {
-        const currDistance = calculateDistance(CONSTANT_SPEED);
-        console.log(currDistance);
-        setTotalDistanceCovered(prev => prev + currDistance);
+        const cachedData = await AsyncStorage.getItem('cachedData');
+        const parsedData: {
+          speed: number;
+          fuelBurned: number[];
+        } = JSON.parse(cachedData ? cachedData : '') || {
+          speed: 0,
+          fuelBurned: [0, 0, 0, 0],
+        };
+        const currDistance = calculateDistance(parsedData.speed);
+        setAllTripData(prev => ({
+          ...prev,
+          estimatedTime: prev.estimatedTime + 1,
+          totalDistance: prev.totalDistance + currDistance,
+          speed: +parsedData.speed,
+        }));
         totalDistance += currDistance;
-        await AsyncStorage.setItem('tripData', JSON.stringify({totalDistance}));
+        estimatedTime++;
+        await AsyncStorage.setItem(
+          'tripData',
+          JSON.stringify({totalDistance, estimatedTime}),
+        );
+        setFuelBurned(parsedData.fuelBurned);
       }, 1000);
       await AsyncStorage.setItem('tripStartRef', JSON.stringify(tripStartRef));
       while (BackgroundService.isRunning()) {
@@ -128,10 +157,6 @@ export default function Trips() {
       }
     })();
   }, []);
-
-  useEffect(() => {
-    console.log('From store====', currentTrips);
-  }, [currentTrips, selectedSwitch]);
   const options = {
     taskName: 'Example',
     taskTitle: 'ExampleTask title',
@@ -150,9 +175,11 @@ export default function Trips() {
     return speed * (1 / 3600);
   };
   const sockCon = useRef<WebSocket>();
-  const startTrip = async (id: 1 | 2 | 3, speed: number) => {
-    let CONSTANT_SPEED = 0;
+  const startTrip = async (id: 1 | 2 | 3) => {
+    let variableSpeed = 0;
+    let tripStarted = false;
     await AsyncStorage.removeItem('closeConn');
+    await AsyncStorage.removeItem('newConn');
     console.log('=====WEB SOCKET START======');
     const ws = new WebSocket(`ws://timesp1.local/ws`);
     sockCon.current = ws;
@@ -173,8 +200,31 @@ export default function Trips() {
         if (closeConn) {
           ws.close();
         }
-        console.log({speed: enginesData[0].SensorData.speed});
-        CONSTANT_SPEED = enginesData[0].SensorData.speed;
+        variableSpeed = enginesData[0]?.SensorData?.speed;
+        setAllTripData(prev => ({...prev, speed: variableSpeed}));
+        if (!tripStarted) {
+          const initialRemainingFuel = [
+            enginesData[0]?.FuelManagement.remaining_fuel | 0,
+            enginesData[1]?.FuelManagement.remaining_fuel | 0,
+            0,
+            0,
+          ];
+          await AsyncStorage.setItem(
+            'initialRemainingFuel',
+            JSON.stringify(initialRemainingFuel),
+          );
+          tripStarted = true;
+          return;
+        }
+        const allFuel = await AsyncStorage.getItem('initialRemainingFuel');
+        if (allFuel) {
+          const currentRemainingFuel = enginesData.map((e, i) => {
+            const parsedFuel: number[] = JSON.parse(allFuel);
+            const diff = parsedFuel[i] - e.FuelManagement.remaining_fuel;
+            return diff;
+          });
+          setFuelBurned([...currentRemainingFuel, 0, 0]);
+        }
       } catch (error) {
         console.log('Error during WebSocket message processing:', error);
         ws.close();
@@ -194,11 +244,20 @@ export default function Trips() {
     };
     setTripStarted(true);
     let totalDistance = 0;
+    let estimatedTime = 0;
     const tripStartRef = setInterval(async () => {
-      const currDistance = calculateDistance(CONSTANT_SPEED);
-      setTotalDistanceCovered(prev => prev + currDistance);
+      const currDistance = calculateDistance(variableSpeed);
+      setAllTripData(prev => ({
+        ...prev,
+        estimatedTime: prev.estimatedTime + 1,
+        totalDistance: prev.totalDistance + currDistance,
+      }));
       totalDistance += currDistance;
-      await AsyncStorage.setItem('tripData', JSON.stringify({totalDistance}));
+      estimatedTime++;
+      await AsyncStorage.setItem(
+        'tripData',
+        JSON.stringify({totalDistance, estimatedTime}),
+      );
     }, 1000);
     await AsyncStorage.setItem('tripStartRef', JSON.stringify(tripStartRef));
     while (BackgroundService.isRunning()) {
@@ -214,135 +273,18 @@ export default function Trips() {
     }
     if (tripStartRef) {
       clearInterval(JSON.parse(tripStartRef));
-      setTotalDistanceCovered(0);
+      setAllTripData(prev => ({
+        estimatedTime: 0,
+        totalDistance: 0,
+        speed: 0,
+      }));
       setTripStarted(false);
       await AsyncStorage.removeItem('isTripStarted');
       await AsyncStorage.removeItem('tripStartRef');
+      console.log('Ending trip....');
+      setFuelBurned([0, 0, 0, 0]);
     }
   };
-  const speedEfficiency = useMemo(() => {
-    const totalFuelBurned1 =
-      Number(enginesData1[0]?.FuelManagement.total_fuel_burned || 0) +
-      Number(enginesData1[1]?.FuelManagement.total_fuel_burned || 0);
-    const totalFuelBurned2 =
-      Number(enginesData2[0]?.FuelManagement.total_fuel_burned || 0) +
-      Number(enginesData2[1]?.FuelManagement.total_fuel_burned || 0);
-
-    const totalSpeed = Number(enginesData1[0]?.SensorData.speed || 0);
-    const totalFuelBurned = totalFuelBurned1 + totalFuelBurned2;
-
-    // Efficiency in knots per gallon
-    return totalFuelBurned > 0 ? totalSpeed / totalFuelBurned : 0;
-  }, [
-    enginesData1[0]?.FuelManagement.total_fuel_burned,
-    enginesData1[1]?.FuelManagement.total_fuel_burned,
-    enginesData2[0]?.FuelManagement.total_fuel_burned,
-    enginesData2[1]?.FuelManagement.total_fuel_burned,
-    enginesData1[0]?.SensorData.speed,
-  ]);
-
-  useEffect(() => {
-    const updatedTrips = [...trips];
-    updatedTrips[selectedSwitch - 1] = {
-      ...updatedTrips[selectedSwitch - 1],
-      tripEfficiency: speedEfficiency,
-    };
-    // console.log('asdas', speedEfficiency);
-
-    setTrips(updatedTrips);
-  }, [speedEfficiency]);
-
-  useEffect(() => {
-    return () => {
-      // Clear intervals for the currently active trip
-      if (intervalRefs.current[selectedSwitch - 1]) {
-        clearInterval(intervalRefs.current[selectedSwitch - 1]!);
-        intervalRefs.current[selectedSwitch - 1] = null;
-      }
-
-      if (intervalRefs1.current[selectedSwitch - 1]) {
-        clearInterval(intervalRefs1.current[selectedSwitch - 1]!);
-        intervalRefs1.current[selectedSwitch - 1] = null;
-      }
-    };
-  }, []);
-
-  //trip ended false krrhe
-  useUpdateEffect(() => {
-    console.log('trip started ====', trips[selectedSwitch - 1].tripStarted);
-    const updatedTrips = [...trips];
-    updatedTrips[selectedSwitch - 1] = {
-      ...updatedTrips[selectedSwitch - 1],
-      tripEnded: !trips[selectedSwitch - 1].tripStarted,
-    };
-    // setTripEnded(!tripStarted);
-  }, [trips[selectedSwitch - 1].tripStarted, selectedSwitch]);
-
-  // Update the ref whenever engine data changes
-  useEffect(() => {
-    if (trips[selectedSwitch - 1].tripStarted == true) {
-      latestEngineDataRef.current = {enginesData1, enginesData2};
-    }
-  }, [enginesData1, enginesData2]);
-
-  // Fuel consumption calculation effect
-  useEffect(() => {
-    if (
-      intervalRefs1.current[selectedSwitch - 1] == null &&
-      trips[selectedSwitch - 1].tripStarted == true
-    ) {
-      console.log(
-        'Starting fuel consumption calculation for trip:',
-        selectedSwitch,
-      );
-
-      intervalRefs1.current[selectedSwitch - 1] = setInterval(() => {
-        const {enginesData1, enginesData2} = latestEngineDataRef.current;
-
-        const newFuelBurn = [
-          Number(enginesData1[0]?.FuelManagement.total_fuel_burned) || 0,
-          Number(enginesData1[1]?.FuelManagement.total_fuel_burned) || 0,
-          Number(enginesData2[0]?.FuelManagement.total_fuel_burned) || 0,
-          Number(enginesData2[1]?.FuelManagement.total_fuel_burned) || 0,
-        ];
-
-        setTrips(prevTrips => {
-          const updatedTrips = [...prevTrips];
-          const currentTrip = updatedTrips[selectedSwitch - 1];
-
-          const updatedFuelConsumption = newFuelBurn.map(
-            (currentFuel, index) => {
-              const initialFuel = Number(currentTrip.initialFuel[index]);
-              return currentFuel - initialFuel;
-            },
-          );
-
-          updatedTrips[selectedSwitch - 1] = {
-            ...currentTrip,
-            fuelConsumption: updatedFuelConsumption,
-          };
-
-          console.log(
-            'Updated fuel consumption:================',
-            updatedFuelConsumption,
-          );
-          return updatedTrips;
-        });
-      }, 999); // Update every 5 seconds
-    } else {
-      if (intervalRefs1.current[selectedSwitch - 1]) {
-        clearInterval(intervalRefs1.current[selectedSwitch - 1]!);
-        intervalRefs1.current[selectedSwitch - 1] = null;
-      }
-    }
-
-    return () => {
-      if (intervalRefs1.current[selectedSwitch - 1]) {
-        clearInterval(intervalRefs1.current[selectedSwitch - 1]!);
-        intervalRefs1.current[selectedSwitch - 1] = null;
-      }
-    };
-  }, [selectedSwitch, trips[selectedSwitch - 1].tripStarted]); // Removed enginesData1 and enginesData2 from here
 
   useEffect(() => {
     if (warningVisible) {
@@ -401,6 +343,15 @@ export default function Trips() {
   // useEffect(() => {
   //   console.log('🚀 ~ Trips ~ trips:', trips);
   // }, [trips]);
+
+  const calculateEfficience = () => {
+    const result =
+      fuelBurned.reduce((a, b) => a + b, 0) / allTripData.totalDistance;
+    if (!Number.isNaN(result) && result !== Infinity) {
+      return result.toFixed(2);
+    }
+    return '0.00';
+  };
 
   return (
     <MyCanvas>
@@ -489,10 +440,7 @@ export default function Trips() {
                     onChange={text => {
                       setNameInput(text);
                     }}
-                    value={
-                      trips[selectedSwitch - 1].tripStarted &&
-                      trips[selectedSwitch - 1].name
-                    }
+                    value={''}
                   />
                 </View>
               </TripSection>
@@ -500,25 +448,10 @@ export default function Trips() {
               <RenderRow
                 title="Trip Start"
                 unit="Date"
-                value={
-                  trips[selectedSwitch - 1].tripStarted &&
-                  trips[selectedSwitch - 1].startingTime
-                    ? formatDate(trips[selectedSwitch - 1].startingTime)
-                    : ''
-                }
+                value={''}
                 editable={false}
               />
-              <RenderRow
-                title=""
-                unit="Time"
-                value={
-                  trips[selectedSwitch - 1].tripStarted &&
-                  trips[selectedSwitch - 1].startingTime
-                    ? formatTime(trips[selectedSwitch - 1].startingTime)
-                    : ''
-                }
-                editable={false}
-              />
+              <RenderRow title="" unit="Time" value={''} editable={false} />
             </MyCard>
             <GapView length={20} />
             <MyCard>
@@ -528,20 +461,16 @@ export default function Trips() {
                   <MyText size={16}>Fuel Used</MyText>
                 </View>
                 <View style={styles.boxes}>
-                  {trips[selectedSwitch - 1].fuelConsumption.map(
-                    (fuel, index) => (
-                      <RenderColumn
-                        key={'fuel' + index}
-                        value={Number(fuel.toFixed(2))}
-                        label={index + 1}
-                      />
-                    ),
-                  )}
+                  {fuelBurned.map((fuel, index) => (
+                    <RenderColumn
+                      key={'fuel' + index}
+                      value={Number(fuel).toFixed(2)}
+                      label={index + 1}
+                    />
+                  ))}
                   <RenderColumn
                     label={'Total'}
-                    value={trips[selectedSwitch - 1].fuelConsumption
-                      .reduce((a, b) => a + b, 0)
-                      .toFixed(2)}
+                    value={fuelBurned.reduce((a, b) => a + b, 0).toFixed(2)}
                   />
                 </View>
               </View>
@@ -551,44 +480,22 @@ export default function Trips() {
               <RenderRow
                 title="Total Distance"
                 unit="N.Mile"
-                value={
-                  Number(totalDistanceCovered).toFixed(5)
-                  // trips[selectedSwitch - 1].tripStarted
-                  //   ? Number(trips[selectedSwitch - 1].distanceCovered).toFixed(
-                  //       2,
-                  //     )
-                  //   : '0.00'
-                }
+                value={Number(allTripData.totalDistance).toFixed(5)}
               />
               <RenderRow
                 title="Estimated Run Time"
                 unit="hours/minute"
-                value={
-                  trips[selectedSwitch - 1].tripStarted
-                    ? trips[selectedSwitch - 1].tripTime
-                    : '0.00'
-                }
+                value={allTripData.estimatedTime.toString()}
               />
               <RenderRow
                 title="Average Speed"
-                value={
-                  trips[selectedSwitch - 1].tripStarted
-                    ? Number(speed).toFixed(3)
-                    : '0.00'
-                } //xxx
+                value={Number(allTripData.speed).toFixed(3)} //xxx
                 unit="knots"
               />
               <RenderRow
                 title="Efficiency"
                 unit="Gal/N.Mile"
-                value={
-                  trips[selectedSwitch - 1].tripStarted &&
-                  trips[selectedSwitch - 1].tripEfficiency
-                    ? Number(trips[selectedSwitch - 1].tripEfficiency).toFixed(
-                        2,
-                      )
-                    : '0.00'
-                }
+                value={calculateEfficience()}
               />
             </MyCard>
             <GapView length={30} />
@@ -600,7 +507,7 @@ export default function Trips() {
                   if (!tripStarted) {
                     // handleStartTrip(selectedSwitch, Number(speed));
                     await BackgroundService.start(
-                      () => startTrip(selectedSwitch, Number(speed)),
+                      () => startTrip(selectedSwitch),
                       options,
                     );
                   } else {
