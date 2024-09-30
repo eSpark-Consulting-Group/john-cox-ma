@@ -105,8 +105,8 @@ export default function Trips() {
               ws.close();
               return;
             }
-            const jsonData: {data: SocketJSON} = JSON.parse(e.data);
-            const enginesData = jsonData.data.Engines;
+            const jsonData: SocketJSON = JSON.parse(e.data);
+            const enginesData = jsonData.Engines;
             if (!enginesData || enginesData.length === 0) {
               console.log('TRIPS====== No engine data or empty array received');
               ws.close();
@@ -182,7 +182,8 @@ export default function Trips() {
           await AsyncStorage.setItem('tripData', JSON.stringify(n));
           const currentRemainingFuel = cachedData.map((e, i) => {
             const parsedFuel: number[] = remainingFuel?.['1'] || [0, 0, 0, 0];
-            const diff = parsedFuel[i] - e.FuelManagement.remaining_fuel;
+            const diff =
+              parsedFuel[i] - (Number(e.FuelManagement.remaining_fuel) | 0);
             return diff;
           });
           setFuelBurned(prev => ({
@@ -235,7 +236,8 @@ export default function Trips() {
           await AsyncStorage.setItem('tripData', JSON.stringify(n));
           const currentRemainingFuel = cachedData.map((e, i) => {
             const parsedFuel: number[] = remainingFuel?.['2'] || [0, 0, 0, 0];
-            const diff = parsedFuel[i] - e.FuelManagement.remaining_fuel;
+            const diff =
+              parsedFuel[i] - (Number(e.FuelManagement.remaining_fuel) | 0);
             return diff;
           });
           setFuelBurned(prev => ({
@@ -288,7 +290,8 @@ export default function Trips() {
           await AsyncStorage.setItem('tripData', JSON.stringify(n));
           const currentRemainingFuel = cachedData.map((e, i) => {
             const parsedFuel: number[] = remainingFuel?.['3'] || [0, 0, 0, 0];
-            const diff = parsedFuel[i] - e.FuelManagement.remaining_fuel;
+            const diff =
+              parsedFuel[i] - (Number(e.FuelManagement.remaining_fuel) | 0);
             return diff;
           });
           setFuelBurned(prev => ({
@@ -368,9 +371,11 @@ export default function Trips() {
         (await AsyncStorage.getItem('initialRemainingFuel')) ||
           JSON.stringify({}),
       );
+      console.log(' all initial ');
+
       const initialRemainingFuel = [
-        enginesData[0]?.FuelManagement.remaining_fuel | 0,
-        enginesData[1]?.FuelManagement.remaining_fuel | 0,
+        Number(enginesData[0]?.FuelManagement.remaining_fuel) | 0,
+        Number(enginesData[1]?.FuelManagement.remaining_fuel) | 0,
         0,
         0,
       ];
@@ -381,6 +386,7 @@ export default function Trips() {
           [id]: initialRemainingFuel,
         }),
       );
+      console.log('fuel >>>>>>> ', initialRemainingFuel);
     } else {
       await AsyncStorage.setItem('isStarted', id.toString());
     }
@@ -402,8 +408,8 @@ export default function Trips() {
 
       ws.onmessage = async e => {
         try {
-          const jsonData: {data: SocketJSON} = JSON.parse(e.data);
-          const enginesData = jsonData.data.Engines;
+          const jsonData: SocketJSON = JSON.parse(e.data);
+          const enginesData = jsonData.Engines;
           await AsyncStorage.setItem(
             'enginesData',
             JSON.stringify(enginesData),
@@ -429,10 +435,12 @@ export default function Trips() {
             );
             const initialRemainingFuel = [
               enginesData[0]?.FuelManagement.remaining_fuel | 0,
-              enginesData[1]?.FuelManagement.remaining_fuel | 0,
+              Number(enginesData[1]?.FuelManagement.remaining_fuel) | 0,
               0,
               0,
             ];
+            console.log('fuel ===== ', initialRemainingFuel);
+
             await AsyncStorage.setItem(
               'initialRemainingFuel',
               JSON.stringify({
@@ -496,11 +504,14 @@ export default function Trips() {
           const a = JSON.parse(allFuel);
           if (a?.[id]) {
             const parsedFuel: number[] = a[id];
-            const diff = parsedFuel[i] - e.FuelManagement.remaining_fuel;
+            const diff =
+              parsedFuel[i] - (Number(e.FuelManagement.remaining_fuel) | 0);
             return diff;
           }
           return 0;
         });
+        console.log('current rem fuel >>>>> ', currentRemainingFuel);
+
         setFuelBurned(prev => ({
           ...prev,
           [id]: [...currentRemainingFuel, 0, 0],

@@ -84,7 +84,7 @@ function SocketProvider({children}: {children: React.ReactNode}) {
         const host = service.addresses[0];
         const port = service.port;
         setServiceFound({host, port});
-        getSocketData(host, port, 'timesp1');
+        // getSocketData(host, port, 'timesp1');
       } else if (service.name === 'timesp2' && service.addresses.length > 0) {
         console.log('setting resolvedService2:  ');
         setServiceName(service.name);
@@ -92,7 +92,7 @@ function SocketProvider({children}: {children: React.ReactNode}) {
         const host = service.addresses[0];
         const port = service.port;
         setServiceFound({host, port});
-        getSocketData(host, port, 'timesp2');
+        // getSocketData(host, port, 'timesp2');
       }
     };
 
@@ -176,7 +176,7 @@ function SocketProvider({children}: {children: React.ReactNode}) {
           setTimeout(() => {
             setRetryCount(prev => prev + 1);
             if (serviceFound) {
-              getSocketData(serviceFound.host, serviceFound.port, serviceName);
+              // getSocketData(serviceFound.host, serviceFound.port, serviceName);
             }
           }, retryDelay);
         } else {
@@ -223,9 +223,6 @@ function SocketProvider({children}: {children: React.ReactNode}) {
   //   ]);
   // });
 
-  useEffect(() => {
-    console.log('speed >>>>>>>>>>>>>>>: ', speed, [speed]);
-  });
   // Handle data for timesp2
   const handleTimesp2Data = (enginesData: EngineData[]) => {
     // console.log('############ handling engine 2 data ##########');
