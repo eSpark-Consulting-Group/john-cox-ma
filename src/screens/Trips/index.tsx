@@ -49,16 +49,22 @@ export default function Trips() {
       totalDistance: 0,
       estimatedTime: 0,
       speed: 0,
+      date: '',
+      time: '',
     },
     2: {
       totalDistance: 0,
       estimatedTime: 0,
       speed: 0,
+      date: '',
+      time: '',
     },
     3: {
       totalDistance: 0,
       estimatedTime: 0,
       speed: 0,
+      date: '',
+      time: '',
     },
   });
 
@@ -140,9 +146,11 @@ export default function Trips() {
       if (tripsState?.[1]) {
         let totalDistance = tripData?.[1].totalDistance;
         let estimatedTime = tripData?.[1].estimatedTime;
+        const date = tripData?.[1].date;
+        const time = tripData?.[1].time;
         setAllTripData(prev => ({
           ...prev,
-          1: {...prev[1], estimatedTime, totalDistance},
+          1: {...prev[1], estimatedTime, totalDistance, date, time},
         }));
         const tripStartRef = setInterval(async () => {
           const cachedData: EngineData[] = JSON.parse(
@@ -153,6 +161,7 @@ export default function Trips() {
           setAllTripData(prev => ({
             ...prev,
             1: {
+              ...prev[1],
               estimatedTime: prev[1].estimatedTime + 1,
               totalDistance: prev[1].totalDistance + currDistance,
               speed: speed,
@@ -190,9 +199,11 @@ export default function Trips() {
       if (tripsState?.[2]) {
         let totalDistance = tripData?.[2].totalDistance;
         let estimatedTime = tripData?.[2].estimatedTime;
+        const date = tripData?.[2].date;
+        const time = tripData?.[2].time;
         setAllTripData(prev => ({
           ...prev,
-          2: {...prev[2], estimatedTime, totalDistance},
+          2: {...prev[2], estimatedTime, totalDistance, date, time},
         }));
         const tripStartRef = setInterval(async () => {
           const cachedData: EngineData[] = JSON.parse(
@@ -203,6 +214,7 @@ export default function Trips() {
           setAllTripData(prev => ({
             ...prev,
             2: {
+              ...prev[2],
               estimatedTime: prev[2].estimatedTime + 1,
               totalDistance: prev[2].totalDistance + currDistance,
               speed: speed,
@@ -240,9 +252,11 @@ export default function Trips() {
       if (tripsState?.[3]) {
         let totalDistance = tripData?.[3].totalDistance;
         let estimatedTime = tripData?.[3].estimatedTime;
+        const date = tripData?.[3].date;
+        const time = tripData?.[3].time;
         setAllTripData(prev => ({
           ...prev,
-          3: {...prev[3], estimatedTime, totalDistance},
+          3: {...prev[3], estimatedTime, totalDistance, date, time},
         }));
         const tripStartRef = setInterval(async () => {
           const cachedData: EngineData[] = JSON.parse(
@@ -253,6 +267,7 @@ export default function Trips() {
           setAllTripData(prev => ({
             ...prev,
             3: {
+              ...prev[3],
               estimatedTime: prev[3].estimatedTime + 1,
               totalDistance: prev[3].totalDistance + currDistance,
               speed: speed,
@@ -343,11 +358,9 @@ export default function Trips() {
   const sockCon = useRef<WebSocket>();
   const startTrip = async (id: 1 | 2 | 3) => {
     await AsyncStorage.setItem('isStarted', id.toString());
-    console.log({id});
     await AsyncStorage.removeItem('closeConn');
     await AsyncStorage.removeItem('newConn');
     const isTripStarted = await AsyncStorage.getItem('tripStartRef');
-    console.log(isTripStarted,">>>>>")
     if (!isTripStarted) {
       console.log('=====WEB SOCKET START======');
       const ws = new WebSocket(
@@ -382,7 +395,6 @@ export default function Trips() {
             | '1'
             | '2'
             | '3';
-          console.log(isStarted);
           if (isStarted) {
             console.log('Trip start hua', isStarted);
             const allInitialFuel = JSON.parse(
@@ -427,6 +439,11 @@ export default function Trips() {
       };
     }
     console.log('Trip chalegi...');
+    const dateObj = new Date();
+    const date = `${dateObj.getDate()}/${
+      dateObj.getMonth() + 1
+    }/${dateObj.getFullYear()}`;
+    const time = `${dateObj.getHours()}:${dateObj.getMinutes()}`;
     setTripStarted(prev => ({...prev, [id]: true}));
     let totalDistance = 0;
     let estimatedTime = 0;
@@ -439,6 +456,7 @@ export default function Trips() {
       setAllTripData(prev => ({
         ...prev,
         [id]: {
+          ...prev[id],
           estimatedTime: prev[id].estimatedTime + 1,
           totalDistance: prev[id].totalDistance + currDistance,
           speed: variableSpeed,
@@ -467,10 +485,19 @@ export default function Trips() {
       );
       const a = {
         ...tripData,
-        [id]: {totalDistance, estimatedTime},
+        [id]: {totalDistance, estimatedTime, date, time},
       };
-      await AsyncStorage.setItem(`tripData`, JSON.stringify(a));
+      await AsyncStorage.setItem('tripData', JSON.stringify(a));
     }, 1000);
+
+    setAllTripData(prev => ({
+      ...prev,
+      [id]: {
+        ...prev[id],
+        date,
+        time,
+      },
+    }));
     const tripRefs = JSON.parse(
       (await AsyncStorage.getItem('tripStartRef')) || JSON.stringify({}),
     );
@@ -500,16 +527,22 @@ export default function Trips() {
           estimatedTime: 0,
           totalDistance: 0,
           speed: 0,
+          date: '',
+          time: '',
         },
         '2': {
           estimatedTime: 0,
           totalDistance: 0,
           speed: 0,
+          date: '',
+          time: '',
         },
         '3': {
           estimatedTime: 0,
           totalDistance: 0,
           speed: 0,
+          date: '',
+          time: '',
         },
       }));
       setTripStarted({1: false, 2: false, 3: false});
@@ -682,10 +715,15 @@ export default function Trips() {
               <RenderRow
                 title="Trip Start"
                 unit="Date"
-                value={''}
+                value={allTripData[selectedSwitch].date}
                 editable={false}
               />
-              <RenderRow title="" unit="Time" value={''} editable={false} />
+              <RenderRow
+                title=""
+                unit="Time"
+                value={allTripData[selectedSwitch].time}
+                editable={false}
+              />
             </MyCard>
             <GapView length={20} />
             <MyCard>
