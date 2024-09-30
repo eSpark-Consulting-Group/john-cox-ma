@@ -177,7 +177,7 @@ export default function Trips() {
           );
           const n = {
             ...o,
-            1: {totalDistance, estimatedTime},
+            1: {totalDistance, estimatedTime, date, time},
           };
           await AsyncStorage.setItem('tripData', JSON.stringify(n));
           const currentRemainingFuel = cachedData.map((e, i) => {
@@ -231,7 +231,7 @@ export default function Trips() {
           );
           const n = {
             ...o,
-            2: {totalDistance, estimatedTime},
+            2: {totalDistance, estimatedTime, date, time},
           };
           await AsyncStorage.setItem('tripData', JSON.stringify(n));
           const currentRemainingFuel = cachedData.map((e, i) => {
@@ -285,7 +285,7 @@ export default function Trips() {
           );
           const n = {
             ...o,
-            3: {totalDistance, estimatedTime},
+            3: {totalDistance, estimatedTime, date, time},
           };
           await AsyncStorage.setItem('tripData', JSON.stringify(n));
           const currentRemainingFuel = cachedData.map((e, i) => {
@@ -388,7 +388,7 @@ export default function Trips() {
       );
       console.log('fuel >>>>>>> ', initialRemainingFuel);
     } else {
-      await AsyncStorage.setItem('isStarted', id.toString());
+      await AsyncStorage.setItem('isStarted', id?.toString());
     }
     await AsyncStorage.removeItem('closeConn');
     await AsyncStorage.removeItem('newConn');
@@ -676,7 +676,7 @@ export default function Trips() {
                   {[1, 2, 3].map(val => (
                     <MySwitch
                       key={val}
-                      label={val.toString()}
+                      label={val?.toString()}
                       isActive={selectedSwitch === val}
                       onPress={() => handleSwitchPress(val as 1 | 2 | 3)}
                     />
@@ -745,7 +745,7 @@ export default function Trips() {
               <RenderRow
                 title="Estimated Run Time"
                 unit="hours/minute"
-                value={allTripData[selectedSwitch].estimatedTime.toString()}
+                value={allTripData[selectedSwitch].estimatedTime?.toString()}
               />
               <RenderRow
                 title="Average Speed"
