@@ -46,6 +46,7 @@ export default function Trips() {
   });
   const [allTripData, setAllTripData] = useState({
     1: {
+      name: '',
       totalDistance: 0,
       estimatedTime: 0,
       speed: 0,
@@ -53,6 +54,7 @@ export default function Trips() {
       time: '',
     },
     2: {
+      name: '',
       totalDistance: 0,
       estimatedTime: 0,
       speed: 0,
@@ -60,6 +62,7 @@ export default function Trips() {
       time: '',
     },
     3: {
+      name: '',
       totalDistance: 0,
       estimatedTime: 0,
       speed: 0,
@@ -439,6 +442,7 @@ export default function Trips() {
       };
     }
     console.log('Trip chalegi...');
+    const tripName = nameInput;
     const dateObj = new Date();
     const date = `${dateObj.getDate()}/${
       dateObj.getMonth() + 1
@@ -457,6 +461,7 @@ export default function Trips() {
         ...prev,
         [id]: {
           ...prev[id],
+          name: tripName,
           estimatedTime: prev[id].estimatedTime + 1,
           totalDistance: prev[id].totalDistance + currDistance,
           speed: variableSpeed,
@@ -524,6 +529,7 @@ export default function Trips() {
       clearInterval(trip?.[3]);
       setAllTripData(prev => ({
         1: {
+          name: '',
           estimatedTime: 0,
           totalDistance: 0,
           speed: 0,
@@ -531,6 +537,7 @@ export default function Trips() {
           time: '',
         },
         '2': {
+          name: '',
           estimatedTime: 0,
           totalDistance: 0,
           speed: 0,
@@ -538,6 +545,7 @@ export default function Trips() {
           time: '',
         },
         '3': {
+          name: '',
           estimatedTime: 0,
           totalDistance: 0,
           speed: 0,
@@ -707,7 +715,7 @@ export default function Trips() {
                     onChange={text => {
                       setNameInput(text);
                     }}
-                    value={''}
+                    value={allTripData[selectedSwitch].name}
                   />
                 </View>
               </TripSection>
