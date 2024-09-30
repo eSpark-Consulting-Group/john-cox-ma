@@ -360,7 +360,30 @@ export default function Trips() {
   };
   const sockCon = useRef<WebSocket>();
   const startTrip = async (id: 1 | 2 | 3) => {
-    await AsyncStorage.setItem('isStarted', id.toString());
+    const enginesData: EngineData[] = JSON.parse(
+      (await AsyncStorage.getItem('enginesData')) || JSON.stringify([]),
+    );
+    if (enginesData?.length) {
+      const allInitialFuel = JSON.parse(
+        (await AsyncStorage.getItem('initialRemainingFuel')) ||
+          JSON.stringify({}),
+      );
+      const initialRemainingFuel = [
+        enginesData[0]?.FuelManagement.remaining_fuel | 0,
+        enginesData[1]?.FuelManagement.remaining_fuel | 0,
+        0,
+        0,
+      ];
+      await AsyncStorage.setItem(
+        'initialRemainingFuel',
+        JSON.stringify({
+          ...allInitialFuel,
+          [id]: initialRemainingFuel,
+        }),
+      );
+    } else {
+      await AsyncStorage.setItem('isStarted', id.toString());
+    }
     await AsyncStorage.removeItem('closeConn');
     await AsyncStorage.removeItem('newConn');
     const isTripStarted = await AsyncStorage.getItem('tripStartRef');
@@ -567,64 +590,6 @@ export default function Trips() {
       console.log('TRIPS====== Ending trip....');
     }
   };
-
-  useEffect(() => {
-    if (warningVisible) {
-      const timer = setTimeout(() => {
-        setWarningVisible(false);
-        setResetVisible(true);
-      }, 3000);
-
-      return () => clearTimeout(timer);
-    }
-  }, [warningVisible]);
-
-  // useEffect(() => {
-  //   if (resetVisible) {
-  //     const timer = setTimeout(() => {
-  //       handleStartTrip(selectedSwitch, Number(speed));
-  //       setResetVisible(false);
-  //       setShowConfirmation(false);
-  //     }, 2000);
-
-  //     return () => clearTimeout(timer);
-  //   }
-  // }, [resetVisible]);
-
-  // function store_data(id: 1 | 2 | 3, trips: any[]) {
-  //   console.log('storing this trip: ', trips[id - 1]);
-
-  //   dispatch(
-  //     setTrip({
-  //       tripId: id,
-  //       data: {
-  //         Trips: {
-  //           ...currentTrips, // Spread existing trip data to maintain other trips
-  //           [id]: {
-  //             // tripName: trips[id - 1].name,
-  //             startingTime: trips[id - 1].startingTime?.toISOString(),
-  //             distanceCovered: trips[id - 1].distanceCovered,
-  //             elapsedTime: trips[id - 1].tripTime,
-  //             fuelConsumption: trips[id - 1].fuelConsumption,
-  //             tripEfficiency: trips[id - 1].tripEfficiency,
-  //           },
-  //         },
-  //       },
-  //     }),
-  //   );
-  // }
-
-  //observe data for all engines
-  // useEffect(() => {
-  //   console.log(
-  //     '🚀 ~ useEffect ~ trips[selectedSwitch - 1].fuelConsumption:',
-  //     trips[selectedSwitch - 1].fuelConsumption,
-  //   );
-  // }, [enginesData1, enginesData2]);
-
-  // useEffect(() => {
-  //   console.log('🚀 ~ Trips ~ trips:', trips);
-  // }, [trips]);
 
   const calculateEfficience = (id: 1 | 2 | 3) => {
     const result =
