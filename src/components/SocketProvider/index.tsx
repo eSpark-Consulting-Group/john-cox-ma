@@ -84,7 +84,7 @@ function SocketProvider({children}: {children: React.ReactNode}) {
         const host = service.addresses[0];
         const port = service.port;
         setServiceFound({host, port});
-        // getSocketData(host, port, 'timesp1');
+        getSocketData(host, port, 'timesp1');
       } else if (service.name === 'timesp2' && service.addresses.length > 0) {
         console.log('setting resolvedService2:  ');
         setServiceName(service.name);
@@ -92,7 +92,7 @@ function SocketProvider({children}: {children: React.ReactNode}) {
         const host = service.addresses[0];
         const port = service.port;
         setServiceFound({host, port});
-        // getSocketData(host, port, 'timesp2');
+        getSocketData(host, port, 'timesp2');
       }
     };
 
@@ -176,7 +176,7 @@ function SocketProvider({children}: {children: React.ReactNode}) {
           setTimeout(() => {
             setRetryCount(prev => prev + 1);
             if (serviceFound) {
-              // getSocketData(serviceFound.host, serviceFound.port, serviceName);
+              getSocketData(serviceFound.host, serviceFound.port, serviceName);
             }
           }, retryDelay);
         } else {
@@ -236,13 +236,11 @@ function SocketProvider({children}: {children: React.ReactNode}) {
   useEffect(() => {
     const loadInitialData = async () => {
       try {
-        let isProvisioned = await AsyncStorage.getItem('provisionedDevices');
+        const isProvisioned = await AsyncStorage.getItem('provisionedDevices');
         const prevTime = await AsyncStorage.getItem('timer');
         if (prevTime) {
           timer.current = parseInt(prevTime, 10);
         }
-        isProvisioned = JSON.stringify({timesp1: false, timesp2: false});
-        console.log(isProvisioned, '>>>>>>');
         if (isProvisioned) {
           const data = JSON.parse(isProvisioned) as ProvisionData;
           setProvision(data);

@@ -35,7 +35,6 @@ export default function Trips() {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [warningVisible, setWarningVisible] = useState(false);
   const [resetVisible, setResetVisible] = useState(false);
-  const [nameInput, setNameInput] = useState<string>('');
   const [selectedSwitch, setSelectedSwitch] = useState<1 | 2 | 3>(1); // Stores the currently selected switch index
   const {resolvedService1, resolvedService2} = useSocket();
 
@@ -151,9 +150,10 @@ export default function Trips() {
         let estimatedTime = tripData?.[1].estimatedTime;
         const date = tripData?.[1].date;
         const time = tripData?.[1].time;
+        const name = tripData?.[1].name;
         setAllTripData(prev => ({
           ...prev,
-          1: {...prev[1], estimatedTime, totalDistance, date, time},
+          1: {...prev[1], estimatedTime, totalDistance, date, time, name},
         }));
         const tripStartRef = setInterval(async () => {
           const cachedData: EngineData[] = JSON.parse(
@@ -177,7 +177,7 @@ export default function Trips() {
           );
           const n = {
             ...o,
-            1: {totalDistance, estimatedTime, date, time},
+            1: {totalDistance, estimatedTime, date, time, name},
           };
           await AsyncStorage.setItem('tripData', JSON.stringify(n));
           const currentRemainingFuel = cachedData.map((e, i) => {
@@ -205,9 +205,10 @@ export default function Trips() {
         let estimatedTime = tripData?.[2].estimatedTime;
         const date = tripData?.[2].date;
         const time = tripData?.[2].time;
+        const name = tripData?.[2].name;
         setAllTripData(prev => ({
           ...prev,
-          2: {...prev[2], estimatedTime, totalDistance, date, time},
+          2: {...prev[2], estimatedTime, totalDistance, date, time, name},
         }));
         const tripStartRef = setInterval(async () => {
           const cachedData: EngineData[] = JSON.parse(
@@ -231,7 +232,7 @@ export default function Trips() {
           );
           const n = {
             ...o,
-            2: {totalDistance, estimatedTime, date, time},
+            2: {totalDistance, estimatedTime, date, time, name},
           };
           await AsyncStorage.setItem('tripData', JSON.stringify(n));
           const currentRemainingFuel = cachedData.map((e, i) => {
@@ -259,9 +260,10 @@ export default function Trips() {
         let estimatedTime = tripData?.[3].estimatedTime;
         const date = tripData?.[3].date;
         const time = tripData?.[3].time;
+        const name = tripData?.[3].name;
         setAllTripData(prev => ({
           ...prev,
-          3: {...prev[3], estimatedTime, totalDistance, date, time},
+          3: {...prev[3], estimatedTime, totalDistance, date, name},
         }));
         const tripStartRef = setInterval(async () => {
           const cachedData: EngineData[] = JSON.parse(
@@ -285,7 +287,7 @@ export default function Trips() {
           );
           const n = {
             ...o,
-            3: {totalDistance, estimatedTime, date, time},
+            3: {totalDistance, estimatedTime, date, time, name},
           };
           await AsyncStorage.setItem('tripData', JSON.stringify(n));
           const currentRemainingFuel = cachedData.map((e, i) => {
@@ -473,7 +475,6 @@ export default function Trips() {
       };
     }
     console.log('Trip chalegi...');
-    const tripName = nameInput;
     const dateObj = new Date();
     const date = `${dateObj.getDate()}/${
       dateObj.getMonth() + 1
@@ -492,7 +493,6 @@ export default function Trips() {
         ...prev,
         [id]: {
           ...prev[id],
-          name: tripName,
           estimatedTime: prev[id].estimatedTime + 1,
           totalDistance: prev[id].totalDistance + currDistance,
           speed: variableSpeed,
@@ -524,7 +524,13 @@ export default function Trips() {
       );
       const a = {
         ...tripData,
-        [id]: {totalDistance, estimatedTime, date, time},
+        [id]: {
+          totalDistance,
+          estimatedTime,
+          date,
+          time,
+          name: allTripData[id].name,
+        },
       };
       await AsyncStorage.setItem('tripData', JSON.stringify(a));
     }, 1000);
@@ -689,7 +695,10 @@ export default function Trips() {
                   <MyInput
                     placeholder="Enter Name"
                     onChange={text => {
-                      setNameInput(text);
+                      setAllTripData(prev => ({
+                        ...prev,
+                        [selectedSwitch]: {...prev[selectedSwitch], name: text},
+                      }));
                     }}
                     value={allTripData[selectedSwitch].name}
                   />
