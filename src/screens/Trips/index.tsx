@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {ScrollView, View} from 'react-native';
+import {Platform, ScrollView, View} from 'react-native';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import BackgroundService from 'react-native-background-actions';
@@ -26,6 +26,7 @@ import {
 import {styles} from './styles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useSocket} from '../../components/SocketProvider';
+import * as FileSystem from 'expo-file-system';
 
 type TripsScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 
@@ -599,12 +600,82 @@ export default function Trips() {
         2: [0, 0, 0, 0],
         3: [0, 0, 0, 0],
       });
-      await AsyncStorage.removeItem('tripStartRef');
-      await AsyncStorage.removeItem('initialRemainingFuel');
-      await AsyncStorage.removeItem('variableSpeed');
-      await AsyncStorage.removeItem('cachedData');
-      await AsyncStorage.removeItem('enginesData');
-      console.log('TRIPS====== Ending trip....');
+      try {
+        await AsyncStorage.removeItem('tripStartRef');
+        await AsyncStorage.removeItem('initialRemainingFuel');
+        await AsyncStorage.removeItem('variableSpeed');
+        await AsyncStorage.removeItem('cachedData');
+        await AsyncStorage.removeItem('enginesData');
+        let directoryUri = (await AsyncStorage.getItem('directoryUri')) || '';
+        const allTripsLogs = JSON.parse(
+          (await AsyncStorage.getItem('allTipsLogs')) || JSON.stringify({}),
+        );
+        allTripsLogs[Date.now()] = JSON.parse(
+          (await AsyncStorage.getItem('tripData')) || JSON.stringify({}),
+        );
+        if (Platform.OS === 'android') {
+          if (!directoryUri) {
+            const permissions =
+              await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+            if (permissions.granted) {
+              directoryUri = permissions.directoryUri;
+              await AsyncStorage.setItem(
+                'directoryUri',
+                permissions.directoryUri,
+              );
+            }
+          }
+          const fileName = 'trips.json';
+          const files =
+            await FileSystem.StorageAccessFramework.readDirectoryAsync(
+              directoryUri,
+            );
+          const existingFileUri = files.find(file => file.includes(fileName));
+          let existingData = {};
+          if (existingFileUri) {
+            const fileContent = await FileSystem.readAsStringAsync(
+              existingFileUri,
+            );
+            try {
+              existingData = JSON.parse(fileContent);
+            } catch (error) {
+              console.error('Error parsing existing JSON:', error);
+            }
+          }
+          const updatedData = {...existingData, ...allTripsLogs};
+          if (existingFileUri) {
+            await FileSystem.writeAsStringAsync(
+              existingFileUri,
+              JSON.stringify(updatedData),
+              {
+                encoding: FileSystem.EncodingType.UTF8,
+              },
+            );
+            console.log(
+              'File successfully updated with merged data:',
+              existingFileUri,
+            );
+          } else {
+            const newFileUri =
+              await FileSystem.StorageAccessFramework.createFileAsync(
+                directoryUri,
+                fileName,
+                'application/json',
+              );
+            await FileSystem.writeAsStringAsync(
+              newFileUri,
+              JSON.stringify(updatedData),
+              {
+                encoding: FileSystem.EncodingType.UTF8,
+              },
+            );
+            console.log('File created and saved successfully:', newFileUri);
+          }
+        }
+        console.log('TRIPS====== Ending trip....');
+      } catch (e) {
+        console.log(e, '>>>>>>');
+      }
     }
   };
 
