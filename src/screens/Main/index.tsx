@@ -24,7 +24,15 @@ import NauticalMile from './NauticalMilte';
 type MainScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 
 export default function Main() {
-  const {enginesData1, speed, enginesData2, setProvision} = useSocket();
+  const {
+    enginesData1,
+    speed,
+    enginesData2,
+    resolvedService1,
+    resolvedService2,
+    setProvision,
+    getSocketData,
+  } = useSocket();
   const theme = useTheme() as MyTheme;
   const navigation = useNavigation<MainScreenProps['navigation']>();
   const [generatorRunning, setGeneratorRunning] = useState<'Yes' | 'No'>('Yes');
@@ -135,14 +143,26 @@ export default function Main() {
       },
     },
   ];
-  //loader pe timer aur refresh lagana he
+
   const fetchProvisionedDevices = async () => {
-    const currentProvision = await AsyncStorage.getItem('provisionedDevices');
-    console.log('curr prov: ', currentProvision);
-    const provisionedDevices = currentProvision
-      ? JSON.parse(currentProvision)
-      : {timesp1: false, timesp2: false};
-    setProv(provisionedDevices);
+    if (resolvedService1)
+      getSocketData(
+        resolvedService1.host,
+        resolvedService1.port,
+        resolvedService1.name,
+      );
+    if (resolvedService2)
+      getSocketData(
+        resolvedService2.host,
+        resolvedService2.port,
+        resolvedService2.name,
+      );
+    // const currentProvision = await AsyncStorage.getItem('provisionedDevices');
+    // console.log('curr prov: ', currentProvision);
+    // const provisionedDevices = currentProvision
+    //   ? JSON.parse(currentProvision)
+    //   : {timesp1: false, timesp2: false};
+    // setProv(provisionedDevices);
   };
 
   useEffect(() => {
@@ -152,7 +172,7 @@ export default function Main() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowLoader(false);
-      if (showLoader) setProvision({timesp1: true, timesp2: true});
+      if (showLoader) fetchProvisionedDevices();
     }, 7000);
 
     return () => clearTimeout(timer); // Cleanup timer on component unmount
@@ -212,7 +232,7 @@ export default function Main() {
               onPress={() => setShowLoader(true)}>
               <Ionicons name="reload" size={24} color={theme.colors.primary} />
             </TouchableOpacity>
-            {prov.timesp1 && (
+            {resolvedService1 && (
               <View style={styles().GaugeRow}>
                 {enginesData1.length ? (
                   enginesData1.map((item, index) => (
@@ -234,7 +254,7 @@ export default function Main() {
               </View>
             )}
             <GapView length={20} />
-            {prov.timesp2 && (
+            {resolvedService2 && (
               <View style={styles().GaugeRow}>
                 {enginesData2.length ? (
                   enginesData2.map((item, index) => (
@@ -245,7 +265,7 @@ export default function Main() {
                           ? Number(item?.SensorData?.fuel)
                           : 0
                       }
-                      name={`FMM1\n${item.position}`}
+                      name={`FMM2\n${item.position}`}
                     />
                   ))
                 ) : showLoader ? (
