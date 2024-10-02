@@ -82,14 +82,17 @@ export default function Trips() {
   const continueTrip = async (tripsState: any, tripRefs: any) => {
     const tripJSON = await AsyncStorage.getItem('tripData');
     const newConn = await AsyncStorage.getItem('newConn');
-    console.log(tripsState);
     if (tripJSON) {
       if (!newConn) {
         console.log('TRIPS====== =====WEB SOCKET START======');
         const ws = new WebSocket(
           `ws://${resolvedService1?.addresses[0]}:${resolvedService1?.port}/ws`,
         );
-        sockCon.current = ws;
+        sockCon.current.timesp1 = ws;
+        const ws2 = new WebSocket(
+          `ws://${resolvedService2?.addresses[0]}:${resolvedService2?.port}/ws`,
+        );
+        sockCon.current.timesp2 = ws2;
         ws.onopen = async () => {
           await AsyncStorage.setItem('newConn', 'true');
           console.log(
@@ -97,7 +100,38 @@ export default function Trips() {
             `${resolvedService1?.addresses[0]}:${resolvedService1?.port}`,
           );
         };
-
+        ws2.onopen = async () => {
+          console.log(
+            'TRIPS====== WebSocket connection opened for : ',
+            `timesp2.local`,
+          );
+        };
+        ws2.onmessage = async e => {
+          try {
+            const tripStartRef = await AsyncStorage.getItem('tripStartRef');
+            if (!tripStartRef) {
+              ws2.close();
+              return;
+            }
+            const jsonData: SocketJSON = JSON.parse(e.data);
+            const enginesData = jsonData.Engines;
+            if (!enginesData || enginesData.length === 0) {
+              console.log('TRIPS====== No engine data or empty array received');
+              ws2.close();
+              return;
+            }
+            await AsyncStorage.setItem(
+              'enginesData2',
+              JSON.stringify(enginesData),
+            );
+          } catch (error) {
+            console.log(
+              'TRIPS====== Error during WebSocket message processing:',
+              error,
+            );
+            ws2.close();
+          }
+        };
         ws.onmessage = async e => {
           try {
             const tripStartRef = await AsyncStorage.getItem('tripStartRef');
@@ -146,170 +180,86 @@ export default function Trips() {
         (await AsyncStorage.getItem('initialRemainingFuel')) ||
           JSON.stringify({}),
       );
-      if (tripsState?.[1]) {
-        let totalDistance = tripData?.[1].totalDistance;
-        let estimatedTime = tripData?.[1].estimatedTime;
-        const date = tripData?.[1].date;
-        const time = tripData?.[1].time;
-        const name = tripData?.[1].name;
-        setAllTripData(prev => ({
-          ...prev,
-          1: {...prev[1], estimatedTime, totalDistance, date, time, name},
-        }));
-        const tripStartRef = setInterval(async () => {
-          const cachedData: EngineData[] = JSON.parse(
-            (await AsyncStorage.getItem('enginesData')) || JSON.stringify([{}]),
-          );
-          const speed = cachedData[0]?.SensorData?.speed || 0;
-          const currDistance = calculateDistance(speed);
+      const remainingFuel2 = JSON.parse(
+        (await AsyncStorage.getItem('initialRemainingFuel2')) ||
+          JSON.stringify({}),
+      );
+      const keys = Object.keys(tripsState);
+      for (let i = 0; i < keys.length; i++) {
+        const key = keys[i] as '1' | '2' | '3';
+        if (tripsState?.[key]) {
+          let totalDistance = tripData?.[key].totalDistance;
+          let estimatedTime = tripData?.[key].estimatedTime;
+          const date = tripData?.[key].date;
+          const time = tripData?.[key].time;
+          const name = tripData?.[key].name;
           setAllTripData(prev => ({
             ...prev,
-            1: {
-              ...prev[1],
-              estimatedTime: prev[1].estimatedTime + 1,
-              totalDistance: prev[1].totalDistance + currDistance,
-              speed: speed,
+            [key]: {
+              ...prev[key],
+              estimatedTime,
+              totalDistance,
+              date,
+              time,
+              name,
             },
           }));
-          totalDistance += currDistance;
-          estimatedTime++;
-          const o = JSON.parse(
-            (await AsyncStorage.getItem('tripData')) || JSON.stringify({}),
+          const tripStartRef = setInterval(async () => {
+            const cachedData: EngineData[] = JSON.parse(
+              (await AsyncStorage.getItem('enginesData')) || JSON.stringify([]),
+            );
+            const cachedData2: EngineData[] = JSON.parse(
+              (await AsyncStorage.getItem('enginesData2')) ||
+                JSON.stringify([]),
+            );
+            const speed = cachedData[0]?.SensorData?.speed || 0;
+            const currDistance = calculateDistance(speed);
+            setAllTripData(prev => ({
+              ...prev,
+              [key]: {
+                ...prev[key],
+                estimatedTime: prev[key].estimatedTime + 1,
+                totalDistance: prev[key].totalDistance + currDistance,
+                speed: speed,
+              },
+            }));
+            totalDistance += currDistance;
+            estimatedTime++;
+            const o = JSON.parse(
+              (await AsyncStorage.getItem('tripData')) || JSON.stringify({}),
+            );
+            const n = {
+              ...o,
+              [key]: {totalDistance, estimatedTime, date, time, name},
+            };
+            await AsyncStorage.setItem('tripData', JSON.stringify(n));
+            const currentRemainingFuel = cachedData.map((e, i) => {
+              const parsedFuel: number[] = remainingFuel?.[key] || [0, 0, 0, 0];
+              const diff =
+                parsedFuel[i] - (Number(e.FuelManagement.remaining_fuel) | 0);
+              return diff;
+            });
+            const currentRemainingFuel2 = cachedData2.map((e, i) => {
+              const parsedFuel: number[] = remainingFuel?.[key] || [0, 0, 0, 0];
+              const diff =
+                parsedFuel[i] - (Number(e.FuelManagement.remaining_fuel) | 0);
+              return diff;
+            });
+            const [a, b] = currentRemainingFuel;
+            setFuelBurned(prev => ({
+              ...prev,
+              [key]: [a, b, ...currentRemainingFuel2],
+            }));
+          }, 1000);
+          const allTripRefs = JSON.parse(
+            (await AsyncStorage.getItem('tripStartRef')) || JSON.stringify({}),
           );
-          const n = {
-            ...o,
-            1: {totalDistance, estimatedTime, date, time, name},
+          const a = {
+            ...allTripRefs,
+            [key]: tripStartRef,
           };
-          await AsyncStorage.setItem('tripData', JSON.stringify(n));
-          const currentRemainingFuel = cachedData.map((e, i) => {
-            const parsedFuel: number[] = remainingFuel?.['1'] || [0, 0, 0, 0];
-            const diff =
-              parsedFuel[i] - (Number(e.FuelManagement.remaining_fuel) | 0);
-            return diff;
-          });
-          setFuelBurned(prev => ({
-            ...prev,
-            '1': [...currentRemainingFuel, 0, 0],
-          }));
-        }, 1000);
-        const allTripRefs = JSON.parse(
-          (await AsyncStorage.getItem('tripStartRef')) || JSON.stringify({}),
-        );
-        const a = {
-          ...allTripRefs,
-          1: tripStartRef,
-        };
-        await AsyncStorage.setItem('tripStartRef', JSON.stringify(a));
-      }
-      if (tripsState?.[2]) {
-        let totalDistance = tripData?.[2].totalDistance;
-        let estimatedTime = tripData?.[2].estimatedTime;
-        const date = tripData?.[2].date;
-        const time = tripData?.[2].time;
-        const name = tripData?.[2].name;
-        setAllTripData(prev => ({
-          ...prev,
-          2: {...prev[2], estimatedTime, totalDistance, date, time, name},
-        }));
-        const tripStartRef = setInterval(async () => {
-          const cachedData: EngineData[] = JSON.parse(
-            (await AsyncStorage.getItem('enginesData')) || JSON.stringify([{}]),
-          );
-          const speed = cachedData[0]?.SensorData?.speed || 0;
-          const currDistance = calculateDistance(speed);
-          setAllTripData(prev => ({
-            ...prev,
-            2: {
-              ...prev[2],
-              estimatedTime: prev[2].estimatedTime + 1,
-              totalDistance: prev[2].totalDistance + currDistance,
-              speed: speed,
-            },
-          }));
-          totalDistance += currDistance;
-          estimatedTime++;
-          const o = JSON.parse(
-            (await AsyncStorage.getItem('tripData')) || JSON.stringify({}),
-          );
-          const n = {
-            ...o,
-            2: {totalDistance, estimatedTime, date, time, name},
-          };
-          await AsyncStorage.setItem('tripData', JSON.stringify(n));
-          const currentRemainingFuel = cachedData.map((e, i) => {
-            const parsedFuel: number[] = remainingFuel?.['2'] || [0, 0, 0, 0];
-            const diff =
-              parsedFuel[i] - (Number(e.FuelManagement.remaining_fuel) | 0);
-            return diff;
-          });
-          setFuelBurned(prev => ({
-            ...prev,
-            '2': [...currentRemainingFuel, 0, 0],
-          }));
-        }, 1000);
-        const allTripRefs = JSON.parse(
-          (await AsyncStorage.getItem('tripStartRef')) || JSON.stringify({}),
-        );
-        const a = {
-          ...allTripRefs,
-          2: tripStartRef,
-        };
-        await AsyncStorage.setItem('tripStartRef', JSON.stringify(a));
-      }
-      if (tripsState?.[3]) {
-        let totalDistance = tripData?.[3].totalDistance;
-        let estimatedTime = tripData?.[3].estimatedTime;
-        const date = tripData?.[3].date;
-        const time = tripData?.[3].time;
-        const name = tripData?.[3].name;
-        setAllTripData(prev => ({
-          ...prev,
-          3: {...prev[3], estimatedTime, totalDistance, date, name},
-        }));
-        const tripStartRef = setInterval(async () => {
-          const cachedData: EngineData[] = JSON.parse(
-            (await AsyncStorage.getItem('enginesData')) || JSON.stringify([{}]),
-          );
-          const speed = cachedData[0]?.SensorData?.speed || 0;
-          const currDistance = calculateDistance(speed);
-          setAllTripData(prev => ({
-            ...prev,
-            3: {
-              ...prev[3],
-              estimatedTime: prev[3].estimatedTime + 1,
-              totalDistance: prev[3].totalDistance + currDistance,
-              speed: speed,
-            },
-          }));
-          totalDistance += currDistance;
-          estimatedTime++;
-          const o = JSON.parse(
-            (await AsyncStorage.getItem('tripData')) || JSON.stringify({}),
-          );
-          const n = {
-            ...o,
-            3: {totalDistance, estimatedTime, date, time, name},
-          };
-          await AsyncStorage.setItem('tripData', JSON.stringify(n));
-          const currentRemainingFuel = cachedData.map((e, i) => {
-            const parsedFuel: number[] = remainingFuel?.['3'] || [0, 0, 0, 0];
-            const diff =
-              parsedFuel[i] - (Number(e.FuelManagement.remaining_fuel) | 0);
-            return diff;
-          });
-          setFuelBurned(prev => ({
-            ...prev,
-            '3': [...currentRemainingFuel, 0, 0],
-          }));
-        }, 1000);
-        const allTripRefs = JSON.parse(
-          (await AsyncStorage.getItem('tripStartRef')) || JSON.stringify({}),
-        );
-        const a = {
-          ...allTripRefs,
-          3: tripStartRef,
-        };
-        await AsyncStorage.setItem('tripStartRef', JSON.stringify(a));
+          await AsyncStorage.setItem('tripStartRef', JSON.stringify(a));
+        }
       }
       while (BackgroundService.isRunning()) {
         await new Promise(resolve => setTimeout(resolve, 1000)); // Adjust the interval if needed
@@ -364,18 +314,25 @@ export default function Trips() {
   const calculateDistance = (speed: number) => {
     return speed * (1 / 3600);
   };
-  const sockCon = useRef<WebSocket>();
+  const sockCon = useRef<{
+    timesp1: WebSocket | null;
+    timesp2: WebSocket | null;
+  }>({
+    timesp1: null,
+    timesp2: null,
+  });
   const startTrip = async (id: 1 | 2 | 3) => {
     const enginesData: EngineData[] = JSON.parse(
       (await AsyncStorage.getItem('enginesData')) || JSON.stringify([]),
+    );
+    const enginesData2: EngineData[] = JSON.parse(
+      (await AsyncStorage.getItem('enginesData2')) || JSON.stringify([]),
     );
     if (enginesData?.length) {
       const allInitialFuel = JSON.parse(
         (await AsyncStorage.getItem('initialRemainingFuel')) ||
           JSON.stringify({}),
       );
-      console.log(' all initial ');
-
       const initialRemainingFuel = [
         Number(enginesData[0]?.FuelManagement.remaining_fuel) | 0,
         Number(enginesData[1]?.FuelManagement.remaining_fuel) | 0,
@@ -389,19 +346,41 @@ export default function Trips() {
           [id]: initialRemainingFuel,
         }),
       );
-      console.log('fuel >>>>>>> ', initialRemainingFuel);
     } else {
       await AsyncStorage.setItem('isStarted', id?.toString());
     }
+    if (enginesData2?.length) {
+      const allInitialFuel = JSON.parse(
+        (await AsyncStorage.getItem('initialRemainingFuel2')) ||
+          JSON.stringify({}),
+      );
+      const initialRemainingFuel = [
+        Number(enginesData[0]?.FuelManagement.remaining_fuel) | 0,
+        Number(enginesData[1]?.FuelManagement.remaining_fuel) | 0,
+      ];
+      await AsyncStorage.setItem(
+        'initialRemainingFuel2',
+        JSON.stringify({
+          ...allInitialFuel,
+          [id]: initialRemainingFuel,
+        }),
+      );
+    } else {
+      await AsyncStorage.setItem('isStarted2', id?.toString());
+    }
     await AsyncStorage.removeItem('closeConn');
-    await AsyncStorage.removeItem('newConn');
     const isTripStarted = await AsyncStorage.getItem('tripStartRef');
     if (!isTripStarted) {
+      await AsyncStorage.removeItem('newConn');
       console.log('=====WEB SOCKET START======');
       const ws = new WebSocket(
         `ws://${resolvedService1?.addresses[0]}:${resolvedService1?.port}/ws`,
       );
-      sockCon.current = ws;
+      sockCon.current.timesp1 = ws;
+      const ws2 = new WebSocket(
+        `ws://${resolvedService2?.addresses[0]}:${resolvedService2?.port}/ws`,
+      );
+      sockCon.current.timesp2 = ws2;
       ws.onopen = () => {
         console.log(
           'TRIPS====== WebSocket connection opened for : ',
@@ -442,8 +421,6 @@ export default function Trips() {
               0,
               0,
             ];
-            console.log('fuel ===== ', initialRemainingFuel);
-
             await AsyncStorage.setItem(
               'initialRemainingFuel',
               JSON.stringify({
@@ -474,8 +451,74 @@ export default function Trips() {
         }
         console.log('TRIPS====== WebSocket connection closed:', e.code, reason);
       };
+      ws2.onopen = () => {
+        console.log(
+          'TRIPS====== WebSocket connection opened for :  timesp2.local',
+        );
+      };
+
+      ws2.onmessage = async e => {
+        try {
+          const jsonData: SocketJSON = JSON.parse(e.data);
+          const enginesData = jsonData.Engines;
+          await AsyncStorage.setItem(
+            'enginesData2',
+            JSON.stringify(enginesData),
+          );
+          if (!enginesData || enginesData.length === 0) {
+            console.log('No engine data or empty array received');
+            ws2.close();
+            return;
+          }
+          const closeConn = await AsyncStorage.getItem('closeConn');
+          if (closeConn) {
+            ws2.close();
+          }
+          const isStarted2 = (await AsyncStorage.getItem('isStarted2')) as
+            | '1'
+            | '2'
+            | '3';
+          if (isStarted2) {
+            console.log('Eninge 2 start hua =======', isStarted2);
+            const allInitialFuel = JSON.parse(
+              (await AsyncStorage.getItem('initialRemainingFuel2')) ||
+                JSON.stringify({}),
+            );
+            const initialRemainingFuel = [
+              Number(enginesData[0]?.FuelManagement.remaining_fuel) | 0,
+              Number(enginesData[1]?.FuelManagement.remaining_fuel) | 0,
+            ];
+            await AsyncStorage.setItem(
+              'initialRemainingFuel2',
+              JSON.stringify({
+                ...allInitialFuel,
+                [isStarted2]: initialRemainingFuel,
+              }),
+            );
+            await AsyncStorage.removeItem('isStarted2');
+            return;
+          }
+        } catch (error) {
+          console.log(
+            'TRIPS====== Error during WebSocket message processing:',
+            error,
+          );
+          ws2.close();
+        }
+      };
+
+      // ws2.onerror = e => {
+      //   console.log('TRIPS====== WebSocket error:', e.message);
+      // };
+
+      // ws2.onclose = e => {
+      //   const {reason} = e;
+      //   if (e.code === 1006) {
+      //     console.log('TRIPS====== idher');
+      //   }
+      //   console.log('TRIPS====== WebSocket connection closed:', e.code, reason);
+      // };
     }
-    console.log('Trip chalegi...');
     const dateObj = new Date();
     const date = `${dateObj.getDate()}/${
       dateObj.getMonth() + 1
@@ -486,7 +529,10 @@ export default function Trips() {
     let estimatedTime = 0;
     const tripStartRef = setInterval(async () => {
       const enginesData: EngineData[] = JSON.parse(
-        (await AsyncStorage.getItem('enginesData')) || JSON.stringify([{}]),
+        (await AsyncStorage.getItem('enginesData')) || JSON.stringify([]),
+      );
+      const enginesData2: EngineData[] = JSON.parse(
+        (await AsyncStorage.getItem('enginesData2')) || JSON.stringify([]),
       );
       const variableSpeed = enginesData[0]?.SensorData?.speed || 0;
       const currDistance = calculateDistance(+variableSpeed);
@@ -500,8 +546,10 @@ export default function Trips() {
         },
       }));
       const allFuel = await AsyncStorage.getItem('initialRemainingFuel');
+      const allFuel2 = await AsyncStorage.getItem('initialRemainingFuel2');
+      let currentRemainingFuel: number[] = [];
       if (allFuel) {
-        const currentRemainingFuel = enginesData.map((e, i) => {
+        currentRemainingFuel = enginesData.map((e, i) => {
           const a = JSON.parse(allFuel);
           if (a?.[id]) {
             const parsedFuel: number[] = a[id];
@@ -511,13 +559,26 @@ export default function Trips() {
           }
           return 0;
         });
-        console.log('current rem fuel >>>>> ', currentRemainingFuel);
-
-        setFuelBurned(prev => ({
-          ...prev,
-          [id]: [...currentRemainingFuel, 0, 0],
-        }));
+        currentRemainingFuel = [...currentRemainingFuel, 0, 0];
       }
+      if (allFuel2) {
+        const f = enginesData2.map((e, i) => {
+          const a = JSON.parse(allFuel2);
+          if (a?.[id]) {
+            const parsedFuel: number[] = a[id];
+            const diff =
+              parsedFuel[i] - (Number(e.FuelManagement.remaining_fuel) | 0);
+            return diff;
+          }
+          return 0;
+        });
+        const [a, b] = currentRemainingFuel;
+        currentRemainingFuel = [a, b, ...f];
+      }
+      setFuelBurned(prev => ({
+        ...prev,
+        [id]: currentRemainingFuel,
+      }));
       totalDistance += currDistance;
       estimatedTime++;
       const tripData = JSON.parse(
@@ -560,8 +621,11 @@ export default function Trips() {
   const endTrip = async () => {
     await BackgroundService.stop();
     const tripStartRef = await AsyncStorage.getItem('tripStartRef');
-    if (sockCon.current) {
-      sockCon.current.close();
+    if (sockCon.current.timesp1) {
+      sockCon.current.timesp1.close();
+    }
+    if (sockCon.current.timesp2) {
+      sockCon.current.timesp2.close();
     }
     if (tripStartRef) {
       const trip = JSON.parse(tripStartRef);
@@ -604,8 +668,9 @@ export default function Trips() {
         await AsyncStorage.removeItem('tripStartRef');
         await AsyncStorage.removeItem('initialRemainingFuel');
         await AsyncStorage.removeItem('variableSpeed');
-        await AsyncStorage.removeItem('cachedData');
         await AsyncStorage.removeItem('enginesData');
+        await AsyncStorage.removeItem('enginesData2');
+        await AsyncStorage.removeItem('initialRemainingFuel2');
         let directoryUri = (await AsyncStorage.getItem('directoryUri')) || '';
         const allTripsLogs = JSON.parse(
           (await AsyncStorage.getItem('allTipsLogs')) || JSON.stringify({}),
