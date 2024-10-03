@@ -7,6 +7,7 @@ export type RootStackParamsList = {
   Trips: undefined;
   Main: undefined;
   Login: undefined;
+  // Login: {reolvedService?: Service | null};
   Setup: undefined;
   FMMSetup: {config: EngineData[]};
   FuelTanks: undefined;

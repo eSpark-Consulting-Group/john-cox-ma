@@ -166,10 +166,6 @@ export default function Main() {
   };
 
   useEffect(() => {
-    fetchProvisionedDevices();
-  }, []);
-
-  useEffect(() => {
     const timer = setTimeout(() => {
       setShowLoader(false);
       if (showLoader) fetchProvisionedDevices();
