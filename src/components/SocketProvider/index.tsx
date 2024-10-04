@@ -29,9 +29,11 @@ const initialState = {
   getTimerValue: () => 0,
   resolvedService1: {} as Service | null,
   resolvedService2: {} as Service | null,
+  getSocketData: (host: string, port: number, serviceName: string) => {},
 };
 
 const SocketContext = createContext(initialState);
+
 export const useSocket = () => useContext(SocketContext);
 
 function SocketProvider({children}: {children: React.ReactNode}) {
@@ -212,17 +214,6 @@ function SocketProvider({children}: {children: React.ReactNode}) {
     }
   };
 
-  // useEffect(() => {
-  //   console.log('Engine data 1 >>>>>>>>>>>>>>>: ', enginesData1, [
-  //     enginesData1,
-  //   ]);
-  // });
-  // useEffect(() => {
-  //   console.log('Engine data 2 >>>>>>>>>>>>>>>: ', enginesData2, [
-  //     enginesData2,
-  //   ]);
-  // });
-
   // Handle data for timesp2
   const handleTimesp2Data = (enginesData: EngineData[]) => {
     // console.log('############ handling engine 2 data ##########');
@@ -253,18 +244,6 @@ function SocketProvider({children}: {children: React.ReactNode}) {
     loadInitialData();
   }, []);
 
-  // // Handle provision changes
-  // useEffect(() => {
-  //   const handleProvisionChange = () => {
-  //     if (provision.timesp1 || provision.timesp2) {
-  //       // Trigger Zeroconf scan by updating dependency
-  //       setRetryCount(0);
-  //     }
-  //   };
-
-  //   handleProvisionChange();
-  // }, [provision]);
-
   return (
     <SocketContext.Provider
       value={{
@@ -276,6 +255,7 @@ function SocketProvider({children}: {children: React.ReactNode}) {
         getTimerValue,
         resolvedService1,
         resolvedService2,
+        getSocketData,
       }}>
       {children}
     </SocketContext.Provider>

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -19,6 +19,8 @@ import {EngineData, Fonts, MyTheme} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
 import LabelDropdown from '../../components/LabelDropdown';
 import {api} from '../../api';
+import {useSocket} from '../../components/SocketProvider';
+import {ApiResponse} from 'apisauce';
 
 type FMMSetupScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 type RouteType = {
@@ -43,6 +45,7 @@ export default function FMMSetup({route}: RouteType) {
   });
   const [allConfig, setAllConfig] = useState(prevConfig);
   const [isLoading, setIsLoading] = useState(false);
+  const {resolvedService1, resolvedService2} = useSocket();
   const theme = useTheme() as MyTheme;
   const navigation = useNavigation<FMMSetupScreenProps['navigation']>();
   const onValuesChange = (
@@ -65,6 +68,49 @@ export default function FMMSetup({route}: RouteType) {
       console.error('Error during logout:', error);
     }
   };
+
+  const doneHandler = async () => {
+    console.log('Data being sent:', JSON.stringify(allConfig));
+    async () =>
+      console.log(
+        'API URL:',
+        `https://${resolvedService1?.addresses[0]}:${resolvedService1?.port}`,
+      );
+    const API = api(`http://${resolvedService1?.addresses[0]}`);
+    try {
+      setIsLoading(true);
+      const token = await AsyncStorage.getItem('token');
+      API.setHeader('Authorization', `Bearer ${token}`);
+      console.log('Token:', token);
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Request timed out')), 10000),
+      );
+
+      const apiPromise = API.post('/setConfigurations', {
+        data: allConfig,
+      });
+
+      const response: ApiResponse<unknown, unknown> | any = await Promise.race([
+        timeoutPromise,
+        apiPromise,
+      ]);
+
+      if (response.status >= 200 && response.status < 300) {
+        console.log('Success response:', response);
+        logoutHandler();
+      } else if (response.status === 401) {
+        console.log('Unauthorized. Redirecting to login...');
+        navigation.navigate('Login');
+      } else {
+        console.log('Failed response:', response.status, response.data);
+      }
+    } catch (error) {
+      console.log('API call error:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <MyCanvas>
       <ScrollView
@@ -127,26 +173,8 @@ export default function FMMSetup({route}: RouteType) {
             <MyButton
               label="Done"
               labelStyle={{fontSize: 20}}
-              onPress={async () => {
-                const API = api('https://timesp1.local');
-                try {
-                  setIsLoading(true);
-                  const token = await AsyncStorage.getItem('token');
-                  API.setHeader('Authorization', `Bearer ${token}`);
-                  const response = await API.post('/setConfigurations', {
-                    data: allConfig,
-                  });
-                  if (response.status === 200) {
-                    logoutHandler();
-                  } else if (response.status === 401) {
-                    navigation.navigate('Login');
-                  }
-                } catch (error) {
-                  console.log('-=======', error);
-                } finally {
-                  setIsLoading(false);
-                }
-              }}
+              onPress={() => doneHandler()}
+              // onPress={() => {}}
             />
           )}
 
