@@ -8,8 +8,8 @@ export type RootStackParamsList = {
   Main: undefined;
   Login: undefined;
   // Login: {reolvedService?: Service | null};
-  Setup: undefined;
-  FMMSetup: {config: EngineData[]};
+  Setup: {loggedinDomain: string};
+  FMMSetup: {config: EngineData[]; loggedinDomain: string};
   FuelTanks: undefined;
   ScanDevices: undefined;
   Proof: {device: ESPDevice};

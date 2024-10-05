@@ -20,8 +20,15 @@ import LabelDropdown from '../../components/LabelDropdown';
 import {useSocket} from '../../components/SocketProvider';
 
 type SetupScreenProps = NativeStackScreenProps<RootStackParamsList, 'Setup'>;
-
-export default function Setup() {
+type RouteType = {
+  route: {
+    params: {
+      loggedinDomain: string;
+    };
+  };
+};
+export default function Setup({route}: RouteType) {
+  const loggedinDomain = route.params.loggedinDomain;
   const theme = useTheme() as MyTheme;
   const navigation = useNavigation<SetupScreenProps['navigation']>();
   const {enginesData1} = useSocket();
@@ -167,7 +174,7 @@ export default function Setup() {
             labelStyle={{fontSize: 20}}
             style={styles().signin}
             onPress={() => {
-              navigation.navigate('FMMSetup', {config});
+              navigation.navigate('FMMSetup', {config, loggedinDomain});
             }}
           />
           <GapView length={25} />

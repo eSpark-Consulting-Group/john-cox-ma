@@ -53,7 +53,7 @@ export default function Login() {
           );
           const data = response.data as {token: string};
           await AsyncStorage.setItem('token', data.token);
-          navigation.navigate('Setup');
+          navigation.navigate('Setup', {loggedinDomain: domain});
           console.log(response.data);
 
           break; // Exit the loop if login is successful

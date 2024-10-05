@@ -27,11 +27,13 @@ type RouteType = {
   route: {
     params: {
       config: EngineData[];
+      loggedinDomain: string;
     };
   };
 };
 export default function FMMSetup({route}: RouteType) {
   const config = route.params.config;
+  const loggedinDomain = route.params.loggedinDomain;
   const prevConfig = config.map(item => {
     return {
       engine_id: item.id,
@@ -76,7 +78,7 @@ export default function FMMSetup({route}: RouteType) {
         'API URL:',
         `https://${resolvedService1?.addresses[0]}:${resolvedService1?.port}`,
       );
-    const API = api(`http://${resolvedService1?.addresses[0]}`);
+    const API = api(`http://${loggedinDomain}`);
     try {
       setIsLoading(true);
       const token = await AsyncStorage.getItem('token');
@@ -184,7 +186,7 @@ export default function FMMSetup({route}: RouteType) {
             gradient
             labelStyle={{fontSize: 20}}
             onPress={() => {
-              navigation.navigate('Setup');
+              navigation.navigate('Setup', {loggedinDomain});
               console.log('Wapis jayein');
             }}
           />
