@@ -29,8 +29,8 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [creds, setCreds] = useState({
-    username: 'ESP_409151',
-    password: 'fc3258',
+    username: 'ESP_24dcc3',
+    password: '9c10b4',
   });
 
   const loginHandler = async () => {
@@ -38,22 +38,31 @@ export default function Login() {
       setError('');
       setIsLoading(true);
 
-      const domains = [
-        `${resolvedService1?.addresses[0]}:${resolvedService1?.port}`,
-        `${resolvedService2?.addresses[0]}:${resolvedService2?.port}`,
+      const domains: {domain: string; deviceName: 'timesp1' | 'timesp2'}[] = [
+        {
+          domain: `${resolvedService1?.addresses[0]}:${resolvedService1?.port}`,
+          deviceName: 'timesp1',
+        },
+        {
+          domain: `${resolvedService2?.addresses[0]}:${resolvedService2?.port}`,
+          deviceName: 'timesp2',
+        },
       ];
 
       for (const domain of domains) {
         try {
-          console.log(`http://${domain}/userLogin`);
+          console.log(`http://${domain.domain}/userLogin`);
 
           const response = await axios.post(
-            `http://${domain}/userLogin`,
+            `http://${domain.domain}/userLogin`,
             creds,
           );
           const data = response.data as {token: string};
           await AsyncStorage.setItem('token', data.token);
-          navigation.navigate('Setup', {loggedinDomain: domain});
+          navigation.navigate('Setup', {
+            loggedinDomain: domain.domain,
+            deviceName: domain.deviceName,
+          });
           console.log(response.data);
 
           break; // Exit the loop if login is successful

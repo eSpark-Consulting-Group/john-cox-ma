@@ -215,7 +215,12 @@ export default function Trips() {
               (await AsyncStorage.getItem('enginesData2')) ||
                 JSON.stringify([]),
             );
-            const speed = cachedData[0]?.SensorData?.speed || 0;
+            const speed =
+              cachedData[0]?.SensorData?.speed ||
+              cachedData[1]?.SensorData?.speed ||
+              cachedData2[0]?.SensorData?.speed ||
+              cachedData2[1]?.SensorData?.speed ||
+              0;
             const currDistance = calculateDistance(speed);
             totalDistance += currDistance;
             estimatedTime++;
@@ -545,7 +550,12 @@ export default function Trips() {
       const enginesData2: EngineData[] = JSON.parse(
         (await AsyncStorage.getItem('enginesData2')) || JSON.stringify([]),
       );
-      const variableSpeed = enginesData[0]?.SensorData?.speed || 0;
+      const variableSpeed =
+        enginesData[0]?.SensorData?.speed ||
+        enginesData[1]?.SensorData?.speed ||
+        enginesData2[0]?.SensorData?.speed ||
+        enginesData2[1]?.SensorData?.speed ||
+        0;
       const currDistance = calculateDistance(+variableSpeed);
       const allFuel = await AsyncStorage.getItem('initialRemainingFuel');
       const allFuel2 = await AsyncStorage.getItem('initialRemainingFuel2');

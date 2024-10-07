@@ -28,12 +28,12 @@ type RouteType = {
     params: {
       config: EngineData[];
       loggedinDomain: string;
+      deviceName: 'timesp1' | 'timesp2';
     };
   };
 };
 export default function FMMSetup({route}: RouteType) {
-  const config = route.params.config;
-  const loggedinDomain = route.params.loggedinDomain;
+  const {loggedinDomain, deviceName, config} = route.params;
   const prevConfig = config.map(item => {
     return {
       engine_id: item.id,
@@ -186,7 +186,7 @@ export default function FMMSetup({route}: RouteType) {
             gradient
             labelStyle={{fontSize: 20}}
             onPress={() => {
-              navigation.navigate('Setup', {loggedinDomain});
+              navigation.navigate('Setup', {loggedinDomain, deviceName});
               console.log('Wapis jayein');
             }}
           />

@@ -24,15 +24,18 @@ type RouteType = {
   route: {
     params: {
       loggedinDomain: string;
+      deviceName: 'timesp1' | 'timesp2';
     };
   };
 };
 export default function Setup({route}: RouteType) {
-  const loggedinDomain = route.params.loggedinDomain;
+  const {loggedinDomain, deviceName} = route.params;
   const theme = useTheme() as MyTheme;
   const navigation = useNavigation<SetupScreenProps['navigation']>();
-  const {enginesData1} = useSocket();
-  const [config, setConfig] = useState(enginesData1);
+  const {enginesData1, enginesData2} = useSocket();
+  const [config, setConfig] = useState(
+    deviceName === 'timesp1' ? enginesData1 : enginesData2,
+  );
 
   const onPress = (index: number) => {
     const allConfig = [...config];
@@ -174,7 +177,11 @@ export default function Setup({route}: RouteType) {
             labelStyle={{fontSize: 20}}
             style={styles().signin}
             onPress={() => {
-              navigation.navigate('FMMSetup', {config, loggedinDomain});
+              navigation.navigate('FMMSetup', {
+                config,
+                loggedinDomain,
+                deviceName,
+              });
             }}
           />
           <GapView length={25} />

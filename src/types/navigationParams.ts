@@ -8,8 +8,12 @@ export type RootStackParamsList = {
   Main: undefined;
   Login: undefined;
   // Login: {reolvedService?: Service | null};
-  Setup: {loggedinDomain: string};
-  FMMSetup: {config: EngineData[]; loggedinDomain: string};
+  Setup: {loggedinDomain: string; deviceName: 'timesp1' | 'timesp2'};
+  FMMSetup: {
+    config: EngineData[];
+    loggedinDomain: string;
+    deviceName: 'timesp1' | 'timesp2';
+  };
   FuelTanks: undefined;
   ScanDevices: undefined;
   Proof: {device: ESPDevice};
