@@ -87,49 +87,54 @@ export default function Trips() {
           `ws://${resolvedService1?.addresses[0]}:${resolvedService1?.port}/ws`,
         );
         sockCon.current.timesp1 = ws;
-        const ws2 = new WebSocket(
-          `ws://${resolvedService2?.addresses[0]}:${resolvedService2?.port}/ws`,
-        );
-        sockCon.current.timesp2 = ws2;
-        ws.onopen = async () => {
-          await AsyncStorage.setItem('newConn', 'true');
-          console.log(
-            'TRIPS====== WebSocket connection opened for : ',
-            `${resolvedService1?.addresses[0]}:${resolvedService1?.port}`,
+        if (resolvedService2?.addresses[0]) {
+          const ws2 = new WebSocket(
+            `ws://${resolvedService2?.addresses[0]}:${resolvedService2?.port}/ws`,
           );
-        };
-        ws2.onopen = async () => {
-          console.log(
-            'TRIPS====== WebSocket connection opened for : ',
-            `timesp2.local`,
-          );
-        };
-        ws2.onmessage = async e => {
-          try {
-            const tripStartRef = await AsyncStorage.getItem('tripStartRef');
-            if (!tripStartRef) {
-              ws2.close();
-              return;
-            }
-            const jsonData: SocketJSON = JSON.parse(e.data);
-            const enginesData = jsonData.Engines;
-            if (!enginesData || enginesData.length === 0) {
-              console.log('TRIPS====== No engine data or empty array received');
-              ws2.close();
-              return;
-            }
-            await AsyncStorage.setItem(
-              'enginesData2',
-              JSON.stringify(enginesData),
-            );
-          } catch (error) {
+          sockCon.current.timesp2 = ws2;
+          ws.onopen = async () => {
+            await AsyncStorage.setItem('newConn', 'true');
             console.log(
-              'TRIPS====== Error during WebSocket message processing:',
-              error,
+              'TRIPS====== WebSocket connection opened for : ',
+              `${resolvedService1?.addresses[0]}:${resolvedService1?.port}`,
             );
-            ws2.close();
-          }
-        };
+          };
+          ws2.onopen = async () => {
+            console.log(
+              'TRIPS====== WebSocket connection opened for : ',
+              `timesp2.local`,
+            );
+          };
+          ws2.onmessage = async e => {
+            try {
+              const tripStartRef = await AsyncStorage.getItem('tripStartRef');
+              if (!tripStartRef) {
+                ws2.close();
+                return;
+              }
+              const jsonData: SocketJSON = JSON.parse(e.data);
+              const enginesData = jsonData.Engines;
+              if (!enginesData || enginesData.length === 0) {
+                console.log(
+                  'TRIPS====== No engine data or empty array received',
+                );
+                ws2.close();
+                return;
+              }
+              await AsyncStorage.setItem(
+                'enginesData2',
+                JSON.stringify(enginesData),
+              );
+            } catch (error) {
+              console.log(
+                'TRIPS====== Error during WebSocket message processing:',
+                error,
+              );
+              ws2.close();
+            }
+          };
+        }
+
         ws.onmessage = async e => {
           try {
             const tripStartRef = await AsyncStorage.getItem('tripStartRef');
@@ -380,10 +385,68 @@ export default function Trips() {
         `ws://${resolvedService1?.addresses[0]}:${resolvedService1?.port}/ws`,
       );
       sockCon.current.timesp1 = ws;
-      const ws2 = new WebSocket(
-        `ws://${resolvedService2?.addresses[0]}:${resolvedService2?.port}/ws`,
-      );
-      sockCon.current.timesp2 = ws2;
+      if (resolvedService2?.addresses[0]) {
+        const ws2 = new WebSocket(
+          `ws://${resolvedService2?.addresses[0]}:${resolvedService2?.port}/ws`,
+        );
+        sockCon.current.timesp2 = ws2;
+        ws2.onopen = () => {
+          console.log(
+            'TRIPS====== WebSocket connection opened for :  timesp2.local',
+          );
+        };
+
+        ws2.onmessage = async e => {
+          try {
+            const jsonData: SocketJSON = JSON.parse(e.data);
+            const enginesData = jsonData.Engines;
+            await AsyncStorage.setItem(
+              'enginesData2',
+              JSON.stringify(enginesData),
+            );
+            if (!enginesData || enginesData.length === 0) {
+              console.log('No engine data or empty array received');
+              ws2.close();
+              return;
+            }
+            const closeConn = await AsyncStorage.getItem('closeConn');
+            if (closeConn) {
+              ws2.close();
+            }
+            const isStarted2 = (await AsyncStorage.getItem('isStarted2')) as
+              | '1'
+              | '2'
+              | '3';
+            if (isStarted2) {
+              console.log('Eninge 2 start hua =======', isStarted2);
+              const allInitialFuel = JSON.parse(
+                (await AsyncStorage.getItem('initialRemainingFuel2')) ||
+                  JSON.stringify({}),
+              );
+              console.log({allInitialFuel});
+              const initialRemainingFuel = [
+                Number(enginesData[0]?.FuelManagement.remaining_fuel) | 0,
+                Number(enginesData[1]?.FuelManagement.remaining_fuel) | 0,
+              ];
+              await AsyncStorage.setItem(
+                'initialRemainingFuel2',
+                JSON.stringify({
+                  ...allInitialFuel,
+                  [isStarted2]: initialRemainingFuel,
+                }),
+              );
+              await AsyncStorage.removeItem('isStarted2');
+              return;
+            }
+          } catch (error) {
+            console.log(
+              'TRIPS====== Error during WebSocket message processing:',
+              error,
+            );
+            ws2.close();
+          }
+        };
+      }
       ws.onopen = () => {
         console.log(
           'TRIPS====== WebSocket connection opened for : ',
@@ -453,62 +516,6 @@ export default function Trips() {
           console.log('TRIPS====== idher');
         }
         console.log('TRIPS====== WebSocket connection closed:', e.code, reason);
-      };
-      ws2.onopen = () => {
-        console.log(
-          'TRIPS====== WebSocket connection opened for :  timesp2.local',
-        );
-      };
-
-      ws2.onmessage = async e => {
-        try {
-          const jsonData: SocketJSON = JSON.parse(e.data);
-          const enginesData = jsonData.Engines;
-          await AsyncStorage.setItem(
-            'enginesData2',
-            JSON.stringify(enginesData),
-          );
-          if (!enginesData || enginesData.length === 0) {
-            console.log('No engine data or empty array received');
-            ws2.close();
-            return;
-          }
-          const closeConn = await AsyncStorage.getItem('closeConn');
-          if (closeConn) {
-            ws2.close();
-          }
-          const isStarted2 = (await AsyncStorage.getItem('isStarted2')) as
-            | '1'
-            | '2'
-            | '3';
-          if (isStarted2) {
-            console.log('Eninge 2 start hua =======', isStarted2);
-            const allInitialFuel = JSON.parse(
-              (await AsyncStorage.getItem('initialRemainingFuel2')) ||
-                JSON.stringify({}),
-            );
-            console.log({allInitialFuel});
-            const initialRemainingFuel = [
-              Number(enginesData[0]?.FuelManagement.remaining_fuel) | 0,
-              Number(enginesData[1]?.FuelManagement.remaining_fuel) | 0,
-            ];
-            await AsyncStorage.setItem(
-              'initialRemainingFuel2',
-              JSON.stringify({
-                ...allInitialFuel,
-                [isStarted2]: initialRemainingFuel,
-              }),
-            );
-            await AsyncStorage.removeItem('isStarted2');
-            return;
-          }
-        } catch (error) {
-          console.log(
-            'TRIPS====== Error during WebSocket message processing:',
-            error,
-          );
-          ws2.close();
-        }
       };
 
       // ws2.onerror = e => {
