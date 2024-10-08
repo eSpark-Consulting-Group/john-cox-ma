@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {KeyboardAvoidingView, ScrollView, StyleSheet} from 'react-native';
+import {KeyboardAvoidingView, ScrollView, StyleSheet, View} from 'react-native';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import axios from 'axios';
@@ -7,6 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {
   GapView,
+  LabelDropdown,
   LabelInput,
   Loader,
   MyButton,
@@ -28,6 +29,9 @@ export default function Login() {
   const navigation = useNavigation<LoginScreenProps['navigation']>();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [selectedDevice, setSelectedDevice] = useState<'timesp1' | 'timesp2'>(
+    'timesp1',
+  );
   const [creds, setCreds] = useState({
     username: 'ESP_24dcc3',
     password: '9c10b4',
@@ -37,39 +41,21 @@ export default function Login() {
     try {
       setError('');
       setIsLoading(true);
+      const domain =
+        selectedDevice === 'timesp1'
+          ? `${resolvedService1?.addresses[0]}:${resolvedService1?.port}`
+          : `${resolvedService2?.addresses[0]}:${resolvedService2?.port}`;
 
-      const domains: {domain: string; deviceName: 'timesp1' | 'timesp2'}[] = [
-        {
-          domain: `${resolvedService1?.addresses[0]}:${resolvedService1?.port}`,
-          deviceName: 'timesp1',
-        },
-        {
-          domain: `${resolvedService2?.addresses[0]}:${resolvedService2?.port}`,
-          deviceName: 'timesp2',
-        },
-      ];
+      console.log(`http://${domain}/userLogin`);
 
-      for (const domain of domains) {
-        try {
-          console.log(`http://${domain.domain}/userLogin`);
-
-          const response = await axios.post(
-            `http://${domain.domain}/userLogin`,
-            creds,
-          );
-          const data = response.data as {token: string};
-          await AsyncStorage.setItem('token', data.token);
-          navigation.navigate('Setup', {
-            loggedinDomain: domain.domain,
-            deviceName: domain.deviceName,
-          });
-          console.log(response.data);
-
-          break; // Exit the loop if login is successful
-        } catch (error: any) {
-          console.log(error);
-        }
-      }
+      const response = await axios.post(`http://${domain}/userLogin`, creds);
+      const data = response.data as {token: string};
+      await AsyncStorage.setItem('token', data.token);
+      navigation.navigate('Setup', {
+        loggedinDomain: domain,
+        deviceName: selectedDevice,
+      });
+      console.log(response.data);
     } catch (error: any) {
       setError(error.message || 'Internal Server Error!');
       console.log(`Error while login: ${error.message}`);
@@ -121,6 +107,16 @@ export default function Login() {
               password
             />
             <GapView length={30} />
+            <View>
+              <LabelDropdown
+                text={'Select Device'}
+                value={selectedDevice}
+                data={['timesp1', 'timesp2']}
+                onSelect={e => {
+                  setSelectedDevice(e as 'timesp1' | 'timesp2');
+                }}
+              />
+            </View>
             {isLoading ? (
               <Loader size="small" />
             ) : (
