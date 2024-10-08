@@ -134,12 +134,12 @@ export default function Main() {
       label: 'Setup',
       labelStyle: {paddingVertical: 20, fontSize: 16},
       onPress: async () => {
-        const token = await AsyncStorage.getItem('token');
-        if (!token) {
-          navigation.navigate('Login');
-        } else {
-          navigation.navigate('Setup');
-        }
+        navigation.navigate('Login');
+        // const token = await AsyncStorage.getItem('token');
+        // if (!token) {
+        // } else {
+        //   navigation.navigate('Setup');
+        // }
       },
     },
   ];

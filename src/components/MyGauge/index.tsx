@@ -19,8 +19,18 @@ function MyGauge({value = 0, name}: MyGaugeProps) {
   return (
     <View style={styles().main}>
       <View style={styles().container}>
-        <View style={{position: 'absolute', top: -23, right: -18}}>
-          <Gauge />
+        <View
+          style={{
+            position: 'absolute',
+            top: -10,
+            //  right: -18
+          }}>
+          <Gauge
+            style={{
+              width: 500,
+              height: 500,
+            }}
+          />
         </View>
         <MyText
           text={name}
@@ -74,9 +84,9 @@ const styles = (theme?: MyTheme) =>
     },
     name: {
       position: 'absolute',
-      bottom: 39,
-      right: 35,
-      width: 80,
+      bottom: 30,
+      right: 25,
+      width: '50%',
     },
     textBox: {
       flexDirection: 'row',
