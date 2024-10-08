@@ -21,6 +21,8 @@ import Proof from '../screens/Provisioning/Proof';
 import ScanNetworks from '../screens/Provisioning/ScanNetworks';
 import Confirmation from '../screens/Provisioning/Confirmation';
 import store from '../app/store';
+import WrappedStackNavigator from './WrappedStackNavigator';
+import ServiceProvider from '../components/ServiceProvider';
 
 const RootStack = createNativeStackNavigator<RootStackParamsList>();
 
@@ -28,91 +30,26 @@ export default function RootNav() {
   useEffect(() => {}, []);
 
   return (
-    <Provider store={store}>
-      <SocketProvider>
-        <NavigationContainer theme={DarkTheme}>
-          <RootStack.Navigator initialRouteName="ScanDevices">
-            <RootStack.Screen
-              name="ScanDevices"
-              component={ScanDevices}
-              options={{
-                headerShown: false,
-              }}
-            />
-            <RootStack.Screen
-              name="Proof"
-              component={Proof}
-              options={{
-                headerShown: false,
-              }}
-            />
-            <RootStack.Screen
-              name="ScanNetworks"
-              component={ScanNetworks}
-              options={{
-                headerShown: false,
-              }}
-            />
-            <RootStack.Screen
-              name="Confirmation"
-              component={Confirmation}
-              options={{
-                headerShown: false,
-              }}
-            />
-            <RootStack.Screen
-              name="Test"
-              component={Test}
-              options={{
-                headerShown: false,
-              }}
-            />
-            <RootStack.Screen
-              name="Main"
-              component={Main}
-              options={{
-                headerShown: false,
-              }}
-            />
-            <RootStack.Screen
-              name="Login"
-              component={Login}
-              options={{
-                headerShown: false,
-              }}
-            />
-            <RootStack.Screen
-              name="Setup"
-              component={Setup}
-              options={{
-                headerShown: false,
-              }}
-            />
-            <RootStack.Screen
-              name="FMMSetup"
-              component={FMMSetup}
-              options={{
-                headerShown: false,
-              }}
-            />
-            <RootStack.Screen
-              name="FuelTanks"
-              component={FuelTanks}
-              options={{
-                headerShown: false,
-              }}
-            />
-            <RootStack.Screen
-              name="Trips"
-              component={Trips}
-              options={{
-                headerShown: false,
-              }}
-            />
-          </RootStack.Navigator>
-        </NavigationContainer>
-      </SocketProvider>
-    </Provider>
+    <ServiceProvider>
+      <NavigationContainer theme={DarkTheme}>
+        <RootStack.Navigator initialRouteName="ScanDevices">
+          <RootStack.Screen
+            name="WithContext"
+            component={WrappedStackNavigator}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <RootStack.Screen
+            name="Trips"
+            component={Trips}
+            options={{
+              headerShown: false,
+            }}
+          />
+        </RootStack.Navigator>
+      </NavigationContainer>
+    </ServiceProvider>
   );
 }
 

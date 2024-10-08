@@ -25,8 +25,8 @@ import {
 } from './Trips_components';
 import {styles} from './styles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useSocket} from '../../components/SocketProvider';
 import * as FileSystem from 'expo-file-system';
+import {useService} from '../../components/ServiceProvider';
 
 type TripsScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 
@@ -37,7 +37,7 @@ export default function Trips() {
   const [warningVisible, setWarningVisible] = useState(false);
   const [resetVisible, setResetVisible] = useState(false);
   const [selectedSwitch, setSelectedSwitch] = useState<1 | 2 | 3>(1); // Stores the currently selected switch index
-  const {resolvedService1, resolvedService2} = useSocket();
+  const {resolvedService1, resolvedService2} = useService();
 
   const [tripStarted, setTripStarted] = useState({
     1: false,
@@ -340,6 +340,7 @@ export default function Trips() {
     const enginesData2: EngineData[] = JSON.parse(
       (await AsyncStorage.getItem('enginesData2')) || JSON.stringify([]),
     );
+    console.log({enginesData});
     if (enginesData?.length) {
       const allInitialFuel = JSON.parse(
         (await AsyncStorage.getItem('initialRemainingFuel')) ||
@@ -361,7 +362,6 @@ export default function Trips() {
     } else {
       await AsyncStorage.setItem('isStarted', id?.toString());
     }
-    console.log({enginesData2});
     if (enginesData2?.length) {
       const allInitialFuel = JSON.parse(
         (await AsyncStorage.getItem('initialRemainingFuel2')) ||
