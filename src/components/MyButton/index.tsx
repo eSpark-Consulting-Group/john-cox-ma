@@ -59,7 +59,7 @@ function MyButton({
               end={[0.5, 1]}
             />
             <MyText
-              style={[buttonTextStyle]}
+              style={buttonTextStyle}
               fontFamily={fontFamily}
               textColor={textColor || theme.colors.primary}
               size={18}>

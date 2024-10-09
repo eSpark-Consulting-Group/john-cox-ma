@@ -1,5 +1,11 @@
 import React, {useEffect, useMemo, useState} from 'react';
-import {ScrollView, StyleSheet, TouchableOpacity, View} from 'react-native';
+import {
+  ScrollView,
+  StyleSheet,
+  TextStyle,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {Ionicons} from '@expo/vector-icons';
@@ -117,22 +123,22 @@ export default function Main() {
   const buttonsData = [
     {
       label: 'Main',
-      labelStyle: {paddingVertical: 20, fontSize: 16},
+      labelStyle: {fontSize: 16, height: 65, textAlignVertical: 'center'},
       onPress: () => console.log('main'),
     },
     {
       label: 'Fuel Tanks',
-      labelStyle: {fontSize: 16},
+      labelStyle: {fontSize: 16, height: 65, textAlignVertical: 'center'},
       onPress: () => navigation.navigate('FuelTanks'),
     },
     {
       label: 'Trips',
-      labelStyle: {paddingVertical: 20, fontSize: 16},
+      labelStyle: {fontSize: 16, height: 65, textAlignVertical: 'center'},
       onPress: () => navigation.navigate('Trips'),
     },
     {
       label: 'Setup',
-      labelStyle: {paddingVertical: 20, fontSize: 16},
+      labelStyle: {fontSize: 16, height: 65, textAlignVertical: 'center'},
       onPress: async () => {
         navigation.navigate('Login');
         // const token = await AsyncStorage.getItem('token');
@@ -334,7 +340,7 @@ export default function Main() {
                   gradient
                   style={{width: '22%'}}
                   label={item.label}
-                  labelStyle={item.labelStyle}
+                  labelStyle={item.labelStyle as TextStyle}
                   onPress={item.onPress}
                 />
               ))}
