@@ -36,42 +36,29 @@ function SocketProvider({children}: {children: React.ReactNode}) {
   const {resolvedService1, resolvedService2} = useService();
   useFocusEffect(
     React.useCallback(() => {
-      console.log({resolvedService1})
       if (resolvedService1?.addresses) {
         getSocketData(resolvedService1.host, resolvedService1.port, 'timesp1');
       }
-      // const onStart = () => {
-      //   console.log('Zeroconf scan started.');
-      // };
-
-      // const onFound = (serviceName: string) => {
-      //   console.log('Service found:', serviceName);
-      // };
-
-      // const onResolved = (service: Service) => {
-      //   console.log('Service resolved:', service);
-      //   // Check if this is the service we are looking for
-      //   if (
-      //     service.name === 'timesp1' &&
-      //     service.addresses.length > 0
-      //   ) {
-      //     const host = service.addresses[0];
-      //     const port = service.port;
-      //     getSocketData(host, port, 'timesp1');
-      //   } else if (service.name === 'timesp2' && service.addresses.length > 0) {
-      //     console.log('setting resolvedService2:  ');
-      //     const host = service.addresses[0];
-      //     const port = service.port;
-      //     getSocketData(host, port, 'timesp2');
-      //   }
-      // };
       // Cleanup function
       return () => {
-        if (wsRef.current) {
-          wsRef.current.close();
+        if (wsRef.current.timesp1) {
+          wsRef.current.timesp1.close();
         }
       };
     }, [resolvedService1]),
+  );
+  useFocusEffect(
+    React.useCallback(() => {
+      if (resolvedService2?.addresses) {
+        getSocketData(resolvedService2.host, resolvedService2.port, 'timesp2');
+      }
+      // Cleanup function
+      return () => {
+        if (wsRef.current.timesp2) {
+          wsRef.current.timesp2.close();
+        }
+      };
+    }, [resolvedService2]),
   );
   const [enginesData1, setEnginesData1] = useState<EngineData[]>([]);
   const [enginesData2, setEnginesData2] = useState<EngineData[]>([]);
@@ -84,20 +71,17 @@ function SocketProvider({children}: {children: React.ReactNode}) {
   const engine2Ref = useRef<EngineData[]>([]);
   const timer = useRef(0);
   const interval = useRef<NodeJS.Timeout | null>(null);
-  const wsRef = useRef<WebSocket | null>(null);
+  const wsRef = useRef<{timesp1: WebSocket | null; timesp2: WebSocket | null}>({
+    timesp1: null,
+    timesp2: null,
+  });
 
   // Function to establish WebSocket connection
   const getSocketData = (host: string, port: number, serviceName: string) => {
-    // Prevent multiple WebSocket instances
-    if (wsRef.current) {
-      wsRef.current.close();
-      wsRef.current = null;
-    }
-
     const wsUrl = `ws://${host}:${port}/ws`;
     console.log('Connecting to WebSocket at:', wsUrl);
     const ws = new WebSocket(wsUrl);
-    wsRef.current = ws;
+    wsRef.current[serviceName as 'timesp1' | 'timesp2'] = ws;
 
     ws.onopen = () => {
       console.log('WebSocket connection opened for:', host);
