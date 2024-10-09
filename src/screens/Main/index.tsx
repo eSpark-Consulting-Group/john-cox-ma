@@ -196,8 +196,9 @@ export default function Main() {
             <GapView length={55} />
             <View
               style={{
-                width: '43%',
-                justifyContent: 'space-between',
+                width: '100%',
+                justifyContent: 'center',
+                gap: 20,
                 flexDirection: 'row',
               }}>
               <MyButton

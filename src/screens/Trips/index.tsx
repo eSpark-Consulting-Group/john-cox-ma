@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Platform, ScrollView, View} from 'react-native';
+import {Platform, ScrollView, ToastAndroid, View} from 'react-native';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import BackgroundService from 'react-native-background-actions';
@@ -33,8 +33,8 @@ type TripsScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 export default function Trips() {
   const theme = useTheme() as MyTheme;
   const navigation = useNavigation<TripsScreenProps['navigation']>();
-  const [showConfirmation, setShowConfirmation] = useState(false);
   const [warningVisible, setWarningVisible] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
   const [resetVisible, setResetVisible] = useState(false);
   const [selectedSwitch, setSelectedSwitch] = useState<1 | 2 | 3>(1); // Stores the currently selected switch index
   const {resolvedService1, resolvedService2} = useSocket();
@@ -77,6 +77,7 @@ export default function Trips() {
   const handleSwitchPress = (index: 1 | 2 | 3) => {
     setSelectedSwitch(index);
   };
+
   const continueTrip = async (tripsState: any, tripRefs: any) => {
     const tripJSON = await AsyncStorage.getItem('tripData');
     const newConn = await AsyncStorage.getItem('newConn');
@@ -278,6 +279,7 @@ export default function Trips() {
       }
     }
   };
+
   useEffect(() => {
     (async () => {
       const tripStartRef = await AsyncStorage.getItem('tripStartRef');
@@ -309,6 +311,25 @@ export default function Trips() {
       }
     })();
   }, []);
+
+  useEffect(() => {
+    if (warningVisible) {
+      setTimeout(() => {
+        setWarningVisible(false);
+        setResetVisible(true);
+      }, 2000);
+    }
+  }, [warningVisible]);
+
+  useEffect(() => {
+    if (resetVisible) {
+      setTimeout(() => {
+        setShowConfirmation(false);
+        setResetVisible(false);
+      }, 3000);
+    }
+  }, [resetVisible]);
+
   const options = {
     taskName: 'Example',
     taskTitle: 'ExampleTask title',
@@ -638,9 +659,12 @@ export default function Trips() {
     }
   };
 
-  const endTrip = async (id: 1 | 2 | 3) => {
+  const endTrip = async (id: 1 | 2 | 3, reset?: boolean) => {
     const tripStartRef = await AsyncStorage.getItem('tripStartRef');
     if (tripStartRef) {
+      if (reset) {
+        setWarningVisible(true);
+      }
       const trip = JSON.parse(tripStartRef);
       console.log({trip});
 
@@ -680,6 +704,10 @@ export default function Trips() {
         await AsyncStorage.removeItem('enginesData2');
         await AsyncStorage.removeItem('initialRemainingFuel2');
       }
+      if (reset) {
+        console.log('resseted data!');
+        return;
+      }
       try {
         const tripData: {
           [key: string]: {
@@ -689,6 +717,7 @@ export default function Trips() {
         } = JSON.parse(
           (await AsyncStorage.getItem('tripData')) || JSON.stringify({}),
         );
+
         const calculateEfficiency = () => {
           const result =
             tripData[id].fuelBurned.reduce((a, b) => a + b, 0) /
@@ -698,6 +727,8 @@ export default function Trips() {
           }
           return '0.00';
         };
+
+        // saving trip data to filesystem
         const allTripsLogs = {
           [Date.now()]: {
             ...tripData[id],
@@ -768,6 +799,9 @@ export default function Trips() {
       } catch (e) {
         console.log(e, '>>>>>>');
       }
+    } else {
+      console.log('cannot reset');
+      ToastAndroid.show('Trip is not started', ToastAndroid.SHORT);
     }
   };
 
@@ -814,7 +848,7 @@ export default function Trips() {
                   label="YES"
                   textColor="#B81106"
                   labelStyle={styles.rowButtons}
-                  onPress={() => setWarningVisible(true)}
+                  onPress={() => endTrip(selectedSwitch, true)}
                 />
               </View>
             </View>
