@@ -9,6 +9,7 @@ const initialState = {
 const ServiceContext = createContext(initialState);
 export const useService = () => useContext(ServiceContext);
 const zeroconf = new Zeroconf();
+
 const ServiceProvider = ({children}: {children: React.ReactNode}) => {
   const [resolvedService1, setResolvedService1] = useState<Service | null>(
     null,
@@ -34,7 +35,8 @@ const ServiceProvider = ({children}: {children: React.ReactNode}) => {
         !resolvedService1
       ) {
         setResolvedService1(service);
-      } else if (service.name === 'timesp2' && service.addresses.length > 0) {
+      }
+      if (service.name === 'timesp1-2' && service.addresses.length > 0) {
         console.log('setting resolvedService2:  ');
         setResolvedService2(service);
       }

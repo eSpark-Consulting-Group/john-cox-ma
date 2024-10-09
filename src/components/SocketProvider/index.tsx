@@ -102,7 +102,9 @@ function SocketProvider({children}: {children: React.ReactNode}) {
 
         if (serviceName === 'timesp1') {
           handleTimesp1Data(enginesData);
+          // console.log('🚀 ~ getSocketData ~ enginesData: timesp1', enginesData);
         } else if (serviceName === 'timesp2') {
+          // console.log('🚀 ~ getSocketData ~ enginesData: timesp2', enginesData);
           handleTimesp2Data(enginesData);
         }
       } catch (error) {
