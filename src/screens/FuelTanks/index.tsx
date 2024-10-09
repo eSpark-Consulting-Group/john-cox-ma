@@ -50,7 +50,7 @@ export default function FuelTanks() {
           </View>
           <MyBox
             text={'Fuel'}
-            value={850}
+            // value={null}
             unit="gal"
             width={'80%'}
             textSize={26}
@@ -59,14 +59,14 @@ export default function FuelTanks() {
           <View style={styles().lowerBoxes}>
             <MyBox
               text={'Date'}
-              value={'05/01/23'}
+              //  value={null}
               width={'50%'}
               textSize={26}
             />
             <MyBox
               text={'Time'}
-              value={850}
-              unit="PM"
+              // value={null}
+              // unit="PM"
               width={'50%'}
               textSize={26}
             />
