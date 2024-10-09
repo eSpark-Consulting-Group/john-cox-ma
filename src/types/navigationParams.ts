@@ -2,6 +2,7 @@ import {ESPDevice} from '@espark-consultants/react-native-esp-idf-provisioning';
 import {EngineData} from '.';
 
 export type RootStackParamsList = {
+  WithContext: undefined;
   Test: undefined;
   Splash: undefined;
   Trips: undefined;

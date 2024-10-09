@@ -20,19 +20,13 @@ import {MyTheme} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
 import {useSocket} from '../../components/SocketProvider';
 import NauticalMile from './NauticalMilte';
+import {useService} from '../../components/ServiceProvider';
 
 type MainScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 
 export default function Main() {
-  const {
-    enginesData1,
-    speed,
-    enginesData2,
-    resolvedService1,
-    resolvedService2,
-    setProvision,
-    getSocketData,
-  } = useSocket();
+  const {enginesData1, enginesData2, setProvision} = useSocket();
+  const {resolvedService1, resolvedService2} = useService();
   const theme = useTheme() as MyTheme;
   const navigation = useNavigation<MainScreenProps['navigation']>();
   const [generatorRunning, setGeneratorRunning] = useState<'Yes' | 'No'>('Yes');
@@ -143,36 +137,6 @@ export default function Main() {
       },
     },
   ];
-
-  const fetchProvisionedDevices = async () => {
-    if (resolvedService1)
-      getSocketData(
-        resolvedService1.host,
-        resolvedService1.port,
-        resolvedService1.name,
-      );
-    if (resolvedService2)
-      getSocketData(
-        resolvedService2.host,
-        resolvedService2.port,
-        resolvedService2.name,
-      );
-    // const currentProvision = await AsyncStorage.getItem('provisionedDevices');
-    // console.log('curr prov: ', currentProvision);
-    // const provisionedDevices = currentProvision
-    //   ? JSON.parse(currentProvision)
-    //   : {timesp1: false, timesp2: false};
-    // setProv(provisionedDevices);
-  };
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowLoader(false);
-      if (showLoader) fetchProvisionedDevices();
-    }, 7000);
-
-    return () => clearTimeout(timer); // Cleanup timer on component unmount
-  }, [showLoader]);
 
   return (
     <MyCanvas>

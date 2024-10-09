@@ -8,14 +8,13 @@ import React, {
   useState,
 } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Zeroconf, {Service} from 'react-native-zeroconf';
 
 import {EngineData, SocketJSON} from '../../types';
+import {useFocusEffect} from '@react-navigation/native';
+import {useService} from '../ServiceProvider';
 
 type ProvisionData = {timesp1: boolean; timesp2: boolean};
 type SetState = Dispatch<SetStateAction<ProvisionData>>;
-
-const zeroconf = new Zeroconf();
 
 const initialState = {
   enginesData1: [] as EngineData[],
@@ -27,9 +26,6 @@ const initialState = {
   },
   speed: '0' as string | number,
   getTimerValue: () => 0,
-  resolvedService1: {} as Service | null,
-  resolvedService2: {} as Service | null,
-  getSocketData: (host: string, port: number, serviceName: string) => {},
 };
 
 const SocketContext = createContext(initialState);
@@ -37,17 +33,46 @@ const SocketContext = createContext(initialState);
 export const useSocket = () => useContext(SocketContext);
 
 function SocketProvider({children}: {children: React.ReactNode}) {
-  const [serviceFound, setServiceFound] = useState<{
-    host: string;
-    port: number;
-  } | null>(null);
-  const [resolvedService1, setResolvedService1] = useState<Service | null>(
-    null,
+  const {resolvedService1, resolvedService2} = useService();
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log({resolvedService1})
+      if (resolvedService1?.addresses) {
+        getSocketData(resolvedService1.host, resolvedService1.port, 'timesp1');
+      }
+      // const onStart = () => {
+      //   console.log('Zeroconf scan started.');
+      // };
+
+      // const onFound = (serviceName: string) => {
+      //   console.log('Service found:', serviceName);
+      // };
+
+      // const onResolved = (service: Service) => {
+      //   console.log('Service resolved:', service);
+      //   // Check if this is the service we are looking for
+      //   if (
+      //     service.name === 'timesp1' &&
+      //     service.addresses.length > 0
+      //   ) {
+      //     const host = service.addresses[0];
+      //     const port = service.port;
+      //     getSocketData(host, port, 'timesp1');
+      //   } else if (service.name === 'timesp2' && service.addresses.length > 0) {
+      //     console.log('setting resolvedService2:  ');
+      //     const host = service.addresses[0];
+      //     const port = service.port;
+      //     getSocketData(host, port, 'timesp2');
+      //   }
+      // };
+      // Cleanup function
+      return () => {
+        if (wsRef.current) {
+          wsRef.current.close();
+        }
+      };
+    }, [resolvedService1]),
   );
-  const [resolvedService2, setResolvedService2] = useState<Service | null>(
-    null,
-  );
-  const [serviceName, setServiceName] = useState<string>();
   const [enginesData1, setEnginesData1] = useState<EngineData[]>([]);
   const [enginesData2, setEnginesData2] = useState<EngineData[]>([]);
   const [speed, setSpeed] = useState<number | string>('0');
@@ -59,66 +84,7 @@ function SocketProvider({children}: {children: React.ReactNode}) {
   const engine2Ref = useRef<EngineData[]>([]);
   const timer = useRef(0);
   const interval = useRef<NodeJS.Timeout | null>(null);
-  const [retryCount, setRetryCount] = useState(0);
-  const maxRetries = 1;
   const wsRef = useRef<WebSocket | null>(null);
-
-  // Initialize Zeroconf and set up event listeners
-  useEffect(() => {
-    const onStart = () => {
-      console.log('Zeroconf scan started.');
-    };
-
-    const onFound = (serviceName: string) => {
-      console.log('Service found:', serviceName);
-    };
-
-    const onResolved = (service: Service) => {
-      console.log('Service resolved:', service);
-      // Check if this is the service we are looking for
-      if (
-        service.name === 'timesp1' &&
-        service.addresses.length > 0 &&
-        !resolvedService1
-      ) {
-        setServiceName(service.name);
-        setResolvedService1(service);
-        const host = service.addresses[0];
-        const port = service.port;
-        setServiceFound({host, port});
-        getSocketData(host, port, 'timesp1');
-      } else if (service.name === 'timesp2' && service.addresses.length > 0) {
-        console.log('setting resolvedService2:  ');
-        setServiceName(service.name);
-        setResolvedService2(service);
-        const host = service.addresses[0];
-        const port = service.port;
-        setServiceFound({host, port});
-        getSocketData(host, port, 'timesp2');
-      }
-    };
-
-    const onError = (err: Error) => {
-      console.error('Zeroconf error:', err.message);
-    };
-
-    zeroconf.on('start', onStart);
-    zeroconf.on('found', onFound);
-    zeroconf.on('resolved', onResolved);
-    zeroconf.on('error', onError);
-
-    // Start scanning
-    zeroconf.scan('websocket', 'tcp', 'local.');
-
-    // Cleanup function
-    return () => {
-      zeroconf.removeListener('start', onStart);
-      zeroconf.removeListener('found', onFound);
-      zeroconf.removeListener('resolved', onResolved);
-      zeroconf.removeListener('error', onError);
-      zeroconf.stop();
-    };
-  }, [provision.timesp1, provision.timesp2]);
 
   // Function to establish WebSocket connection
   const getSocketData = (host: string, port: number, serviceName: string) => {
@@ -136,8 +102,7 @@ function SocketProvider({children}: {children: React.ReactNode}) {
     ws.onopen = () => {
       console.log('WebSocket connection opened for:', host);
       clearInterval(interval.current!);
-      startTimer();
-      setRetryCount(0); // Reset retry count on successful connection
+      startTimer(); // Reset retry count on successful connection
     };
 
     ws.onmessage = e => {
@@ -168,23 +133,6 @@ function SocketProvider({children}: {children: React.ReactNode}) {
 
     ws.onclose = e => {
       console.log('WebSocket connection closed:', e.code, e.reason);
-      if (e.code !== 1000) {
-        // 1000 = normal closure
-        if (retryCount < maxRetries) {
-          const retryDelay = Math.min(1000 * 2 ** retryCount, 30000); // Exponential backoff up to 30s
-          console.log(
-            `Attempting to reconnect in ${retryDelay / 1000} seconds...`,
-          );
-          setTimeout(() => {
-            setRetryCount(prev => prev + 1);
-            if (serviceFound) {
-              getSocketData(serviceFound.host, serviceFound.port, serviceName);
-            }
-          }, retryDelay);
-        } else {
-          console.log('some issue');
-        }
-      }
     };
   };
 
@@ -200,7 +148,8 @@ function SocketProvider({children}: {children: React.ReactNode}) {
 
   // Handle data for timesp1
   const handleTimesp1Data = (enginesData: EngineData[]) => {
-    const currentSpeed = enginesData[0]?.SensorData?.speed;
+    const currentSpeed =
+      enginesData[0]?.SensorData?.speed || enginesData[1]?.SensorData?.speed;
 
     if (currentSpeed !== undefined && currentSpeed !== null) {
       setSpeed(currentSpeed);
@@ -253,9 +202,6 @@ function SocketProvider({children}: {children: React.ReactNode}) {
         speed,
         provision,
         getTimerValue,
-        resolvedService1,
-        resolvedService2,
-        getSocketData,
       }}>
       {children}
     </SocketContext.Provider>
