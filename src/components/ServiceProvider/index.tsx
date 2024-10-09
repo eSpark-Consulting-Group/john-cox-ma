@@ -36,7 +36,7 @@ const ServiceProvider = ({children}: {children: React.ReactNode}) => {
       ) {
         setResolvedService1(service);
       }
-      if (service.name === 'timesp1-2' && service.addresses.length > 0) {
+      if (service.name === 'timesp2' && service.addresses.length > 0) {
         console.log('setting resolvedService2:  ');
         setResolvedService2(service);
       }
