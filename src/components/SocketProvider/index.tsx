@@ -26,6 +26,7 @@ const initialState = {
   },
   speed: '0' as string | number,
   getTimerValue: () => 0,
+  getSocketData: (host: string, port: number, serviceName: string) => {},
 };
 
 const SocketContext = createContext(initialState);
@@ -43,6 +44,9 @@ function SocketProvider({children}: {children: React.ReactNode}) {
       return () => {
         if (wsRef.current.timesp1) {
           wsRef.current.timesp1.close();
+          wsRef.current.timesp1 = null;
+          setEnginesData1([]);
+          engine1Ref.current = [];
         }
       };
     }, [resolvedService1]),
@@ -56,6 +60,9 @@ function SocketProvider({children}: {children: React.ReactNode}) {
       return () => {
         if (wsRef.current.timesp2) {
           wsRef.current.timesp2.close();
+          wsRef.current.timesp2 = null;
+          setEnginesData2([]);
+          engine2Ref.current = [];
         }
       };
     }, [resolvedService2]),
@@ -80,6 +87,10 @@ function SocketProvider({children}: {children: React.ReactNode}) {
   const getSocketData = (host: string, port: number, serviceName: string) => {
     const wsUrl = `ws://${host}:${port}/ws`;
     console.log('Connecting to WebSocket at:', wsUrl);
+    const servName = serviceName as 'timesp1' | 'timesp2';
+    if (wsRef.current[servName]?.OPEN) {
+      return;
+    }
     const ws = new WebSocket(wsUrl);
     wsRef.current[serviceName as 'timesp1' | 'timesp2'] = ws;
 
@@ -115,9 +126,11 @@ function SocketProvider({children}: {children: React.ReactNode}) {
 
     ws.onerror = e => {
       console.log('WebSocket error:', e.message);
+      resetEgninesData(servName);
     };
 
     ws.onclose = e => {
+      resetEgninesData(servName);
       console.log('WebSocket connection closed:', e.code, e.reason);
     };
   };
@@ -179,9 +192,20 @@ function SocketProvider({children}: {children: React.ReactNode}) {
     loadInitialData();
   }, []);
 
+  const resetEgninesData = (servName: 'timesp1' | 'timesp2') => {
+    if (servName === 'timesp1') {
+      setEnginesData1([]);
+      engine1Ref.current = [];
+    }
+    if (servName === 'timesp2') {
+      setEnginesData2([]);
+      engine2Ref.current = [];
+    }
+  };
   return (
     <SocketContext.Provider
       value={{
+        getSocketData,
         enginesData1,
         enginesData2,
         setProvision,

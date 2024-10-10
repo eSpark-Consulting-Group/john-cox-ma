@@ -25,7 +25,7 @@ import {useService} from '../../components/ServiceProvider';
 type MainScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 
 export default function Main() {
-  const {enginesData1, enginesData2, setProvision} = useSocket();
+  const {enginesData1, enginesData2, getSocketData} = useSocket();
   const {resolvedService1, resolvedService2} = useService();
   const theme = useTheme() as MyTheme;
   const navigation = useNavigation<MainScreenProps['navigation']>();
@@ -138,6 +138,15 @@ export default function Main() {
     },
   ];
 
+  const fetchSocketData = () => {
+    if (resolvedService1 && enginesData1.length === 0) {
+      getSocketData(resolvedService1.host, resolvedService1.port, 'timesp1');
+    }
+    if (resolvedService2 && enginesData2.length === 0) {
+      getSocketData(resolvedService2.host, resolvedService2.port, 'timesp2');
+    }
+  };
+
   return (
     <MyCanvas>
       <ScrollView
@@ -190,8 +199,12 @@ export default function Main() {
             <GapView length={90} />
             <TouchableOpacity
               style={{alignSelf: 'flex-end', paddingRight: '4%'}}
-              onPress={() => setShowLoader(true)}>
-              <Ionicons name="reload" size={24} color={theme.colors.primary} />
+              onPress={fetchSocketData}>
+              <Ionicons
+                name="reload"
+                size={35}
+                color={theme.colors.primary}
+              />
             </TouchableOpacity>
             {resolvedService1 && (
               <View style={styles().GaugeRow}>
