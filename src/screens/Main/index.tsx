@@ -25,7 +25,7 @@ import {useService} from '../../components/ServiceProvider';
 type MainScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 
 export default function Main() {
-  const {enginesData1, enginesData2, getSocketData} = useSocket();
+  const {enginesData1, enginesData2, getSocketData, speed} = useSocket();
   const {resolvedService1, resolvedService2} = useService();
   const theme = useTheme() as MyTheme;
   const navigation = useNavigation<MainScreenProps['navigation']>();
@@ -63,31 +63,6 @@ export default function Main() {
     enginesData1[1]?.FuelManagement.remaining_fuel,
     enginesData2[0]?.FuelManagement.remaining_fuel,
     enginesData2[1]?.FuelManagement.remaining_fuel,
-  ]);
-
-  const speedEfficiency = useMemo(() => {
-    const totalFuelBurned1 =
-      Number(enginesData1[0]?.FuelManagement.total_fuel_burned || 0) +
-      Number(enginesData1[1]?.FuelManagement.total_fuel_burned || 0);
-    const totalFuelBurned2 =
-      Number(enginesData2[0]?.FuelManagement.total_fuel_burned || 0) +
-      Number(enginesData2[1]?.FuelManagement.total_fuel_burned || 0);
-
-    const totalSpeed = Number(enginesData1[0]?.SensorData.speed || 0);
-
-    const totalFuelBurned = totalFuelBurned1 + totalFuelBurned2;
-
-    // Efficiency in knots per gallon
-    return totalFuelBurned > 0 ? totalSpeed / totalFuelBurned : 0;
-  }, [
-    enginesData1[0]?.FuelManagement.total_fuel_burned,
-    enginesData1[1]?.FuelManagement.total_fuel_burned,
-    enginesData2[0]?.FuelManagement.total_fuel_burned,
-    enginesData2[1]?.FuelManagement.total_fuel_burned,
-    enginesData1[0]?.SensorData.speed,
-    enginesData1[1]?.SensorData.speed,
-    enginesData2[0]?.SensorData.speed,
-    enginesData2[1]?.SensorData.speed,
   ]);
 
   const distanceToEmpty = useMemo(() => {
@@ -200,11 +175,7 @@ export default function Main() {
             <TouchableOpacity
               style={{alignSelf: 'flex-end', paddingRight: '4%'}}
               onPress={fetchSocketData}>
-              <Ionicons
-                name="reload"
-                size={35}
-                color={theme.colors.primary}
-              />
+              <Ionicons name="reload" size={35} color={theme.colors.primary} />
             </TouchableOpacity>
             {resolvedService1 && (
               <View style={styles().GaugeRow}>
@@ -255,7 +226,7 @@ export default function Main() {
                 <MyBox
                   label="Efficiency"
                   text="Speed"
-                  value={speedEfficiency.toFixed(2)}
+                  value={Number(speed).toFixed(2)}
                   unit="Knots"
                   width={'50%'}
                   gap={22}

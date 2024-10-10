@@ -148,7 +148,9 @@ function SocketProvider({children}: {children: React.ReactNode}) {
   // Handle data for timesp1
   const handleTimesp1Data = (enginesData: EngineData[]) => {
     const currentSpeed =
-      enginesData[0]?.SensorData?.speed || enginesData[1]?.SensorData?.speed;
+      enginesData[0]?.SensorData?.speed ||
+      enginesData[1]?.SensorData?.speed ||
+      0;
 
     if (currentSpeed !== undefined && currentSpeed !== null) {
       setSpeed(currentSpeed);
@@ -165,6 +167,16 @@ function SocketProvider({children}: {children: React.ReactNode}) {
   // Handle data for timesp2
   const handleTimesp2Data = (enginesData: EngineData[]) => {
     // console.log('############ handling engine 2 data ##########');
+    const currentSpeed =
+      enginesData[0]?.SensorData?.speed ||
+      enginesData[1]?.SensorData?.speed ||
+      0;
+
+    if (currentSpeed !== undefined && currentSpeed !== null) {
+      setSpeed(currentSpeed);
+    } else {
+      setSpeed('0');
+    }
     if (JSON.stringify(engine2Ref.current) !== JSON.stringify(enginesData)) {
       engine2Ref.current = enginesData;
       setEnginesData2(enginesData);
