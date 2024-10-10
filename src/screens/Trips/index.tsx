@@ -184,10 +184,6 @@ export default function Trips() {
         (await AsyncStorage.getItem('initialRemainingFuel')) ||
           JSON.stringify({}),
       );
-      const remainingFuel2 = JSON.parse(
-        (await AsyncStorage.getItem('initialRemainingFuel2')) ||
-          JSON.stringify({}),
-      );
       const keys = Object.keys(tripsState);
       for (let i = 0; i < keys.length; i++) {
         const key = keys[i] as '1' | '2' | '3';
@@ -232,13 +228,13 @@ export default function Trips() {
               const parsedFuel: number[] = remainingFuel?.[key] || [0, 0, 0, 0];
               const diff =
                 parsedFuel[i] - (Number(e.FuelManagement.remaining_fuel) | 0);
-              return diff;
+              return diff < 0 ? 0 : diff;
             });
             const currentRemainingFuel2 = cachedData2.map((e, i) => {
               const parsedFuel: number[] = remainingFuel?.[key] || [0, 0, 0, 0];
               const diff =
                 parsedFuel[i] - (Number(e.FuelManagement.remaining_fuel) | 0);
-              return diff;
+              return diff < 0 ? 0 : diff;
             });
             const [a, b] = currentRemainingFuel;
             setAllTripData(prev => ({
@@ -588,7 +584,7 @@ export default function Trips() {
             const parsedFuel: number[] = a[id];
             const diff =
               parsedFuel[i] - (Number(e.FuelManagement.remaining_fuel) | 0);
-            return diff;
+            return diff < 0 ? 0 : diff;
           }
           return 0;
         });
@@ -601,7 +597,7 @@ export default function Trips() {
             const parsedFuel: number[] = a[id];
             const diff =
               parsedFuel[i] - (Number(e.FuelManagement.remaining_fuel) | 0);
-            return diff;
+            return diff < 0 ? 0 : diff;
           }
           return 0;
         });
