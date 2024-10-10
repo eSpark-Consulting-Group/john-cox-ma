@@ -150,12 +150,20 @@ async function handleDomainAssignment(device: ESPDevice, res1: any) {
           // Check complete cache for "timesp1"
           const timesp1Exists = await checkCompleteCacheForDomain('timesp1');
           const domainToAssign = timesp1Exists ? 'timesp2' : 'timesp1';
+          console.log(
+            '🚀 ~ handleDomainAssignment ~ domainToAssign:',
+            domainToAssign,
+            device,
+          );
           await checkAndAssignDomain(device, domainToAssign);
           await updateFile(res1.mac_address, device);
         }
       }
       break;
     case 'timesp1':
+      console.log('timeesp1 aya ha ===================>>>>>>>>>>>>>>');
+
+      break;
     case 'timesp2':
       console.log('domain received from device---', res1.domain_name);
       await checkAndAssignDomain(device, res1.domain_name);

@@ -19,7 +19,6 @@ import {EngineData, Fonts, MyTheme} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
 import LabelDropdown from '../../components/LabelDropdown';
 import {api} from '../../api';
-import {useSocket} from '../../components/SocketProvider';
 import {ApiResponse} from 'apisauce';
 
 type FMMSetupScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
@@ -47,7 +46,6 @@ export default function FMMSetup({route}: RouteType) {
   });
   const [allConfig, setAllConfig] = useState(prevConfig);
   const [isLoading, setIsLoading] = useState(false);
-  const {resolvedService1, resolvedService2} = useSocket();
   const theme = useTheme() as MyTheme;
   const navigation = useNavigation<FMMSetupScreenProps['navigation']>();
   const onValuesChange = (
@@ -73,11 +71,6 @@ export default function FMMSetup({route}: RouteType) {
 
   const doneHandler = async () => {
     console.log('Data being sent:', JSON.stringify(allConfig));
-    async () =>
-      console.log(
-        'API URL:',
-        `https://${resolvedService1?.addresses[0]}:${resolvedService1?.port}`,
-      );
     const API = api(`http://${loggedinDomain}`);
     try {
       setIsLoading(true);

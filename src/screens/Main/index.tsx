@@ -26,19 +26,13 @@ import {MyTheme} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
 import {useSocket} from '../../components/SocketProvider';
 import NauticalMile from './NauticalMilte';
+import {useService} from '../../components/ServiceProvider';
 
 type MainScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 
 export default function Main() {
-  const {
-    enginesData1,
-    speed,
-    enginesData2,
-    resolvedService1,
-    resolvedService2,
-    setProvision,
-    getSocketData,
-  } = useSocket();
+  const {enginesData1, enginesData2, getSocketData, speed} = useSocket();
+  const {resolvedService1, resolvedService2} = useService();
   const theme = useTheme() as MyTheme;
   const navigation = useNavigation<MainScreenProps['navigation']>();
   const [generatorRunning, setGeneratorRunning] = useState<'Yes' | 'No'>('Yes');
@@ -75,31 +69,6 @@ export default function Main() {
     enginesData1[1]?.FuelManagement.remaining_fuel,
     enginesData2[0]?.FuelManagement.remaining_fuel,
     enginesData2[1]?.FuelManagement.remaining_fuel,
-  ]);
-
-  const speedEfficiency = useMemo(() => {
-    const totalFuelBurned1 =
-      Number(enginesData1[0]?.FuelManagement.total_fuel_burned || 0) +
-      Number(enginesData1[1]?.FuelManagement.total_fuel_burned || 0);
-    const totalFuelBurned2 =
-      Number(enginesData2[0]?.FuelManagement.total_fuel_burned || 0) +
-      Number(enginesData2[1]?.FuelManagement.total_fuel_burned || 0);
-
-    const totalSpeed = Number(enginesData1[0]?.SensorData.speed || 0);
-
-    const totalFuelBurned = totalFuelBurned1 + totalFuelBurned2;
-
-    // Efficiency in knots per gallon
-    return totalFuelBurned > 0 ? totalSpeed / totalFuelBurned : 0;
-  }, [
-    enginesData1[0]?.FuelManagement.total_fuel_burned,
-    enginesData1[1]?.FuelManagement.total_fuel_burned,
-    enginesData2[0]?.FuelManagement.total_fuel_burned,
-    enginesData2[1]?.FuelManagement.total_fuel_burned,
-    enginesData1[0]?.SensorData.speed,
-    enginesData1[1]?.SensorData.speed,
-    enginesData2[0]?.SensorData.speed,
-    enginesData2[1]?.SensorData.speed,
   ]);
 
   const distanceToEmpty = useMemo(() => {
@@ -150,35 +119,14 @@ export default function Main() {
     },
   ];
 
-  const fetchProvisionedDevices = async () => {
-    if (resolvedService1)
-      getSocketData(
-        resolvedService1.host,
-        resolvedService1.port,
-        resolvedService1.name,
-      );
-    if (resolvedService2)
-      getSocketData(
-        resolvedService2.host,
-        resolvedService2.port,
-        resolvedService2.name,
-      );
-    // const currentProvision = await AsyncStorage.getItem('provisionedDevices');
-    // console.log('curr prov: ', currentProvision);
-    // const provisionedDevices = currentProvision
-    //   ? JSON.parse(currentProvision)
-    //   : {timesp1: false, timesp2: false};
-    // setProv(provisionedDevices);
+  const fetchSocketData = () => {
+    if (resolvedService1 && enginesData1.length === 0) {
+      getSocketData(resolvedService1.host, resolvedService1.port, 'timesp1');
+    }
+    if (resolvedService2 && enginesData2.length === 0) {
+      getSocketData(resolvedService2.host, resolvedService2.port, 'timesp2');
+    }
   };
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowLoader(false);
-      if (showLoader) fetchProvisionedDevices();
-    }, 7000);
-
-    return () => clearTimeout(timer); // Cleanup timer on component unmount
-  }, [showLoader]);
 
   return (
     <MyCanvas>
@@ -232,8 +180,8 @@ export default function Main() {
             <GapView length={90} />
             <TouchableOpacity
               style={{alignSelf: 'flex-end', paddingRight: '4%'}}
-              onPress={() => setShowLoader(true)}>
-              <Ionicons name="reload" size={24} color={theme.colors.primary} />
+              onPress={fetchSocketData}>
+              <Ionicons name="reload" size={35} color={theme.colors.primary} />
             </TouchableOpacity>
             {resolvedService1 && (
               <View style={styles().GaugeRow}>
@@ -284,7 +232,7 @@ export default function Main() {
                 <MyBox
                   label="Efficiency"
                   text="Speed"
-                  value={speedEfficiency.toFixed(2)}
+                  value={Number(speed).toFixed(2)}
                   unit="Knots"
                   width={'50%'}
                   gap={22}
