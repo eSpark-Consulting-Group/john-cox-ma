@@ -86,11 +86,11 @@ function SocketProvider({children}: {children: React.ReactNode}) {
   // Function to establish WebSocket connection
   const getSocketData = (host: string, port: number, serviceName: string) => {
     const wsUrl = `ws://${host}:${port}/ws`;
-    console.log('Connecting to WebSocket at:', wsUrl);
     const servName = serviceName as 'timesp1' | 'timesp2';
     if (wsRef.current[servName]?.OPEN) {
       return;
     }
+    console.log('Connecting to WebSocket at:', wsUrl);
     const ws = new WebSocket(wsUrl);
     wsRef.current[serviceName as 'timesp1' | 'timesp2'] = ws;
 
@@ -103,7 +103,6 @@ function SocketProvider({children}: {children: React.ReactNode}) {
     ws.onmessage = e => {
       try {
         const jsonData: SocketJSON = JSON.parse(e.data);
-
         const enginesData = jsonData;
         if (!enginesData?.Engines || enginesData.Engines.length === 0) {
           console.log('No engine data or empty array received');
@@ -148,7 +147,6 @@ function SocketProvider({children}: {children: React.ReactNode}) {
   // Handle data for timesp1
   const handleTimesp1Data = (enginesData: SocketJSON) => {
     const currentSpeed = enginesData.speed || 0;
-
     if (currentSpeed !== undefined && currentSpeed !== null) {
       setSpeed(currentSpeed);
     } else {
@@ -167,7 +165,9 @@ function SocketProvider({children}: {children: React.ReactNode}) {
     const currentSpeed = enginesData.speed || 0;
 
     if (currentSpeed !== undefined && currentSpeed !== null) {
-      setSpeed(currentSpeed);
+      if (!wsRef.current.timesp1?.OPEN) {
+        setSpeed(currentSpeed);
+      }
     } else {
       setSpeed('0');
     }
@@ -202,10 +202,12 @@ function SocketProvider({children}: {children: React.ReactNode}) {
     if (servName === 'timesp1') {
       setEnginesData1([]);
       engine1Ref.current = [];
+      wsRef.current.timesp1 = null
     }
     if (servName === 'timesp2') {
       setEnginesData2([]);
       engine2Ref.current = [];
+      wsRef.current.timesp2 = null
     }
   };
   return (
