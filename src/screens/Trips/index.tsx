@@ -15,7 +15,7 @@ import {
   MySwitch,
   MyText,
 } from '../../components';
-import {EngineData, MyTheme, SocketJSON} from '../../types';
+import {MyTheme, SocketJSON} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
 import {
   RenderModal,
@@ -114,8 +114,8 @@ export default function Trips() {
                 return;
               }
               const jsonData: SocketJSON = JSON.parse(e.data);
-              const enginesData = jsonData.Engines;
-              if (!enginesData || enginesData.length === 0) {
+              const enginesData = jsonData;
+              if (!enginesData?.Engines || enginesData.Engines.length === 0) {
                 console.log(
                   'TRIPS====== No engine data or empty array received',
                 );
@@ -144,8 +144,8 @@ export default function Trips() {
               return;
             }
             const jsonData: SocketJSON = JSON.parse(e.data);
-            const enginesData = jsonData.Engines;
-            if (!enginesData || enginesData.length === 0) {
+            const enginesData = jsonData;
+            if (!enginesData?.Engines || enginesData.Engines.length === 0) {
               console.log('TRIPS====== No engine data or empty array received');
               ws.close();
               return;
@@ -205,32 +205,27 @@ export default function Trips() {
             },
           }));
           const tripStartRef = setInterval(async () => {
-            const cachedData: EngineData[] = JSON.parse(
+            const cachedData: SocketJSON = JSON.parse(
               (await AsyncStorage.getItem('enginesData')) || JSON.stringify([]),
             );
-            const cachedData2: EngineData[] = JSON.parse(
+            const cachedData2: SocketJSON = JSON.parse(
               (await AsyncStorage.getItem('enginesData2')) ||
                 JSON.stringify([]),
             );
-            const speed =
-              cachedData[0]?.SensorData?.speed ||
-              cachedData[1]?.SensorData?.speed ||
-              cachedData2[0]?.SensorData?.speed ||
-              cachedData2[1]?.SensorData?.speed ||
-              0;
-            const currDistance = calculateDistance(speed);
+            const speed = cachedData.speed || cachedData2.speed || 0;
+            const currDistance = calculateDistance(Number(speed));
             totalDistance += currDistance;
             estimatedTime++;
             const o = JSON.parse(
               (await AsyncStorage.getItem('tripData')) || JSON.stringify({}),
             );
-            const currentRemainingFuel = cachedData.map((e, i) => {
+            const currentRemainingFuel = cachedData.Engines.map((e, i) => {
               const parsedFuel: number[] = remainingFuel?.[key] || [0, 0, 0, 0];
               const diff =
                 parsedFuel[i] - (Number(e.FuelManagement.remaining_fuel) | 0);
               return diff < 0 ? 0 : diff;
             });
-            const currentRemainingFuel2 = cachedData2.map((e, i) => {
+            const currentRemainingFuel2 = cachedData2.Engines.map((e, i) => {
               const parsedFuel: number[] = remainingFuel?.[key] || [0, 0, 0, 0];
               const diff =
                 parsedFuel[i] - (Number(e.FuelManagement.remaining_fuel) | 0);
@@ -351,21 +346,21 @@ export default function Trips() {
     timesp2: null,
   });
   const startTrip = async (id: 1 | 2 | 3) => {
-    const enginesData: EngineData[] = JSON.parse(
+    const enginesData: SocketJSON = JSON.parse(
       (await AsyncStorage.getItem('enginesData')) || JSON.stringify([]),
     );
-    const enginesData2: EngineData[] = JSON.parse(
+    const enginesData2: SocketJSON = JSON.parse(
       (await AsyncStorage.getItem('enginesData2')) || JSON.stringify([]),
     );
     console.log({enginesData});
-    if (enginesData?.length) {
+    if (enginesData?.Engines?.length) {
       const allInitialFuel = JSON.parse(
         (await AsyncStorage.getItem('initialRemainingFuel')) ||
           JSON.stringify({}),
       );
       const initialRemainingFuel = [
-        Number(enginesData[0]?.FuelManagement.remaining_fuel) | 0,
-        Number(enginesData[1]?.FuelManagement.remaining_fuel) | 0,
+        Number(enginesData.Engines[0]?.FuelManagement.remaining_fuel) | 0,
+        Number(enginesData.Engines[1]?.FuelManagement.remaining_fuel) | 0,
         0,
         0,
       ];
@@ -379,14 +374,14 @@ export default function Trips() {
     } else {
       await AsyncStorage.setItem('isStarted', id?.toString());
     }
-    if (enginesData2?.length) {
+    if (enginesData2?.Engines?.length) {
       const allInitialFuel = JSON.parse(
         (await AsyncStorage.getItem('initialRemainingFuel2')) ||
           JSON.stringify({}),
       );
       const initialRemainingFuel = [
-        Number(enginesData[0]?.FuelManagement.remaining_fuel) | 0,
-        Number(enginesData[1]?.FuelManagement.remaining_fuel) | 0,
+        Number(enginesData.Engines[0]?.FuelManagement.remaining_fuel) | 0,
+        Number(enginesData.Engines[1]?.FuelManagement.remaining_fuel) | 0,
       ];
       await AsyncStorage.setItem(
         'initialRemainingFuel2',
@@ -421,12 +416,12 @@ export default function Trips() {
         ws2.onmessage = async e => {
           try {
             const jsonData: SocketJSON = JSON.parse(e.data);
-            const enginesData = jsonData.Engines;
+            const enginesData = jsonData;
             await AsyncStorage.setItem(
               'enginesData2',
               JSON.stringify(enginesData),
             );
-            if (!enginesData || enginesData.length === 0) {
+            if (!enginesData?.Engines || enginesData.Engines.length === 0) {
               console.log('No engine data or empty array received');
               ws2.close();
               return;
@@ -447,8 +442,8 @@ export default function Trips() {
               );
               console.log({allInitialFuel});
               const initialRemainingFuel = [
-                Number(enginesData[0]?.FuelManagement.remaining_fuel) | 0,
-                Number(enginesData[1]?.FuelManagement.remaining_fuel) | 0,
+                Number(enginesData.Engines[0]?.FuelManagement.remaining_fuel) | 0,
+                Number(enginesData.Engines[1]?.FuelManagement.remaining_fuel) | 0,
               ];
               await AsyncStorage.setItem(
                 'initialRemainingFuel2',
@@ -479,8 +474,8 @@ export default function Trips() {
       ws.onmessage = async e => {
         try {
           const jsonData: SocketJSON = JSON.parse(e.data);
-          const enginesData = jsonData.Engines;
-          if (!enginesData || enginesData.length === 0) {
+          const enginesData = jsonData;
+          if (!enginesData?.Engines || enginesData.Engines.length === 0) {
             console.log('No engine data or empty array received');
             ws.close();
             return;
@@ -504,8 +499,8 @@ export default function Trips() {
                 JSON.stringify({}),
             );
             const initialRemainingFuel = [
-              enginesData[0]?.FuelManagement.remaining_fuel | 0,
-              Number(enginesData[1]?.FuelManagement.remaining_fuel) | 0,
+              enginesData.Engines[0]?.FuelManagement.remaining_fuel | 0,
+              Number(enginesData.Engines[1]?.FuelManagement.remaining_fuel) | 0,
               0,
               0,
             ];
@@ -561,24 +556,19 @@ export default function Trips() {
     let totalDistance = 0;
     let estimatedTime = 0;
     const tripStartRef = setInterval(async () => {
-      const enginesData: EngineData[] = JSON.parse(
+      const enginesData: SocketJSON = JSON.parse(
         (await AsyncStorage.getItem('enginesData')) || JSON.stringify([]),
       );
-      const enginesData2: EngineData[] = JSON.parse(
+      const enginesData2: SocketJSON = JSON.parse(
         (await AsyncStorage.getItem('enginesData2')) || JSON.stringify([]),
       );
-      const variableSpeed =
-        enginesData[0]?.SensorData?.speed ||
-        enginesData[1]?.SensorData?.speed ||
-        enginesData2[0]?.SensorData?.speed ||
-        enginesData2[1]?.SensorData?.speed ||
-        0;
+      const variableSpeed = enginesData.speed || enginesData2.speed || 0;
       const currDistance = calculateDistance(+variableSpeed);
       const allFuel = await AsyncStorage.getItem('initialRemainingFuel');
       const allFuel2 = await AsyncStorage.getItem('initialRemainingFuel2');
       let currentRemainingFuel: number[] = [];
       if (allFuel) {
-        currentRemainingFuel = enginesData.map((e, i) => {
+        currentRemainingFuel = enginesData.Engines.map((e, i) => {
           const a = JSON.parse(allFuel);
           if (a?.[id]) {
             const parsedFuel: number[] = a[id];
@@ -591,7 +581,7 @@ export default function Trips() {
         currentRemainingFuel = [...currentRemainingFuel, 0, 0];
       }
       if (allFuel2) {
-        const f = enginesData2.map((e, i) => {
+        const f = enginesData2.Engines.map((e, i) => {
           const a = JSON.parse(allFuel2);
           if (a?.[id]) {
             const parsedFuel: number[] = a[id];

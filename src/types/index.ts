@@ -146,7 +146,6 @@ export type SensorDataProps = {
   id: number;
   engine_id: number;
   fuel: string | undefined;
-  speed: number;
   temperature_return: string;
   temperature_supply: string;
   timestamp_unix: string;
@@ -166,6 +165,7 @@ export type EngineData = {
 
 export type SocketJSON = {
   Engines: EngineData[];
+  speed: string;
 };
 
 export type TripData = {
