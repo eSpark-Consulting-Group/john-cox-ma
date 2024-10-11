@@ -188,7 +188,7 @@ export default function Main() {
                 {enginesData1.length ? (
                   enginesData1.map((item, index) => (
                     <MyGauge
-                      key={item.id}
+                      key={item.name + item.position}
                       value={
                         item?.SensorData?.fuel
                           ? Number(item?.SensorData?.fuel)
@@ -210,7 +210,7 @@ export default function Main() {
                 {enginesData2.length ? (
                   enginesData2.map((item, index) => (
                     <MyGauge
-                      key={item.id}
+                      key={item.name + item.position}
                       value={
                         item?.SensorData?.fuel
                           ? Number(item?.SensorData?.fuel)

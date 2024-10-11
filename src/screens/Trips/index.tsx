@@ -442,8 +442,10 @@ export default function Trips() {
               );
               console.log({allInitialFuel});
               const initialRemainingFuel = [
-                Number(enginesData.Engines[0]?.FuelManagement.remaining_fuel) | 0,
-                Number(enginesData.Engines[1]?.FuelManagement.remaining_fuel) | 0,
+                Number(enginesData.Engines[0]?.FuelManagement.remaining_fuel) |
+                  0,
+                Number(enginesData.Engines[1]?.FuelManagement.remaining_fuel) |
+                  0,
               ];
               await AsyncStorage.setItem(
                 'initialRemainingFuel2',
@@ -551,7 +553,10 @@ export default function Trips() {
     const date = `${dateObj.getDate()}/${
       dateObj.getMonth() + 1
     }/${dateObj.getFullYear()}`;
-    const time = `${dateObj.getHours()}:${dateObj.getMinutes()}`;
+    const time = `${dateObj.getHours()}:${String(dateObj.getMinutes()).padStart(
+      2,
+      '0',
+    )}`;
     setTripStarted(prev => ({...prev, [id]: true}));
     let totalDistance = 0;
     let estimatedTime = 0;
