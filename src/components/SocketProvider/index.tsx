@@ -104,8 +104,8 @@ function SocketProvider({children}: {children: React.ReactNode}) {
       try {
         const jsonData: SocketJSON = JSON.parse(e.data);
 
-        const enginesData = jsonData.Engines;
-        if (!enginesData || enginesData.length === 0) {
+        const enginesData = jsonData;
+        if (!enginesData?.Engines || enginesData.Engines.length === 0) {
           console.log('No engine data or empty array received');
           ws.close();
           return;
@@ -146,11 +146,8 @@ function SocketProvider({children}: {children: React.ReactNode}) {
   const getTimerValue = () => timer.current;
 
   // Handle data for timesp1
-  const handleTimesp1Data = (enginesData: EngineData[]) => {
-    const currentSpeed =
-      enginesData[0]?.SensorData?.speed ||
-      enginesData[1]?.SensorData?.speed ||
-      0;
+  const handleTimesp1Data = (enginesData: SocketJSON) => {
+    const currentSpeed = enginesData.speed || 0;
 
     if (currentSpeed !== undefined && currentSpeed !== null) {
       setSpeed(currentSpeed);
@@ -158,28 +155,25 @@ function SocketProvider({children}: {children: React.ReactNode}) {
       setSpeed('0');
     }
 
-    if (JSON.stringify(engine1Ref.current) !== JSON.stringify(enginesData)) {
-      engine1Ref.current = enginesData;
-      setEnginesData1(enginesData);
+    if (JSON.stringify(engine1Ref.current) !== JSON.stringify(enginesData.Engines)) {
+      engine1Ref.current = enginesData.Engines;
+      setEnginesData1(enginesData.Engines);
     }
   };
 
   // Handle data for timesp2
-  const handleTimesp2Data = (enginesData: EngineData[]) => {
+  const handleTimesp2Data = (enginesData: SocketJSON) => {
     // console.log('############ handling engine 2 data ##########');
-    const currentSpeed =
-      enginesData[0]?.SensorData?.speed ||
-      enginesData[1]?.SensorData?.speed ||
-      0;
+    const currentSpeed = enginesData.speed || 0;
 
     if (currentSpeed !== undefined && currentSpeed !== null) {
       setSpeed(currentSpeed);
     } else {
       setSpeed('0');
     }
-    if (JSON.stringify(engine2Ref.current) !== JSON.stringify(enginesData)) {
-      engine2Ref.current = enginesData;
-      setEnginesData2(enginesData);
+    if (JSON.stringify(engine2Ref.current) !== JSON.stringify(enginesData.Engines)) {
+      engine2Ref.current = enginesData.Engines;
+      setEnginesData2(enginesData.Engines);
     }
   };
 
