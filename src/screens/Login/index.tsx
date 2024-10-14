@@ -55,7 +55,6 @@ export default function Login() {
         loggedinDomain: domain,
         deviceName: selectedDevice,
       });
-      console.log(response.data);
     } catch (error: any) {
       setError(error.message || 'Internal Server Error!');
       console.log(`Error while login: ${error.message}`);

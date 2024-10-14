@@ -20,14 +20,13 @@ function LabelDropdown({
   status,
   isActive,
   dropdnHeight,
-  egnineId,
   onPress,
   value,
 }: LabelDropdownProps) {
   const theme = useTheme() as MyTheme;
   const activeHanlder = () => {
     if (onPress) {
-      onPress(egnineId);
+      onPress();
     }
   };
   return (
