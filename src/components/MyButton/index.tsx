@@ -59,7 +59,7 @@ function MyButton({
               end={[0.5, 1]}
             />
             <MyText
-              style={[buttonTextStyle]}
+              style={buttonTextStyle}
               fontFamily={fontFamily}
               textColor={textColor || theme.colors.primary}
               size={18}>
@@ -88,7 +88,7 @@ export default memo(MyButton);
 
 const styles = StyleSheet.create({
   gradientButton: {
-    width: '101%',
+    width: '100%',
     marginBottom: 5,
   },
   gradient: {
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
   },
   inner: {
-    width: '95%',
+    width: '98%',
     margin: 1,
     borderRadius: 10,
     justifyContent: 'center',

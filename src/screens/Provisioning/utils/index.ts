@@ -131,31 +131,121 @@ async function checkCompleteCacheForDomain(domainName: string) {
   console.log(' ---- timesp2 does not exist already ---- ');
   return false;
 }
+async function checkCompleteCacheForDomainRepitition(domainName: string) {
+  const keys = await AsyncStorage.getAllKeys();
+  let n = 0;
+  for (const key of keys) {
+    const data = await AsyncStorage.getItem(key);
+    console.log(data, '--------------');
+    if (data) {
+      const parsedData = JSON.parse(data);
+      if (parsedData.domain_name === domainName) {
+        console.log(' ---- domain exists ---- ', n + 1);
+        n += 1;
+      }
+    }
+  }
+  return n;
+}
+
+async function checkFileForDomainRepetition() {
+  const permission = await requestDirectoryPermission();
+  let timesp1Count = 0;
+  let timesp2Count = 0;
+
+  if (permission && permission.granted) {
+    const path = await FileSystem.StorageAccessFramework.readDirectoryAsync(
+      permission.directoryUri,
+    );
+
+    if (path && path.length > 0) {
+      console.log('Files found in directory:', path);
+
+      // Iterate over each file in the directory
+      for (const filePath of path) {
+        // Read each file's content
+        const fileContent =
+          await FileSystem.StorageAccessFramework.readAsStringAsync(filePath);
+
+        // Parse the file data and check for domain names
+        const parsedData = JSON.parse(fileContent);
+
+        if (parsedData.domain_name === 'timesp1') {
+          timesp1Count += 1;
+        } else if (parsedData.domain_name === 'timesp2') {
+          timesp2Count += 1;
+        }
+      }
+    } else {
+      console.log('No files found in the directory.');
+    }
+  } else {
+    console.log('Directory permissions not granted.');
+  }
+
+  console.log('timesp1 count:', timesp1Count);
+  console.log('timesp2 count:', timesp2Count);
+
+  return {timesp1Count, timesp2Count};
+}
 
 //res1 device se jo domain aur device details arhi wo heyn
 async function handleDomainAssignment(device: ESPDevice, res1: any) {
   switch (res1.domain_name) {
     case '':
       console.log('Checking cache and files...');
+
       const cachedData = await checkCache(res1.mac_address);
+      const timesp1Exists_Count = await checkCompleteCacheForDomainRepitition(
+        'timesp1',
+      );
+      const timesp2Exists_Count = await checkCompleteCacheForDomainRepitition(
+        'timesp2',
+      );
       if (cachedData) {
-        await checkAndAssignDomain(device, cachedData.domain_name);
+        if (timesp1Exists_Count == 2) {
+          await checkAndAssignDomain(device, 'timesp2');
+          ('timesp1 repeated assignment');
+        } else if (timesp2Exists_Count == 2) {
+          await checkAndAssignDomain(device, 'timesp1');
+          ('timesp2 repeated assignment');
+        } else {
+          await checkAndAssignDomain(device, cachedData.domain_name);
+        }
         await updateFile(res1.mac_address, device);
       } else {
         const fileData = await checkFile(res1.mac_address);
         if (fileData) {
-          const data = JSON.parse(fileData);
-          await checkAndAssignDomain(device, data.domain_name);
+          const {timesp1Count, timesp2Count} =
+            await checkFileForDomainRepetition();
+          if (timesp1Count == 2) {
+            await checkAndAssignDomain(device, 'timesp2');
+            ('timesp1 repeated assignment');
+          } else if (timesp2Count == 2) {
+            await checkAndAssignDomain(device, 'timesp1');
+            ('timesp2 repeated assignment');
+          } else {
+            await checkAndAssignDomain(device, cachedData.domain_name);
+          }
+          await updateFile(res1.mac_address, device);
         } else {
           // Check complete cache for "timesp1"
           const timesp1Exists = await checkCompleteCacheForDomain('timesp1');
           const domainToAssign = timesp1Exists ? 'timesp2' : 'timesp1';
+          console.log(
+            '🚀 ~ handleDomainAssignment ~ domainToAssign:',
+            domainToAssign,
+            device,
+          );
           await checkAndAssignDomain(device, domainToAssign);
           await updateFile(res1.mac_address, device);
         }
       }
       break;
     case 'timesp1':
+      console.log('timeesp1 aya ha ===================>>>>>>>>>>>>>>');
+
+      break;
     case 'timesp2':
       console.log('domain received from device---', res1.domain_name);
       await checkAndAssignDomain(device, res1.domain_name);
@@ -302,7 +392,6 @@ export async function checkCache(mac_address: string) {
 }
 
 async function checkAndAssignDomain(device: ESPDevice, domainName: string) {
-  // now here is the problem 2 - both devices return timesp1 WHY???
   const res = await device?.sendData(
     'domain-name',
     JSON.stringify({

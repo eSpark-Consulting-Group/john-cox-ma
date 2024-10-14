@@ -19,13 +19,13 @@ import {
 } from '../../components';
 import {MyTheme} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
-import {useSocket} from '../../components/SocketProvider';
+import { useService } from '../../components/ServiceProvider';
 
 type LoginScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 
 export default function Login() {
   const theme = useTheme() as MyTheme;
-  const {resolvedService1, resolvedService2} = useSocket();
+  const {resolvedService1, resolvedService2} = useService();
   const navigation = useNavigation<LoginScreenProps['navigation']>();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
