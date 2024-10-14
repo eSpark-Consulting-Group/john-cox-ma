@@ -26,21 +26,3 @@ const getFuelMGT = (jsonData: SocketJSON) => {
   return fuelMGT;
 };
 
-const getEnginesData = (jsonData: SocketJSON): EngineData[] => {
-  const data = jsonData.Engines;
-  return jsonData.Engines.map(engine => {
-    // const foundData = data.find(s => s.FuelManagement?.engine_id === engine.id);
-    return {
-      name: engine.name,
-      id: engine.id,
-      enabled: engine.enabled,
-      position: engine.position,
-      volume_per_cycle: engine.volume_per_cycle,
-      engine_type: engine.engine_type,
-      fuel_type: engine.fuel_type,
-      SensorData: engine?.SensorData,
-      FuelManagement: engine?.FuelManagement,
-    };
-  });
-};
-export {getEnginesData};

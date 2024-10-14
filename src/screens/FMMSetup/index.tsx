@@ -35,7 +35,7 @@ export default function FMMSetup({route}: RouteType) {
   const {loggedinDomain, deviceName, config} = route.params;
   const prevConfig = config.map(item => {
     return {
-      engine_id: item.id,
+      engine_id: item.FuelManagement.engine_id,
       enabled: item.enabled,
       position: item.position,
       volume_per_cycle: item.volume_per_cycle,
