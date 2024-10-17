@@ -81,14 +81,23 @@ export default function ScanDevices() {
           ESPTransport.softap,
           ESPSecurity.unsecure,
         );
-        setDevices(myDevices);
-        console.log('Available Devices:', myDevices);
+
+        if (myDevices.length === 0) {
+          setError(true); // No devices found, show error
+          setDevice(undefined); // Clear the selected device
+        } else {
+          setDevices(myDevices);
+          setError(false); // Clear any previous errors
+          console.log('Available Devices:', myDevices);
+        }
       } else {
         console.log('some issue');
       }
     } catch (error) {
       console.error('Error scanning devices:', error);
       setError(true);
+      setDevices([]); // Clear devices on error
+      setDevice(undefined); // Clear selected device
     } finally {
       setLoading(false); // Stop loading
     }
