@@ -19,7 +19,7 @@ import {
 } from '../../components';
 import {MyTheme} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
-import { useService } from '../../components/ServiceProvider';
+import {useService} from '../../components/ServiceProvider';
 
 type LoginScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 
@@ -33,8 +33,8 @@ export default function Login() {
     'timesp1',
   );
   const [creds, setCreds] = useState({
-    username: 'ESP_24dcc3',
-    password: '9c10b4',
+    username: 'ESP_409151',
+    password: 'fcd96c',
   });
 
   const loginHandler = async () => {

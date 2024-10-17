@@ -153,7 +153,9 @@ function SocketProvider({children}: {children: React.ReactNode}) {
       setSpeed('0');
     }
 
-    if (JSON.stringify(engine1Ref.current) !== JSON.stringify(enginesData.Engines)) {
+    if (
+      JSON.stringify(engine1Ref.current) !== JSON.stringify(enginesData.Engines)
+    ) {
       engine1Ref.current = enginesData.Engines;
       setEnginesData1(enginesData.Engines);
     }
@@ -161,7 +163,6 @@ function SocketProvider({children}: {children: React.ReactNode}) {
 
   // Handle data for timesp2
   const handleTimesp2Data = (enginesData: SocketJSON) => {
-    // console.log('############ handling engine 2 data ##########');
     const currentSpeed = enginesData.speed || 0;
 
     if (currentSpeed !== undefined && currentSpeed !== null) {
@@ -171,7 +172,9 @@ function SocketProvider({children}: {children: React.ReactNode}) {
     } else {
       setSpeed('0');
     }
-    if (JSON.stringify(engine2Ref.current) !== JSON.stringify(enginesData.Engines)) {
+    if (
+      JSON.stringify(engine2Ref.current) !== JSON.stringify(enginesData.Engines)
+    ) {
       engine2Ref.current = enginesData.Engines;
       setEnginesData2(enginesData.Engines);
     }
@@ -202,12 +205,12 @@ function SocketProvider({children}: {children: React.ReactNode}) {
     if (servName === 'timesp1') {
       setEnginesData1([]);
       engine1Ref.current = [];
-      wsRef.current.timesp1 = null
+      wsRef.current.timesp1 = null;
     }
     if (servName === 'timesp2') {
       setEnginesData2([]);
       engine2Ref.current = [];
-      wsRef.current.timesp2 = null
+      wsRef.current.timesp2 = null;
     }
   };
   return (
