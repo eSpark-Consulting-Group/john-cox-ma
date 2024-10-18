@@ -109,7 +109,8 @@ export interface LabelDropdownProps {
   status?: boolean;
   isActive?: boolean;
   dropdnHeight?: number;
-  onPress?: () => void;
+  engineId?: string;
+  onPress?: (id: string | undefined) => void;
   value?: string;
 }
 
@@ -151,6 +152,7 @@ export type SensorDataProps = {
 };
 
 export type EngineData = {
+  id: number;
   name: string;
   enabled: '1' | '0';
   engine_type: string;

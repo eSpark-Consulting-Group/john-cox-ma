@@ -121,6 +121,7 @@ export default function Setup({route}: RouteType) {
                       }}
                       isActive={item.enabled === '0' ? false : true}
                       zIndex={58 - count}
+                      engineId={item.id.toString()}
                       onPress={() => onPress(index)}
                       status
                       value={item.position}
