@@ -26,7 +26,7 @@ export function RenderModal({visible, type, onClose}: RenderModalProps) {
             size={24}
             textColor={theme.colors.secondary}
             style={{textAlign: 'center'}}>
-            Trip ! Data will be resetted!
+            Trip ! Data will be reset!
           </MyText>
         </View>
       );

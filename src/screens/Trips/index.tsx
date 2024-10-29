@@ -827,7 +827,7 @@ export default function Trips() {
                 textColor={theme.colors.secondary}
                 style={styles.confirmation}
                 size={18}>
-                Resetting will over-write prior date
+                Resetting will over-write prior data
               </MyText>
               <View style={styles.buttonRow}>
                 <MyButton
