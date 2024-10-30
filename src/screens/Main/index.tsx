@@ -194,7 +194,7 @@ export default function Main() {
                           ? Number(item?.SensorData?.fuel)
                           : 0
                       }
-                      name={`FMM1\n${item.position}`}
+                      name={item.position}
                     />
                   ))
                 ) : showLoader ? (
@@ -216,7 +216,7 @@ export default function Main() {
                           ? Number(item?.SensorData?.fuel)
                           : 0
                       }
-                      name={`FMM2\n${item.position}`}
+                      name={item.position}
                     />
                   ))
                 ) : showLoader ? (
