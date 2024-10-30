@@ -228,7 +228,7 @@ export default function Main() {
             )}
             <GapView length={20} />
             <View style={styles().container}>
-              <View style={styles().row}>
+              <View style={styles().range}>
                 <MyBox
                   label="Efficiency"
                   text="Speed"
@@ -243,7 +243,7 @@ export default function Main() {
                     value={sumOfBurn}
                     unit="gal/hr"
                     width={'100%'}
-                    gap={1}
+                    gap={22}
                   />
                 </View>
               </View>

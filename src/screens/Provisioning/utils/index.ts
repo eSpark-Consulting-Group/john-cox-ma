@@ -210,6 +210,7 @@ async function handleDomainAssignment(device: ESPDevice, res1: any) {
           await checkAndAssignDomain(device, 'timesp1');
           ('timesp2 repeated assignment');
         } else {
+          console.log(cachedData.domain_name);          
           await checkAndAssignDomain(device, cachedData.domain_name);
         }
         await updateFile(res1.mac_address, device);
