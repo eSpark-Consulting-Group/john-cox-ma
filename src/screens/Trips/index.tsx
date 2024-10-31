@@ -654,7 +654,7 @@ export default function Trips() {
     const tripStartRef = await AsyncStorage.getItem('tripStartRef');
     if (tripStartRef) {
       if (reset) {
-        setWarningVisible(true);
+        setWarningVisible(true);        
       }
       const trip = JSON.parse(tripStartRef);
       console.log({trip});
@@ -664,7 +664,7 @@ export default function Trips() {
         setAllTripData(prev => ({
           ...prev,
           [id]: {
-            name: '',
+            name: reset ? allTripData[selectedSwitch].name : '',
             estimatedTime: 0,
             totalDistance: 0,
             speed: 0,
@@ -696,7 +696,7 @@ export default function Trips() {
         await AsyncStorage.removeItem('initialRemainingFuel2');
       }
       if (reset) {
-        console.log('resseted data!');
+        console.log('resetted data!');
         return;
       }
       try {
