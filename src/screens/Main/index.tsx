@@ -185,7 +185,7 @@ export default function Main() {
             </TouchableOpacity>
             {resolvedService1 && (
               <View style={styles().GaugeRow}>
-                {enginesData1.length ? (
+                {(
                   enginesData1.map((item, index) => (
                     <MyGauge
                       key={item.name + item.position}
@@ -197,17 +197,13 @@ export default function Main() {
                       name={item.position}
                     />
                   ))
-                ) : showLoader ? (
-                  <Loader size="large" />
-                ) : (
-                  <GapView length={10} />
                 )}
               </View>
             )}
             <GapView length={20} />
             {resolvedService2 && (
               <View style={styles().GaugeRow}>
-                {enginesData2.length ? (
+                { (
                   enginesData2.map((item, index) => (
                     <MyGauge
                       key={item.name + item.position}
@@ -217,13 +213,9 @@ export default function Main() {
                           : 0
                       }
                       name={item.position}
-                    />
-                  ))
-                ) : showLoader ? (
-                  <Loader size="large" />
-                ) : (
-                  <GapView length={10} />
-                )}
+                      />
+                    ))
+                  )}
               </View>
             )}
             <GapView length={20} />

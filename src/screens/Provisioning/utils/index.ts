@@ -95,6 +95,7 @@ export const sendingData = async (device: ESPDevice) => {
     );
     console.log('Response:', res);
     if (res) {
+     
       const res1 = JSON.parse(res);
       await handleDomainAssignment(device, res1);
       return res;
@@ -119,7 +120,7 @@ async function checkCompleteCacheForDomain(domainName: string) {
   const keys = await AsyncStorage.getAllKeys();
   for (const key of keys) {
     const data = await AsyncStorage.getItem(key);
-    console.log(data, '--------------');
+    console.log("cache:" , data, '--------------');
     if (data) {
       const parsedData = JSON.parse(data);
       if (parsedData.domain_name === domainName) {
@@ -136,7 +137,7 @@ async function checkCompleteCacheForDomainRepitition(domainName: string) {
   let n = 0;
   for (const key of keys) {
     const data = await AsyncStorage.getItem(key);
-    console.log(data, '--------------');
+    console.log("cache repetition:" , data, '--------------');
     if (data) {
       const parsedData = JSON.parse(data);
       if (parsedData.domain_name === domainName) {
@@ -210,7 +211,7 @@ async function handleDomainAssignment(device: ESPDevice, res1: any) {
           await checkAndAssignDomain(device, 'timesp1');
           ('timesp2 repeated assignment');
         } else {
-          console.log(cachedData.domain_name);          
+          console.log("cachedData.domainName: ", cachedData.domain_name);          
           await checkAndAssignDomain(device, cachedData.domain_name);
         }
         await updateFile(res1.mac_address, device);
