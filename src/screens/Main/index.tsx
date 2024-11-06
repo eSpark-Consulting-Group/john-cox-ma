@@ -185,37 +185,41 @@ export default function Main() {
             </TouchableOpacity>
             {resolvedService1 && (
               <View style={styles().GaugeRow}>
-                {(
-                  enginesData1.map((item, index) => (
-                    <MyGauge
-                      key={item.name + item.position}
-                      value={
-                        item?.SensorData?.fuel
-                          ? Number(item?.SensorData?.fuel)
-                          : 0
-                      }
-                      name={item.position}
-                    />
-                  ))
-                )}
+                {enginesData1.length
+                  ? enginesData1.map((item, index) => (
+                      <MyGauge
+                        key={item.name + item.position}
+                        value={
+                          item?.SensorData?.fuel && item.enabled
+                            ? Number(item?.SensorData?.fuel)
+                            : NaN
+                        }
+                        name={item.position}
+                      />
+                    ))
+                  : [1, 2].map((item, index) => (
+                      <MyGauge key={item} value={NaN} name="Reload" />
+                    ))}
               </View>
             )}
             <GapView length={20} />
             {resolvedService2 && (
               <View style={styles().GaugeRow}>
-                { (
-                  enginesData2.map((item, index) => (
-                    <MyGauge
-                      key={item.name + item.position}
-                      value={
-                        item?.SensorData?.fuel
-                          ? Number(item?.SensorData?.fuel)
-                          : 0
-                      }
-                      name={item.position}
+                {enginesData2.length
+                  ? enginesData2.map((item, index) => (
+                      <MyGauge
+                        key={item.name + item.position}
+                        value={
+                          item?.SensorData?.fuel && item.enabled
+                            ? Number(item?.SensorData?.fuel)
+                            : NaN
+                        }
+                        name={item.position}
                       />
                     ))
-                  )}
+                  : [1, 2].map((item, index) => (
+                      <MyGauge key={item} value={NaN} name="Reload" />
+                    ))}
               </View>
             )}
             <GapView length={20} />
