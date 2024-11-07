@@ -131,14 +131,16 @@ export default function Main() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      if (resolvedService1 && enginesData1.length === 0 && reloadAttempts < 3) {
-        ('reconnecting socket');
+      if (
+        (resolvedService1 && enginesData1.length === 0) ||
+        (resolvedService2 && enginesData2.length === 0)
+      ) {
+        console.log('reconnecting socket');
         fetchSocketData();
-        setReloadAttempts(prev => prev + 1);
       }
     }, 5000); // Adjust interval duration as needed
     return () => clearInterval(interval);
-  }, [resolvedService1, enginesData1, reloadAttempts]);
+  }, [resolvedService1, resolvedService2, enginesData1, enginesData2]);
 
   return (
     <MyCanvas>
@@ -192,10 +194,7 @@ export default function Main() {
             <GapView length={90} />
             <TouchableOpacity
               style={{alignSelf: 'flex-end', paddingRight: '4%'}}
-              onPress={() => {
-                setReloadAttempts(0);
-                fetchSocketData();
-              }}>
+              onPress={fetchSocketData}>
               <Ionicons name="reload" size={35} color={theme.colors.primary} />
             </TouchableOpacity>
             {resolvedService1 && (
