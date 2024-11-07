@@ -64,6 +64,11 @@ const ServiceProvider = ({children}: {children: React.ReactNode}) => {
     };
   }, []);
 
+  useEffect(() => {
+    console.log('Current resolvedService1:', resolvedService1);
+    console.log('Current resolvedService2:', resolvedService2);
+  }, [resolvedService1, resolvedService2]);
+
   return (
     <ServiceContext.Provider value={{resolvedService1, resolvedService2}}>
       {children}

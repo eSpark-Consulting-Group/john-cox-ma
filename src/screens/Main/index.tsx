@@ -42,6 +42,7 @@ export default function Main() {
     timesp1: false,
     timesp2: false,
   });
+  const [reloadAttempts, setReloadAttempts] = useState(0);
 
   const sumOfBurn = useMemo(() => {
     return (
@@ -128,6 +129,19 @@ export default function Main() {
     }
   };
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (
+        (resolvedService1 && enginesData1.length === 0) ||
+        (resolvedService2 && enginesData2.length === 0)
+      ) {
+        console.log('reconnecting socket');
+        fetchSocketData();
+      }
+    }, 5000); // Adjust interval duration as needed
+    return () => clearInterval(interval);
+  }, [resolvedService1, resolvedService2, enginesData1, enginesData2]);
+
   return (
     <MyCanvas>
       <ScrollView
@@ -185,50 +199,46 @@ export default function Main() {
             </TouchableOpacity>
             {resolvedService1 && (
               <View style={styles().GaugeRow}>
-                {enginesData1.length ? (
-                  enginesData1.map((item, index) => (
-                    <MyGauge
-                      key={item.name + item.position}
-                      value={
-                        item?.SensorData?.fuel
-                          ? Number(item?.SensorData?.fuel)
-                          : 0
-                      }
-                      name={`FMM1\n${item.position}`}
-                    />
-                  ))
-                ) : showLoader ? (
-                  <Loader size="large" />
-                ) : (
-                  <GapView length={10} />
-                )}
+                {enginesData1.length
+                  ? enginesData1.map((item, index) => (
+                      <MyGauge
+                        key={item.name + item.position}
+                        value={
+                          item?.SensorData?.fuel && item.enabled
+                            ? Number(item?.SensorData?.fuel)
+                            : NaN
+                        }
+                        name={item.position}
+                      />
+                    ))
+                  : [1, 2].map((item, index) => (
+                      <MyGauge key={item} value={NaN} name="Reload" />
+                    ))}
               </View>
             )}
             <GapView length={20} />
             {resolvedService2 && (
               <View style={styles().GaugeRow}>
-                {enginesData2.length ? (
-                  enginesData2.map((item, index) => (
-                    <MyGauge
-                      key={item.name + item.position}
-                      value={
-                        item?.SensorData?.fuel
-                          ? Number(item?.SensorData?.fuel)
-                          : 0
-                      }
-                      name={`FMM2\n${item.position}`}
-                    />
-                  ))
-                ) : showLoader ? (
-                  <Loader size="large" />
-                ) : (
-                  <GapView length={10} />
-                )}
+                {enginesData2.length
+                  ? enginesData2.map((item, index) => (
+                      <MyGauge
+                        key={item.name + item.position}
+                        value={
+                          item?.SensorData?.fuel && item.enabled
+                            ? Number(item?.SensorData?.fuel)
+                            : NaN
+                        }
+                        name={item.position}
+                      />
+                    ))
+                  : [1, 2].map((item, index) => (
+                      <MyGauge key={item} value={NaN} name="Reload" />
+                    ))}
               </View>
             )}
             <GapView length={20} />
             <View style={styles().container}>
-              <View style={styles().row}>
+              <View style={styles().range}>
                 <MyBox
                   label="Efficiency"
                   text="Speed"
@@ -243,7 +253,7 @@ export default function Main() {
                     value={sumOfBurn}
                     unit="gal/hr"
                     width={'100%'}
-                    gap={1}
+                    gap={22}
                   />
                 </View>
               </View>

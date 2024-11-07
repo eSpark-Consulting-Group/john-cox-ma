@@ -94,7 +94,7 @@ export default function ScanDevices() {
         console.log('some issue');
       }
     } catch (error) {
-      console.error('Error scanning devices:', error);
+      // console.error('Error scanning devices:', error);
       setError(true);
       setDevices([]); // Clear devices on error
       setDevice(undefined); // Clear selected device
