@@ -2,6 +2,7 @@ import React, {useCallback, useEffect, useState} from 'react';
 import {
   FlatList,
   Pressable,
+  ScrollView,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -49,6 +50,7 @@ export default function ScanDevices() {
   const [device, setDevice] = useState<ESPDevice>();
   const [devices, setDevices] = useState<ESPDevice[]>();
   const [granted, setGranted] = useState(false);
+  const [log, setLog] = useState('Helllow');
 
   const requestPermissionsAndScan = async () => {
     try {
@@ -100,6 +102,28 @@ export default function ScanDevices() {
       setDevice(undefined); // Clear selected device
     } finally {
       setLoading(false); // Stop loading
+    }
+  };
+
+  const connectDevice = async (device?: any) => {
+    try {
+      console.log('Starting connection process...');
+      console.log('Device:', device);
+      console.log('Product key:', 'abcd1234');
+      setLog('Connecting..!');
+
+      const dev = new ESPDevice({
+        name: 'TIMESP_AFDB9C',
+        transport: ESPTransport.softap,
+        security: 1,
+      });
+      console.log('ESPDevice:', dev);
+
+      const connectedDev: any = await dev.connect('abcd1234');
+      setLog('Connected device:');
+      console.log('Connected device:' + connectedDev);
+    } catch (error) {
+      console.log('Error:', error);
     }
   };
 
@@ -178,17 +202,30 @@ export default function ScanDevices() {
           </MyCard>
           <GapView length={40} />
           <MyButton
-            label="Select"
+            label="Connect"
             style={{paddingHorizontal: 45}}
             labelStyle={{fontSize: 18}}
             onPress={() => {
-              if (device) {
-                navigation.navigate('Proof', {device});
-              }
+              // if (device) {
+              //   navigation.navigate('Proof', {device});
+              // }
+              connectDevice();
             }}
             textColor={theme.colors.proSecondary}
           />
           <MyButton
+            label="Scan WiFi"
+            style={{paddingHorizontal: 45}}
+            labelStyle={{fontSize: 18}}
+            onPress={() => {
+              // if (device) {
+              //   navigation.navigate('Proof', {device});
+              // }
+              connectDevice();
+            }}
+            textColor={theme.colors.proSecondary}
+          />
+          {/* <MyButton
             label="Skip Setup"
             style={{
               paddingHorizontal: 45,
@@ -199,7 +236,10 @@ export default function ScanDevices() {
               navigation.navigate('Main');
             }}
             textColor={theme.colors.proSecondary}
-          />
+          /> */}
+          <View style={{backgroundColor: 'black', height: 100, width: 100}}>
+            <MyText textColor="white" text={log} />
+          </View>
         </View>
         <MyFooter />
       </View>

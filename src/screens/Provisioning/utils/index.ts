@@ -6,84 +6,157 @@ import {
   checkMultiple,
 } from 'react-native-permissions';
 import * as FileSystem from 'expo-file-system';
+import {Platform} from 'react-native';
 
 export async function checkPermissions() {
-  try {
-    const status = await checkMultiple([
-      PERMISSIONS.ANDROID.BLUETOOTH_SCAN,
-      PERMISSIONS.ANDROID.BLUETOOTH_CONNECT,
-      PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
-    ]);
-    console.log('check Granted permissions HERE:---------------------------');
+  if (Platform.OS == 'ios') {
+    try {
+      const status = await checkMultiple([
+        PERMISSIONS.IOS.BLUETOOTH,
+        PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
+      ]);
+      console.log('check Granted permissions HERE:---------------------------');
 
-    console.log(
-      'Bluetooth Scan Permission:',
-      status[PERMISSIONS.ANDROID.BLUETOOTH_SCAN],
-    );
-    console.log(
-      'Bluetooth Connect Permission:',
-      status[PERMISSIONS.ANDROID.BLUETOOTH_CONNECT],
-    );
-    console.log(
-      'Location Permission:',
-      status[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION],
-    );
+      console.log(
+        'Bluetooth Connect Permission:',
+        status[PERMISSIONS.IOS.BLUETOOTH],
+      );
+      console.log(
+        'Location Permission:',
+        status[PERMISSIONS.IOS.LOCATION_WHEN_IN_USE],
+      );
 
-    if (
-      status[PERMISSIONS.ANDROID.BLUETOOTH_SCAN] == 'granted' &&
-      status[PERMISSIONS.ANDROID.BLUETOOTH_CONNECT] == 'granted' &&
-      status[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION] == 'granted'
-    ) {
-      console.log('All permissions granted. HERE');
-      return true;
-    } else {
-      console.log('Some permissions are not granted. so requesting again HERE');
-      const res = await requestPermissions();
-      return res;
+      if (
+        status[PERMISSIONS.IOS.BLUETOOTH] == 'granted' &&
+        status[PERMISSIONS.IOS.LOCATION_WHEN_IN_USE] == 'granted'
+      ) {
+        console.log('All permissions granted. HERE');
+        return true;
+      } else {
+        console.log(
+          'Some permissions are not granted. so requesting again HERE',
+        );
+        const res = await requestPermissions();
+        return res;
+      }
+    } catch (err) {
+      console.error('check Error requesting permissions:', err);
+      return false;
     }
-  } catch (err) {
-    console.error('check Error requesting permissions:', err);
-    return false;
+  } else {
+    try {
+      const status = await checkMultiple([
+        PERMISSIONS.ANDROID.BLUETOOTH_SCAN,
+        PERMISSIONS.ANDROID.BLUETOOTH_CONNECT,
+        PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
+      ]);
+      console.log('check Granted permissions HERE:---------------------------');
+
+      console.log(
+        'Bluetooth Scan Permission:',
+        status[PERMISSIONS.ANDROID.BLUETOOTH_SCAN],
+      );
+      console.log(
+        'Bluetooth Connect Permission:',
+        status[PERMISSIONS.ANDROID.BLUETOOTH_CONNECT],
+      );
+      console.log(
+        'Location Permission:',
+        status[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION],
+      );
+
+      if (
+        status[PERMISSIONS.ANDROID.BLUETOOTH_SCAN] == 'granted' &&
+        status[PERMISSIONS.ANDROID.BLUETOOTH_CONNECT] == 'granted' &&
+        status[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION] == 'granted'
+      ) {
+        console.log('All permissions granted. HERE');
+        return true;
+      } else {
+        console.log(
+          'Some permissions are not granted. so requesting again HERE',
+        );
+        const res = await requestPermissions();
+        return res;
+      }
+    } catch (err) {
+      console.error('check Error requesting permissions:', err);
+      return false;
+    }
   }
 }
 
 async function requestPermissions() {
-  try {
-    const status = await requestMultiple([
-      PERMISSIONS.ANDROID.BLUETOOTH_SCAN,
-      PERMISSIONS.ANDROID.BLUETOOTH_CONNECT,
-      PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
-    ]);
+  if (Platform.OS == 'ios') {
+    try {
+      const status = await requestMultiple([
+        PERMISSIONS.IOS.BLUETOOTH,
+        PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
+      ]);
 
-    console.log('check Granted permissions:---------------------------');
+      console.log('check Granted permissions:---------------------------');
 
-    console.log(
-      'Bluetooth Scan Permission:',
-      status[PERMISSIONS.ANDROID.BLUETOOTH_SCAN],
-    );
-    console.log(
-      'Bluetooth Connect Permission:',
-      status[PERMISSIONS.ANDROID.BLUETOOTH_CONNECT],
-    );
-    console.log(
-      'Location Permission:',
-      status[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION],
-    );
+      console.log(
+        'Bluetooth Connect Permission:',
+        status[PERMISSIONS.IOS.BLUETOOTH],
+      );
+      console.log(
+        'Location Permission:',
+        status[PERMISSIONS.IOS.LOCATION_WHEN_IN_USE],
+      );
 
-    if (
-      status[PERMISSIONS.ANDROID.BLUETOOTH_SCAN] == 'granted' &&
-      status[PERMISSIONS.ANDROID.BLUETOOTH_CONNECT] == 'granted' &&
-      status[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION] == 'granted'
-    ) {
-      console.log('All permissions granted.');
-      return true;
-    } else {
-      console.log('Some permissions are not granted.');
+      if (
+        status[PERMISSIONS.IOS.BLUETOOTH] == 'granted' &&
+        status[PERMISSIONS.IOS.LOCATION_WHEN_IN_USE] == 'granted'
+      ) {
+        console.log('All permissions granted.');
+        return true;
+      } else {
+        console.log('Some permissions are not granted.');
+        return false;
+      }
+    } catch (err) {
+      console.error('Error requesting permissions:', err);
       return false;
     }
-  } catch (err) {
-    console.error('Error requesting permissions:', err);
-    return false;
+  } else {
+    try {
+      const status = await requestMultiple([
+        PERMISSIONS.ANDROID.BLUETOOTH_SCAN,
+        PERMISSIONS.ANDROID.BLUETOOTH_CONNECT,
+        PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
+      ]);
+
+      console.log('check Granted permissions:---------------------------');
+
+      console.log(
+        'Bluetooth Scan Permission:',
+        status[PERMISSIONS.ANDROID.BLUETOOTH_SCAN],
+      );
+      console.log(
+        'Bluetooth Connect Permission:',
+        status[PERMISSIONS.ANDROID.BLUETOOTH_CONNECT],
+      );
+      console.log(
+        'Location Permission:',
+        status[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION],
+      );
+
+      if (
+        status[PERMISSIONS.ANDROID.BLUETOOTH_SCAN] == 'granted' &&
+        status[PERMISSIONS.ANDROID.BLUETOOTH_CONNECT] == 'granted' &&
+        status[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION] == 'granted'
+      ) {
+        console.log('All permissions granted.');
+        return true;
+      } else {
+        console.log('Some permissions are not granted.');
+        return false;
+      }
+    } catch (err) {
+      console.error('Error requesting permissions:', err);
+      return false;
+    }
   }
 }
 

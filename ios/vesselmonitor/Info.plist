@@ -25,14 +25,27 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
-	<dict>
-		<key>NSAllowsArbitraryLoads</key>
-		<false/>
-		<key>NSAllowsLocalNetworking</key>
-		<true/>
-	</dict>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+    <dict>
+        <key>NSAllowsArbitraryLoads</key>
+        <true/>
+        <key>NSAllowsArbitraryLoadsInWebContent</key>
+        <true/>
+        <key>NSAllowsLocalNetworking</key>
+        <true/>
+    </dict>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+    <string>[REASON]</string>
+    <key>NSBluetoothPeripheralUsageDescription</key>
+    <string>[REASON]</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>[REASON]</string>
+    <key>NSLocationTemporaryUsageDescriptionDictionary</key>
+    <dict>
+      <key>YOUR-PURPOSE-KEY</key>
+      <string>[REASON]</string>
+    </dict>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>[REASON]</string>
 	<key>UILaunchStoryboardName</key>
 	<string>BootSplash.storyboard</string>
 	<key>UIRequiredDeviceCapabilities</key>

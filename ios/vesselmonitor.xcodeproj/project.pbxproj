@@ -12,25 +12,27 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
+		326DBAE6A98B46FEAF9FBF74 /* NotoSans-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 19F148A12D54485AAC049EB9 /* NotoSans-BoldItalic.ttf */; };
+		4B2422646D66488490E24361 /* CrimsonText-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B1BF21D6A24C4F1085FF0170 /* CrimsonText-Regular.ttf */; };
+		5331DAF2EC8340B598F6CDC8 /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 05E1C2DFE52749EBBCF4E33E /* BootSplash.storyboard */; };
+		6D08353DBB384AC58F9FC35A /* AnonymousPro-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E5D31B7BA02C42E7BCB41861 /* AnonymousPro-Bold.ttf */; };
+		72090D35F6E143C897014E5F /* NotoSerif-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 494150EA6A6C464687A46675 /* NotoSerif-Regular.ttf */; };
 		7699B88040F8A987B510C191 /* libPods-vesselmonitor-vesselmonitorTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-vesselmonitor-vesselmonitorTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		6D08353DBB384AC58F9FC35A /* AnonymousPro-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E5D31B7BA02C42E7BCB41861 /* AnonymousPro-Bold.ttf */; };
-		C738A0DA909541FDB4501C7B /* AnonymousPro-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = CB45465E698E410694219524 /* AnonymousPro-Regular.ttf */; };
 		8DB6DFA477EB4A359A13444A /* CrimsonText-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 92547443AE544095848CBA81 /* CrimsonText-Bold.ttf */; };
-		4B2422646D66488490E24361 /* CrimsonText-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B1BF21D6A24C4F1085FF0170 /* CrimsonText-Regular.ttf */; };
 		93EB6893A98042668B344DDE /* NotoSerif-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1DF90BDE4F0945F1B0D6EE49 /* NotoSerif-Bold.ttf */; };
-		72090D35F6E143C897014E5F /* NotoSerif-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 494150EA6A6C464687A46675 /* NotoSerif-Regular.ttf */; };
+		B3E5CCBDDB3881B105C9E3C0 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDB96EAC6779863B4D4C4F48 /* ExpoModulesProvider.swift */; };
 		C5A8E439FE8E422EB2242FAA /* NotoSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = ED5DE1945D8C4A8F83B28958 /* NotoSans-Bold.ttf */; };
-		326DBAE6A98B46FEAF9FBF74 /* NotoSans-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 19F148A12D54485AAC049EB9 /* NotoSans-BoldItalic.ttf */; };
+		C662AE212C12F1F78BDF9BB1 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55254AABF9533E2964413067 /* ExpoModulesProvider.swift */; };
+		C738A0DA909541FDB4501C7B /* AnonymousPro-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = CB45465E698E410694219524 /* AnonymousPro-Regular.ttf */; };
 		F12F2EAAE3B94A2C883E2DC3 /* NotoSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F5F920A3BCA642D6916D5B7A /* NotoSans-Regular.ttf */; };
 		F794024CD23848FD8C94F0C3 /* AnonymousPro-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1A56B249865E45A984FC6A81 /* AnonymousPro-Italic.ttf */; };
-		5331DAF2EC8340B598F6CDC8 /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 05E1C2DFE52749EBBCF4E33E /* BootSplash.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
 		00E356F41AD99517003FC87E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 83CBB9F71A601CBA00E9B192;
+			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 13B07F861A680F5B00A75B9A;
 			remoteInfo = vesselmonitor;
@@ -41,31 +43,33 @@
 		00E356EE1AD99517003FC87E /* vesselmonitorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = vesselmonitorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* vesselmonitorTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = vesselmonitorTests.m; sourceTree = "<group>"; };
+		05E1C2DFE52749EBBCF4E33E /* BootSplash.storyboard */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = BootSplash.storyboard; path = vesselmonitor/BootSplash.storyboard; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* vesselmonitor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vesselmonitor.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = vesselmonitor/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = vesselmonitor/AppDelegate.mm; sourceTree = "<group>"; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = vesselmonitor/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = vesselmonitor/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = vesselmonitor/main.m; sourceTree = "<group>"; };
+		19F148A12D54485AAC049EB9 /* NotoSans-BoldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NotoSans-BoldItalic.ttf"; path = "../src/assets/fonts/NotoSans-BoldItalic.ttf"; sourceTree = "<group>"; };
 		19F6CBCC0A4E27FBF8BF4A61 /* libPods-vesselmonitor-vesselmonitorTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-vesselmonitor-vesselmonitorTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1A56B249865E45A984FC6A81 /* AnonymousPro-Italic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "AnonymousPro-Italic.ttf"; path = "../src/assets/fonts/AnonymousPro-Italic.ttf"; sourceTree = "<group>"; };
+		1DF90BDE4F0945F1B0D6EE49 /* NotoSerif-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NotoSerif-Bold.ttf"; path = "../src/assets/fonts/NotoSerif-Bold.ttf"; sourceTree = "<group>"; };
 		3B4392A12AC88292D35C810B /* Pods-vesselmonitor.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-vesselmonitor.debug.xcconfig"; path = "Target Support Files/Pods-vesselmonitor/Pods-vesselmonitor.debug.xcconfig"; sourceTree = "<group>"; };
+		494150EA6A6C464687A46675 /* NotoSerif-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NotoSerif-Regular.ttf"; path = "../src/assets/fonts/NotoSerif-Regular.ttf"; sourceTree = "<group>"; };
+		55254AABF9533E2964413067 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-vesselmonitor-vesselmonitorTests/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 		5709B34CF0A7D63546082F79 /* Pods-vesselmonitor.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-vesselmonitor.release.xcconfig"; path = "Target Support Files/Pods-vesselmonitor/Pods-vesselmonitor.release.xcconfig"; sourceTree = "<group>"; };
 		5B7EB9410499542E8C5724F5 /* Pods-vesselmonitor-vesselmonitorTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-vesselmonitor-vesselmonitorTests.debug.xcconfig"; path = "Target Support Files/Pods-vesselmonitor-vesselmonitorTests/Pods-vesselmonitor-vesselmonitorTests.debug.xcconfig"; sourceTree = "<group>"; };
 		5DCACB8F33CDC322A6C60F78 /* libPods-vesselmonitor.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-vesselmonitor.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = vesselmonitor/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-vesselmonitor-vesselmonitorTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-vesselmonitor-vesselmonitorTests.release.xcconfig"; path = "Target Support Files/Pods-vesselmonitor-vesselmonitorTests/Pods-vesselmonitor-vesselmonitorTests.release.xcconfig"; sourceTree = "<group>"; };
+		92547443AE544095848CBA81 /* CrimsonText-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "CrimsonText-Bold.ttf"; path = "../src/assets/fonts/CrimsonText-Bold.ttf"; sourceTree = "<group>"; };
+		B1BF21D6A24C4F1085FF0170 /* CrimsonText-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "CrimsonText-Regular.ttf"; path = "../src/assets/fonts/CrimsonText-Regular.ttf"; sourceTree = "<group>"; };
+		CB45465E698E410694219524 /* AnonymousPro-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "AnonymousPro-Regular.ttf"; path = "../src/assets/fonts/AnonymousPro-Regular.ttf"; sourceTree = "<group>"; };
+		DDB96EAC6779863B4D4C4F48 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-vesselmonitor/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
+		E5D31B7BA02C42E7BCB41861 /* AnonymousPro-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "AnonymousPro-Bold.ttf"; path = "../src/assets/fonts/AnonymousPro-Bold.ttf"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
-		E5D31B7BA02C42E7BCB41861 /* AnonymousPro-Bold.ttf */ = {isa = PBXFileReference; name = "AnonymousPro-Bold.ttf"; path = "../src/assets/fonts/AnonymousPro-Bold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		CB45465E698E410694219524 /* AnonymousPro-Regular.ttf */ = {isa = PBXFileReference; name = "AnonymousPro-Regular.ttf"; path = "../src/assets/fonts/AnonymousPro-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		92547443AE544095848CBA81 /* CrimsonText-Bold.ttf */ = {isa = PBXFileReference; name = "CrimsonText-Bold.ttf"; path = "../src/assets/fonts/CrimsonText-Bold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		B1BF21D6A24C4F1085FF0170 /* CrimsonText-Regular.ttf */ = {isa = PBXFileReference; name = "CrimsonText-Regular.ttf"; path = "../src/assets/fonts/CrimsonText-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		1DF90BDE4F0945F1B0D6EE49 /* NotoSerif-Bold.ttf */ = {isa = PBXFileReference; name = "NotoSerif-Bold.ttf"; path = "../src/assets/fonts/NotoSerif-Bold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		494150EA6A6C464687A46675 /* NotoSerif-Regular.ttf */ = {isa = PBXFileReference; name = "NotoSerif-Regular.ttf"; path = "../src/assets/fonts/NotoSerif-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		ED5DE1945D8C4A8F83B28958 /* NotoSans-Bold.ttf */ = {isa = PBXFileReference; name = "NotoSans-Bold.ttf"; path = "../src/assets/fonts/NotoSans-Bold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		19F148A12D54485AAC049EB9 /* NotoSans-BoldItalic.ttf */ = {isa = PBXFileReference; name = "NotoSans-BoldItalic.ttf"; path = "../src/assets/fonts/NotoSans-BoldItalic.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		F5F920A3BCA642D6916D5B7A /* NotoSans-Regular.ttf */ = {isa = PBXFileReference; name = "NotoSans-Regular.ttf"; path = "../src/assets/fonts/NotoSans-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		1A56B249865E45A984FC6A81 /* AnonymousPro-Italic.ttf */ = {isa = PBXFileReference; name = "AnonymousPro-Italic.ttf"; path = "../src/assets/fonts/AnonymousPro-Italic.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		05E1C2DFE52749EBBCF4E33E /* BootSplash.storyboard */ = {isa = PBXFileReference; name = "BootSplash.storyboard"; path = "vesselmonitor/BootSplash.storyboard"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		ED5DE1945D8C4A8F83B28958 /* NotoSans-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NotoSans-Bold.ttf"; path = "../src/assets/fonts/NotoSans-Bold.ttf"; sourceTree = "<group>"; };
+		F5F920A3BCA642D6916D5B7A /* NotoSans-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NotoSans-Regular.ttf"; path = "../src/assets/fonts/NotoSans-Regular.ttf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -129,49 +133,6 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Libraries;
-			sourceTree = "<group>";
-		};
-		83CBB9F61A601CBA00E9B192 /* PBXGroup */ = {
-			isa = PBXGroup;
-			children = (
-				13B07FAE1A68108700A75B9A /* vesselmonitor */,
-				832341AE1AAA6A7D00B99B32 /* Libraries */,
-				00E356EF1AD99517003FC87E /* vesselmonitorTests */,
-				83CBBA001A601CBA00E9B192 /* Products */,
-				2D16E6871FA4F8E400B85C8A /* Frameworks */,
-				BBD78D7AC51CEA395F1C20DB /* Pods */,
-				532B9E8FA6EB4E01897B85BA /* Resources */,
-			);
-			indentWidth = 2;
-			sourceTree = "<group>";
-			tabWidth = 2;
-			usesTabs = 0;
-		};
-		83CBBA001A601CBA00E9B192 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				13B07F961A680F5B00A75B9A /* vesselmonitor.app */,
-				00E356EE1AD99517003FC87E /* vesselmonitorTests.xctest */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				3B4392A12AC88292D35C810B /* Pods-vesselmonitor.debug.xcconfig */,
-				5709B34CF0A7D63546082F79 /* Pods-vesselmonitor.release.xcconfig */,
-				5B7EB9410499542E8C5724F5 /* Pods-vesselmonitor-vesselmonitorTests.debug.xcconfig */,
-				89C6BE57DB24E9ADA2F236DE /* Pods-vesselmonitor-vesselmonitorTests.release.xcconfig */,
-			);
-			path = Pods;
-			sourceTree = "<group>";
-		};
 		532B9E8FA6EB4E01897B85BA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
@@ -188,7 +149,75 @@
 			);
 			name = Resources;
 			sourceTree = "<group>";
-			path = "";
+		};
+		72E3474CB159CED28858723D /* vesselmonitorTests */ = {
+			isa = PBXGroup;
+			children = (
+				55254AABF9533E2964413067 /* ExpoModulesProvider.swift */,
+			);
+			name = vesselmonitorTests;
+			sourceTree = "<group>";
+		};
+		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Libraries;
+			sourceTree = "<group>";
+		};
+		83CBB9F61A601CBA00E9B192 = {
+			isa = PBXGroup;
+			children = (
+				13B07FAE1A68108700A75B9A /* vesselmonitor */,
+				832341AE1AAA6A7D00B99B32 /* Libraries */,
+				00E356EF1AD99517003FC87E /* vesselmonitorTests */,
+				83CBBA001A601CBA00E9B192 /* Products */,
+				2D16E6871FA4F8E400B85C8A /* Frameworks */,
+				BBD78D7AC51CEA395F1C20DB /* Pods */,
+				532B9E8FA6EB4E01897B85BA /* Resources */,
+				88CB13E0A547299EF19F3A6A /* ExpoModulesProviders */,
+			);
+			indentWidth = 2;
+			sourceTree = "<group>";
+			tabWidth = 2;
+			usesTabs = 0;
+		};
+		83CBBA001A601CBA00E9B192 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				13B07F961A680F5B00A75B9A /* vesselmonitor.app */,
+				00E356EE1AD99517003FC87E /* vesselmonitorTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		88CB13E0A547299EF19F3A6A /* ExpoModulesProviders */ = {
+			isa = PBXGroup;
+			children = (
+				E8059B823770856005D653DC /* vesselmonitor */,
+				72E3474CB159CED28858723D /* vesselmonitorTests */,
+			);
+			name = ExpoModulesProviders;
+			sourceTree = "<group>";
+		};
+		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				3B4392A12AC88292D35C810B /* Pods-vesselmonitor.debug.xcconfig */,
+				5709B34CF0A7D63546082F79 /* Pods-vesselmonitor.release.xcconfig */,
+				5B7EB9410499542E8C5724F5 /* Pods-vesselmonitor-vesselmonitorTests.debug.xcconfig */,
+				89C6BE57DB24E9ADA2F236DE /* Pods-vesselmonitor-vesselmonitorTests.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		E8059B823770856005D653DC /* vesselmonitor */ = {
+			isa = PBXGroup;
+			children = (
+				DDB96EAC6779863B4D4C4F48 /* ExpoModulesProvider.swift */,
+			);
+			name = vesselmonitor;
+			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
@@ -198,6 +227,7 @@
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "vesselmonitorTests" */;
 			buildPhases = (
 				A55EABD7B0C7F3A422A6CC61 /* [CP] Check Pods Manifest.lock */,
+				D7E594F1C9B0EAE0E6558E8B /* [Expo] Configure project */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
@@ -219,6 +249,7 @@
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "vesselmonitor" */;
 			buildPhases = (
 				C38B50BA6285516D6DCD4F65 /* [CP] Check Pods Manifest.lock */,
+				CDEC5107E676A4D2129B7E01 /* [Expo] Configure project */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
@@ -238,14 +269,14 @@
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		83CBB9F71A601CBA00E9B192 = {
+		83CBB9F71A601CBA00E9B192 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 1210;
 				TargetAttributes = {
 					00E356ED1AD99517003FC87E = {
 						CreatedOnToolsVersion = 6.2;
-						TestTargetID = 13B07F861A680F5B00A75B9A /* vesselmonitor */;
+						TestTargetID = 13B07F861A680F5B00A75B9A;
 					};
 					13B07F861A680F5B00A75B9A = {
 						LastSwiftMigration = 1120;
@@ -260,7 +291,7 @@
 				en,
 				Base,
 			);
-			mainGroup = 83CBB9F61A601CBA00E9B192 /* PBXGroup */;
+			mainGroup = 83CBB9F61A601CBA00E9B192;
 			productRefGroup = 83CBBA001A601CBA00E9B192 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -396,6 +427,44 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-vesselmonitor-vesselmonitorTests/Pods-vesselmonitor-vesselmonitorTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
+		CDEC5107E676A4D2129B7E01 /* [Expo] Configure project */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "[Expo] Configure project";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-vesselmonitor/expo-configure-project.sh\"\n";
+		};
+		D7E594F1C9B0EAE0E6558E8B /* [Expo] Configure project */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "[Expo] Configure project";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-vesselmonitor-vesselmonitorTests/expo-configure-project.sh\"\n";
+		};
 		E235C05ADACE081382539298 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -438,6 +507,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				00E356F31AD99517003FC87E /* vesselmonitorTests.m in Sources */,
+				C662AE212C12F1F78BDF9BB1 /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -447,6 +517,7 @@
 			files = (
 				13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
+				B3E5CCBDDB3881B105C9E3C0 /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -482,6 +553,7 @@
 					"-lc++",
 					"$(inherited)",
 				);
+				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/vesselmonitor.app/vesselmonitor";
@@ -506,6 +578,7 @@
 					"-lc++",
 					"$(inherited)",
 				);
+				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/vesselmonitor.app/vesselmonitor";
@@ -519,6 +592,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = T79PT33JYU;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = vesselmonitor/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -531,6 +605,7 @@
 					"-ObjC",
 					"-lc++",
 				);
+				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = vesselmonitor;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -546,6 +621,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = T79PT33JYU;
 				INFOPLIST_FILE = vesselmonitor/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -557,6 +633,7 @@
 					"-ObjC",
 					"-lc++",
 				);
+				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = vesselmonitor;
 				SWIFT_VERSION = 5.0;
@@ -597,7 +674,7 @@
 				COPY_PHASE_STRIP = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = i386;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -625,6 +702,7 @@
 				);
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
 					"-DFOLLY_NO_CONFIG",
@@ -632,7 +710,13 @@
 					"-DFOLLY_USE_LIBCPP=1",
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					" ",
+				);
+				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
+				USE_HERMES = true;
 			};
 			name = Debug;
 		};
@@ -669,7 +753,7 @@
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = i386;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -689,6 +773,7 @@
 					"\"$(inherited)\"",
 				);
 				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
 					"-DFOLLY_NO_CONFIG",
@@ -696,7 +781,13 @@
 					"-DFOLLY_USE_LIBCPP=1",
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					" ",
+				);
+				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
+				USE_HERMES = true;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -733,5 +824,5 @@
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 83CBB9F71A601CBA00E9B192;
+	rootObject = 83CBB9F71A601CBA00E9B192 /* Project object */;
 }
