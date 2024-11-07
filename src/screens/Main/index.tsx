@@ -192,7 +192,10 @@ export default function Main() {
             <GapView length={90} />
             <TouchableOpacity
               style={{alignSelf: 'flex-end', paddingRight: '4%'}}
-              onPress={fetchSocketData}>
+              onPress={() => {
+                setReloadAttempts(0);
+                fetchSocketData();
+              }}>
               <Ionicons name="reload" size={35} color={theme.colors.primary} />
             </TouchableOpacity>
             {resolvedService1 && (
