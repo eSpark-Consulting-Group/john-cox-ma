@@ -42,6 +42,7 @@ export default function Main() {
     timesp1: false,
     timesp2: false,
   });
+  const [reloadAttempts, setReloadAttempts] = useState(0);
 
   const sumOfBurn = useMemo(() => {
     return (
@@ -127,6 +128,17 @@ export default function Main() {
       getSocketData(resolvedService2.host, resolvedService2.port, 'timesp2');
     }
   };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (resolvedService1 && enginesData1.length === 0 && reloadAttempts < 3) {
+        ('reconnecting socket');
+        fetchSocketData();
+        setReloadAttempts(prev => prev + 1);
+      }
+    }, 5000); // Adjust interval duration as needed
+    return () => clearInterval(interval);
+  }, [resolvedService1, enginesData1, reloadAttempts]);
 
   return (
     <MyCanvas>

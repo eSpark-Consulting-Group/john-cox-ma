@@ -36,7 +36,10 @@ function MyGauge({value = 0, name}: MyGaugeProps) {
           text={name}
           fontFamily="CrimsonText-Bold"
           size={14}
-          style={styles().name}
+          style={[
+            styles().name,
+            name === 'reload' && {color: 'red'}, // Conditionally set text color to red
+          ]}
         />
         <RNSpeedometer
           value={value}
