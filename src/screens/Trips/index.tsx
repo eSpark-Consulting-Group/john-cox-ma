@@ -654,7 +654,7 @@ export default function Trips() {
     const tripStartRef = await AsyncStorage.getItem('tripStartRef');
     if (tripStartRef) {
       if (reset) {
-        setWarningVisible(true);        
+        setWarningVisible(true);
       }
       const trip = JSON.parse(tripStartRef);
       console.log({trip});

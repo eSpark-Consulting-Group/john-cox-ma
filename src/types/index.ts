@@ -137,6 +137,7 @@ export type DisplayBoxProps = {
 export type FuelManagementData = {
   id: number;
   engine_id: number;
+  current_fuel_consumption: number;
   distance_to_empty: number;
   remaining_fuel: number;
   total_fuel_burned: number;
@@ -145,7 +146,6 @@ export type FuelManagementData = {
 export type SensorDataProps = {
   id: number;
   engine_id: number;
-  fuel: string | undefined;
   temperature_return: string;
   temperature_supply: string;
   timestamp_unix: string;
@@ -166,6 +166,10 @@ export type EngineData = {
 export type SocketJSON = {
   Engines: EngineData[];
   speed: string;
+  tank1_fuel: number;
+  tank2_fuel: number;
+  tank3_fuel: number;
+  tank4_fuel: number;
 };
 
 export type TripData = {

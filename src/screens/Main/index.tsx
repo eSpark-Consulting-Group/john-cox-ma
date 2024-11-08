@@ -204,8 +204,11 @@ export default function Main() {
                       <MyGauge
                         key={item.name + item.position}
                         value={
-                          item?.SensorData?.fuel && item.enabled
-                            ? Number(item?.SensorData?.fuel)
+                          item?.FuelManagement.current_fuel_consumption &&
+                          item.enabled
+                            ? Number(
+                                item?.FuelManagement.current_fuel_consumption,
+                              )
                             : NaN
                         }
                         name={item.position}
@@ -224,8 +227,11 @@ export default function Main() {
                       <MyGauge
                         key={item.name + item.position}
                         value={
-                          item?.SensorData?.fuel && item.enabled
-                            ? Number(item?.SensorData?.fuel)
+                          item?.FuelManagement.current_fuel_consumption &&
+                          item.enabled
+                            ? Number(
+                                item?.FuelManagement.current_fuel_consumption,
+                              )
                             : NaN
                         }
                         name={item.position}
