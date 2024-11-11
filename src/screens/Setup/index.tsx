@@ -13,7 +13,7 @@ import {
   MyHeader,
   MyText,
 } from '../../components';
-import {MyTheme} from '../../types';
+import {MyTheme, Unit} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
 import {temp} from '../../constants';
 import LabelDropdown from '../../components/LabelDropdown';
@@ -28,6 +28,7 @@ type RouteType = {
     };
   };
 };
+
 export default function Setup({route}: RouteType) {
   const {loggedinDomain, deviceName} = route.params;
   const theme = useTheme() as MyTheme;
@@ -36,6 +37,7 @@ export default function Setup({route}: RouteType) {
   const [config, setConfig] = useState(
     deviceName === 'timesp1' ? enginesData1 : enginesData2,
   );
+  const [toUnit, setToUnit] = useState<Unit>('kilometers');
 
   const onPress = (index: number) => {
     const allConfig = [...config];
@@ -59,9 +61,20 @@ export default function Setup({route}: RouteType) {
   const logoutHandler = async () => {
     try {
       await AsyncStorage.removeItem('token');
+      setToUnit('kilometers');
       navigation.navigate('Main');
     } catch (error) {
       console.error('Error during logout:', error);
+    }
+  };
+
+  const onUnitSelect = (value: string) => {
+    if (value == 'Statute Miles') {
+      setToUnit('miles');
+    } else if (value == 'Nautical Miles') {
+      setToUnit('nauticalMiles');
+    } else {
+      setToUnit('kilometers');
     }
   };
   return (
@@ -82,7 +95,17 @@ export default function Setup({route}: RouteType) {
           <View style={{zIndex: 7}}>
             <MyCard>
               <GapView length={15} />
-              {temp.map((item, index) => (
+
+              <LabelDropdown
+                text={'Distance'}
+                data={['Kilometers', 'Statute Miles', 'Nautical Miles']}
+                onSelect={(value: Unit) => {
+                  onUnitSelect(value);
+                }}
+                zIndex={62}
+                value={toUnit}
+              />
+              {/* {temp.map((item, index) => (
                 <View key={index}>
                   <LabelDropdown
                     text={item.text}
@@ -92,7 +115,7 @@ export default function Setup({route}: RouteType) {
                   />
                   <GapView length={index != 3 ? 20 : 15} />
                 </View>
-              ))}
+              ))} */}
             </MyCard>
           </View>
           <GapView length={15} />
@@ -181,6 +204,7 @@ export default function Setup({route}: RouteType) {
                 config,
                 loggedinDomain,
                 deviceName,
+                toUnit,
               });
             }}
           />

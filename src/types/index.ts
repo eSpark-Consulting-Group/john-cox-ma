@@ -102,7 +102,7 @@ export interface LabelDropdownProps {
   size?: number;
   data: string[];
   zIndex?: number;
-  onSelect: (value: string) => void;
+  onSelect: (value: any) => void;
   style?: StyleProp<ViewStyle>;
   containerStyle?: ViewStyle;
   height?: number;
@@ -184,3 +184,5 @@ export type TripData = {
   fuelConsumption: number[]; // assuming it's an array of numbers
   tripEfficiency: number | undefined;
 };
+
+export type Unit = 'kilometers' | 'miles' | 'nauticalMiles';
