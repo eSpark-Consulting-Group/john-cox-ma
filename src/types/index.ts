@@ -185,4 +185,5 @@ export type TripData = {
   tripEfficiency: number | undefined;
 };
 
-export type Unit = 'kilometers' | 'miles' | 'nauticalMiles';
+export type DistanceUnit = 'Kilometers' | 'Statute Miles' | 'Nautical Miles';
+export type VolumeUnit = 'US Gallons' | 'Liters' ;

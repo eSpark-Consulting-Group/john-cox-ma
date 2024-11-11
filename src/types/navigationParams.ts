@@ -1,5 +1,5 @@
 import {ESPDevice} from '@espark-consultants/react-native-esp-idf-provisioning';
-import {EngineData, Unit} from '.';
+import {EngineData, DistanceUnit, VolumeUnit} from '.';
 
 export type RootStackParamsList = {
   WithContext: undefined;
@@ -14,7 +14,8 @@ export type RootStackParamsList = {
     config: EngineData[];
     loggedinDomain: string;
     deviceName: 'timesp1' | 'timesp2';
-    toUnit: Unit
+    distanceToUnit?: DistanceUnit
+    volumeToUnit?: VolumeUnit
   };
   FuelTanks: undefined;
   ScanDevices: undefined;

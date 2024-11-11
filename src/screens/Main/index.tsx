@@ -24,12 +24,18 @@ import {
   MyGauge,
   MyCanvas,
 } from '../../components';
-import {MyTheme, Unit} from '../../types';
+import {MyTheme, DistanceUnit, VolumeUnit} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
 import {useSocket} from '../../components/SocketProvider';
 import NauticalMile from './NauticalMilte';
 import {useService} from '../../components/ServiceProvider';
-import {distanceUnit, distanceValue, getUnits} from '../FMMSetup/utils';
+import {
+  distanceUnit,
+  distanceValue,
+  getUnits,
+  volumeUnit,
+  volumeValue,
+} from '../FMMSetup/utils';
 
 type MainScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 
@@ -40,7 +46,10 @@ export default function Main() {
   const navigation = useNavigation<MainScreenProps['navigation']>();
   const [generatorRunning, setGeneratorRunning] = useState<'Yes' | 'No'>('Yes');
   const [confirmation, setConfirmation] = useState(false);
-  const [units, setUnits] = useState<{distance: Unit}>();
+  const [units, setUnits] = useState<{
+    distance: DistanceUnit;
+    volume: VolumeUnit;
+  }>();
   const hasFocusedRef = useRef(false);
 
   const sumOfBurn = useMemo(() => {
@@ -294,8 +303,11 @@ export default function Main() {
                   <MyBox
                     label="Range"
                     text="Fuel Remaining"
-                    value={remainingFuel}
-                    unit="gal"
+                    value={volumeValue(
+                      remainingFuel,
+                      volumeUnit(units?.volume!),
+                    )}
+                    unit={volumeUnit(units?.volume!)}
                   />
                 </View>
                 <View style={{width: '40%'}}>

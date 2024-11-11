@@ -1,10 +1,12 @@
 // conversions.ts
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {Unit} from '../../../types';
-import {useState} from 'react';
+import {DistanceUnit, VolumeUnit} from '../../../types';
 
-export const updateUnits = async (units: {distance: Unit}) => {
+export const updateUnits = async (units: {
+  distance: DistanceUnit;
+  volume: VolumeUnit;
+}) => {
   try {
     AsyncStorage.setItem('units', JSON.stringify(units));
     console.log('Units saved successfully');
@@ -16,20 +18,29 @@ export const updateUnits = async (units: {distance: Unit}) => {
 export const getUnits = async () => {
   const units = await AsyncStorage.getItem('units');
   if (units) {
-    const parsedUnits: {distance: Unit} = JSON.parse(units);
+    const parsedUnits: {distance: DistanceUnit; volume: VolumeUnit} =
+      JSON.parse(units);
 
     return parsedUnits;
   }
 };
 
-export const distanceUnit = (value: Unit) => {
+export const distanceUnit = (value: DistanceUnit) => {
   switch (value) {
-    case 'miles':
+    case 'Statute Miles':
       return 'S.Mile';
-    case 'nauticalMiles':
+    case 'Nautical Miles':
       return 'N.Mile';
     default:
       return 'Km';
+  }
+};
+export const volumeUnit = (value: VolumeUnit) => {
+  switch (value) {
+    case 'US Gallons':
+      return 'gal';
+    default:
+      return 'Ltr';
   }
 };
 
@@ -55,56 +66,16 @@ export const distanceValue = (
     }
   }
 };
+type volumeUnitsType = 'Ltr' | 'gal';
 
-interface ConversionResult {
-  value: number;
-  fromUnit: Unit;
-  toUnit: Unit;
-}
-
-export const convertDistance = (
-  value: number,
-  fromUnit: Unit,
-  toUnit: Unit,
-): ConversionResult => {
-  if (fromUnit === toUnit) {
-    return {value, fromUnit, toUnit}; // No conversion needed
-  }
-
-  // Conversion rates
+export const volumeValue = (incomingVolume: number, unit: volumeUnitsType) => {
   const conversionRates = {
-    kilometersToMiles: 0.621371,
-    kilometersToNauticalMiles: 0.539957,
+    litresToGallons: 0.264172,
   };
 
-  let convertedValue: number;
-
-  switch (`${fromUnit}To${toUnit}`) {
-    case 'kilometersToMiles':
-      convertedValue = value * conversionRates.kilometersToMiles;
-      break;
-    case 'kilometersToNauticalMiles':
-      convertedValue = value * conversionRates.kilometersToNauticalMiles;
-      break;
-    case 'milesToKilometers':
-      convertedValue = value / conversionRates.kilometersToMiles;
-      break;
-    case 'milesToNauticalMiles':
-      convertedValue =
-        (value / conversionRates.kilometersToMiles) *
-        conversionRates.kilometersToNauticalMiles;
-      break;
-    case 'nauticalMilesToKilometers':
-      convertedValue = value / conversionRates.kilometersToNauticalMiles;
-      break;
-    case 'nauticalMilesToMiles':
-      convertedValue =
-        (value / conversionRates.kilometersToNauticalMiles) *
-        conversionRates.kilometersToMiles;
-      break;
-    default:
-      convertedValue = value; // No conversion if case not matched
+  if (incomingVolume && unit == 'gal') {
+    return incomingVolume * conversionRates.litresToGallons;
+  } else {
+    return incomingVolume;
   }
-
-  return {value: convertedValue, fromUnit, toUnit};
 };

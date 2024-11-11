@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {ScrollView, StyleSheet, View, KeyboardAvoidingView} from 'react-native';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -13,11 +13,12 @@ import {
   MyHeader,
   MyText,
 } from '../../components';
-import {MyTheme, Unit} from '../../types';
+import {MyTheme, DistanceUnit, VolumeUnit} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
 import {temp} from '../../constants';
 import LabelDropdown from '../../components/LabelDropdown';
 import {useSocket} from '../../components/SocketProvider';
+import {getUnits} from '../FMMSetup/utils';
 
 type SetupScreenProps = NativeStackScreenProps<RootStackParamsList, 'Setup'>;
 type RouteType = {
@@ -37,7 +38,8 @@ export default function Setup({route}: RouteType) {
   const [config, setConfig] = useState(
     deviceName === 'timesp1' ? enginesData1 : enginesData2,
   );
-  const [toUnit, setToUnit] = useState<Unit>('kilometers');
+  const [distanceToUnit, setDistanceToUnit] = useState<DistanceUnit>();
+  const [volumeToUnit, setVolumeToUnit] = useState<VolumeUnit>();
 
   const onPress = (index: number) => {
     const allConfig = [...config];
@@ -61,21 +63,31 @@ export default function Setup({route}: RouteType) {
   const logoutHandler = async () => {
     try {
       await AsyncStorage.removeItem('token');
-      setToUnit('kilometers');
       navigation.navigate('Main');
     } catch (error) {
       console.error('Error during logout:', error);
     }
   };
 
-  const onUnitSelect = (value: string) => {
-    if (value == 'Statute Miles') {
-      setToUnit('miles');
-    } else if (value == 'Nautical Miles') {
-      setToUnit('nauticalMiles');
-    } else {
-      setToUnit('kilometers');
+  const fetchUnits = async () => {
+    const unitsData = await getUnits();
+    console.log('Fetched Units Data:', unitsData);
+
+    if (unitsData) {
+      setDistanceToUnit(unitsData.distance);
+      setVolumeToUnit(unitsData.volume);
     }
+  };
+  useEffect(() => {
+    fetchUnits();
+  }, []);
+
+  const onDistanceUnitSelect = (value: DistanceUnit) => {
+    setDistanceToUnit(value);
+  };
+
+  const onVolumeUnitSelect = (value: VolumeUnit) => {
+    setVolumeToUnit(value);
   };
   return (
     <MyCanvas>
@@ -97,13 +109,22 @@ export default function Setup({route}: RouteType) {
               <GapView length={15} />
 
               <LabelDropdown
+                text={'Volume'}
+                data={['US Gallons', 'Liters']}
+                onSelect={(value: VolumeUnit) => {
+                  onVolumeUnitSelect(value);
+                }}
+                zIndex={64}
+                value={volumeToUnit}
+              />
+              <LabelDropdown
                 text={'Distance'}
                 data={['Kilometers', 'Statute Miles', 'Nautical Miles']}
-                onSelect={(value: Unit) => {
-                  onUnitSelect(value);
+                onSelect={(value: DistanceUnit) => {
+                  onDistanceUnitSelect(value);
                 }}
                 zIndex={62}
-                value={toUnit}
+                value={distanceToUnit}
               />
               {/* {temp.map((item, index) => (
                 <View key={index}>
@@ -204,7 +225,8 @@ export default function Setup({route}: RouteType) {
                 config,
                 loggedinDomain,
                 deviceName,
-                toUnit,
+                distanceToUnit,
+                volumeToUnit,
               });
             }}
           />

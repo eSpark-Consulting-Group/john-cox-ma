@@ -15,7 +15,13 @@ import {
   MyHeader,
   MyText,
 } from '../../components';
-import {EngineData, Fonts, MyTheme, Unit} from '../../types';
+import {
+  EngineData,
+  Fonts,
+  MyTheme,
+  DistanceUnit,
+  VolumeUnit,
+} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
 import LabelDropdown from '../../components/LabelDropdown';
 import {api} from '../../api';
@@ -29,7 +35,8 @@ type RouteType = {
       config: EngineData[];
       loggedinDomain: string;
       deviceName: 'timesp1' | 'timesp2';
-      toUnit: Unit;
+      distanceToUnit: DistanceUnit;
+      volumeToUnit: VolumeUnit;
     };
   };
 };
@@ -97,7 +104,8 @@ export default function FMMSetup({route}: RouteType) {
         console.log('Success response:', response);
 
         await updateUnits({
-          distance: route.params.toUnit,
+          distance: route.params.distanceToUnit,
+          volume: route.params.volumeToUnit,
         });
         logoutHandler();
       } else if (response.status === 401) {
