@@ -1,13 +1,13 @@
-export const temp = [
-  {text: 'Volume', options: ['US Gallons', 'Liters'], zindez: 64},
-  {
+export const temp = {
+  volume: {text: 'Volume', options: ['US Gallons', 'Liters'], zindez: 64},
+  distance: {
     text: 'Distance',
     options: ['Kilometers', 'Statute Miles', 'Nautical Miles'],
     zindez: 62,
   },
-  {text: 'Temperature', options: ['Fahrenheit', 'Celsius'], zindez: 60},
-  {text: 'Clock', options: ['12-Hour', '24-Hour'], zindez: 58},
-];
+  temperature: {text: 'Temperature', options: ['Fahrenheit', 'Celsius'], zindez: 60},
+  clock: {text: 'Clock', options: ['12-Hour', '24-Hour'], zindez: 58},
+};
 
 export const fuelData = [
   {

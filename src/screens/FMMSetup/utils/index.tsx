@@ -3,6 +3,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {DistanceUnit, VolumeUnit} from '../../../types';
 
+type volumeUnitsType = 'ltr' | 'gal';
+type distanceUnitsType = 'S.Mile' | 'N.Mile' | 'Km';
+// type temperatureUnitsType = 'ltr' | 'gal';
+
 export const updateUnits = async (units: {
   distance: DistanceUnit;
   volume: VolumeUnit;
@@ -44,8 +48,6 @@ export const volumeUnit = (value: VolumeUnit) => {
   }
 };
 
-type distanceUnitsType = 'S.Mile' | 'N.Mile' | 'Km';
-
 export const distanceValue = (
   incomingDistance: number,
   unit: distanceUnitsType,
@@ -66,7 +68,6 @@ export const distanceValue = (
     }
   }
 };
-type volumeUnitsType = 'ltr' | 'gal';
 
 export const volumeValue = (incomingVolume: number, unit: volumeUnitsType) => {
   const conversionRates = {
