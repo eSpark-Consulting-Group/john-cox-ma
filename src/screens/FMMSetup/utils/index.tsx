@@ -66,7 +66,7 @@ export const distanceValue = (
       default:
         return incomingDistance;
     }
-  }
+  } else return NaN;
 };
 
 export const volumeValue = (incomingVolume: number, unit: volumeUnitsType) => {
@@ -79,4 +79,20 @@ export const volumeValue = (incomingVolume: number, unit: volumeUnitsType) => {
   } else {
     return incomingVolume;
   }
+};
+
+export const convertConsumption = (
+  consumption: number,
+  volUnit: VolumeUnit,
+  distUnit: DistanceUnit,
+) => {
+  if (volUnit === 'Gallons') {
+    consumption /= 3.78541;
+  }
+  if (distUnit === 'Nautical Miles') {
+    consumption *= 1.852;
+  } else if (distUnit === 'Statute Miles') {
+    consumption *= 1.609;
+  }
+  return consumption;
 };

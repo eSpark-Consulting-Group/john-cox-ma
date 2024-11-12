@@ -3,6 +3,7 @@ import {useEffect, useRef, useState} from 'react';
 import {MyBox} from '../../components';
 import {useSocket} from '../../components/SocketProvider';
 import {DistanceUnit, VolumeUnit} from '../../types';
+import {convertConsumption} from '../FMMSetup/utils';
 
 interface NauticalMileProps {
   volUnit?: VolumeUnit;
@@ -30,22 +31,6 @@ const NauticalMile = ({volUnit, distUnit}: NauticalMileProps) => {
       clearInterval(interval.current);
     };
   }, []);
-
-  const convertConsumption = (
-    consumption: number,
-    volUnit: VolumeUnit,
-    distUnit: DistanceUnit,
-  ) => {
-    if (volUnit === 'Gallons') {
-      consumption /= 3.78541;
-    }
-    if (distUnit === 'Nautical Miles') {
-      consumption *= 1.852;
-    } else if (distUnit === 'Statute Miles') {
-      consumption *= 1.609;
-    }
-    return consumption;
-  };
 
   const calculateConsumption = (speed: string | number, time: number) => {
     // return (Number(speed) * time) / 60;

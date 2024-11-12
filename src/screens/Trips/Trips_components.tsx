@@ -1,7 +1,7 @@
 import {useTheme} from '@react-navigation/native';
 import {View, Modal, StyleSheet} from 'react-native';
 import {MyText, MyInput, DisplayBox} from '../../components';
-import {MyTheme} from '../../types';
+import {MyTheme, VolumeUnit} from '../../types';
 
 export interface RenderModalProps {
   visible: boolean;
@@ -80,9 +80,11 @@ export function RenderRow({
 export function RenderColumn({
   label,
   value,
+  volUnit,
 }: {
   label: number | string;
   value: number | string;
+  volUnit: VolumeUnit;
 }) {
   const theme = useTheme() as MyTheme;
   return (
@@ -98,7 +100,7 @@ export function RenderColumn({
         textColor={theme.colors.primary}
         fontFamily="CrimsonText-Bold"
       />
-      <MyText text={'gal'} />
+      <MyText text={volUnit == 'Gallons' ? 'gal' : 'ltr'} />
     </View>
   );
 }
