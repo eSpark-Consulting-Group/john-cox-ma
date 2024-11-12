@@ -37,10 +37,10 @@ export const distanceUnit = (value: DistanceUnit) => {
 };
 export const volumeUnit = (value: VolumeUnit) => {
   switch (value) {
-    case 'US Gallons':
+    case 'Gallons':
       return 'gal';
     default:
-      return 'Ltr';
+      return 'ltr';
   }
 };
 
@@ -66,7 +66,7 @@ export const distanceValue = (
     }
   }
 };
-type volumeUnitsType = 'Ltr' | 'gal';
+type volumeUnitsType = 'ltr' | 'gal';
 
 export const volumeValue = (incomingVolume: number, unit: volumeUnitsType) => {
   const conversionRates = {

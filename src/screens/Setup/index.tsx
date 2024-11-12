@@ -86,8 +86,10 @@ export default function Setup({route}: RouteType) {
     setDistanceToUnit(value);
   };
 
-  const onVolumeUnitSelect = (value: VolumeUnit) => {
-    setVolumeToUnit(value);
+  const onVolumeUnitSelect = (value: VolumeUnit | 'US Gallons') => {
+    if (value == 'US Gallons') {
+      setVolumeToUnit('Gallons');
+    } else setVolumeToUnit(value);
   };
   return (
     <MyCanvas>

@@ -186,4 +186,4 @@ export type TripData = {
 };
 
 export type DistanceUnit = 'Kilometers' | 'Statute Miles' | 'Nautical Miles';
-export type VolumeUnit = 'US Gallons' | 'Liters' ;
+export type VolumeUnit = 'Gallons' | 'Liters' ;

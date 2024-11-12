@@ -240,16 +240,25 @@ export default function Main() {
                         value={
                           item?.FuelManagement.current_fuel_consumption &&
                           item.enabled
-                            ? Number(
-                                item?.FuelManagement.current_fuel_consumption,
+                            ? volumeValue(
+                                Number(
+                                  item?.FuelManagement.current_fuel_consumption,
+                                ),
+                                volumeUnit(units?.volume!),
                               )
                             : NaN
                         }
                         name={item.position}
+                        volUnit={volumeUnit(units?.volume!)}
                       />
                     ))
                   : [1, 2].map((item, index) => (
-                      <MyGauge key={item} value={NaN} name="Reload" />
+                      <MyGauge
+                        key={item}
+                        value={NaN}
+                        name="Reload"
+                        volUnit={volumeUnit(units?.volume!)}
+                      />
                     ))}
               </View>
             )}
@@ -263,16 +272,25 @@ export default function Main() {
                         value={
                           item?.FuelManagement.current_fuel_consumption &&
                           item.enabled
-                            ? Number(
-                                item?.FuelManagement.current_fuel_consumption,
+                            ? volumeValue(
+                                Number(
+                                  item?.FuelManagement.current_fuel_consumption,
+                                ),
+                                volumeUnit(units?.volume!),
                               )
                             : NaN
                         }
                         name={item.position}
+                        volUnit={volumeUnit(units?.volume!)}
                       />
                     ))
                   : [1, 2].map((item, index) => (
-                      <MyGauge key={item} value={NaN} name="Reload" />
+                      <MyGauge
+                        key={item}
+                        value={NaN}
+                        name="Reload"
+                        volUnit={volumeUnit(units?.volume!)}
+                      />
                     ))}
               </View>
             )}
@@ -290,14 +308,17 @@ export default function Main() {
                 <View style={styles().fuelBurn}>
                   <MyBox
                     text="Total Fuel Burn"
-                    value={sumOfBurn}
-                    unit="gal/hr"
+                    value={volumeValue(sumOfBurn, volumeUnit(units?.volume!))}
+                    unit={volumeUnit(units?.volume!) + '/hr'}
                     width={'100%'}
                     gap={22}
                   />
                 </View>
               </View>
-              <NauticalMile />
+              <NauticalMile
+                volUnit={units?.volume}
+                distUnit={units?.distance}
+              />
               <View style={styles().range}>
                 <View style={{width: '50%'}}>
                   <MyBox

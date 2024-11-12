@@ -2,8 +2,14 @@ import {useEffect, useRef, useState} from 'react';
 
 import {MyBox} from '../../components';
 import {useSocket} from '../../components/SocketProvider';
+import {DistanceUnit, VolumeUnit} from '../../types';
 
-const NauticalMile = () => {
+interface NauticalMileProps {
+  volUnit?: VolumeUnit;
+  distUnit?: DistanceUnit;
+}
+
+const NauticalMile = ({volUnit, distUnit}: NauticalMileProps) => {
   const {getTimerValue, provision, speed} = useSocket();
   const [time, setTime] = useState(0);
 
@@ -25,11 +31,33 @@ const NauticalMile = () => {
     };
   }, []);
 
+  const convertConsumption = (
+    consumption: number,
+    volUnit: VolumeUnit,
+    distUnit: DistanceUnit,
+  ) => {
+    if (volUnit === 'Gallons') {
+      consumption /= 3.78541;
+    }
+    if (distUnit === 'Nautical Miles') {
+      consumption *= 1.852;
+    } else if (distUnit === 'Statute Miles') {
+      consumption *= 1.609;
+    }
+    return consumption;
+  };
+
+  const calculateConsumption = (speed: string | number, time: number) => {
+    // return (Number(speed) * time) / 60;
+    const consumptionLPerKm = (Number(speed) * time) / 60;
+    return convertConsumption(consumptionLPerKm, volUnit!, distUnit!);
+  };
+
   return (
     <MyBox
-      text="Gallons per Nautical mile"
-      value={(Number(speed) * time) / 60}
-      width={'70%'}
+      text={`${volUnit} per ${distUnit}`}
+      value={calculateConsumption(speed, time)}
+      width="70%"
     />
   );
 };
