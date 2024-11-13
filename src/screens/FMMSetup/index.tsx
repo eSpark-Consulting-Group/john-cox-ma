@@ -15,11 +15,18 @@ import {
   MyHeader,
   MyText,
 } from '../../components';
-import {EngineData, Fonts, MyTheme} from '../../types';
+import {
+  EngineData,
+  MyTheme,
+  DistanceUnit,
+  VolumeUnit,
+  TimeFormat,
+} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
 import LabelDropdown from '../../components/LabelDropdown';
 import {api} from '../../api';
 import {ApiResponse} from 'apisauce';
+import {updateUnits} from './utils';
 
 type FMMSetupScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 type RouteType = {
@@ -28,6 +35,9 @@ type RouteType = {
       config: EngineData[];
       loggedinDomain: string;
       deviceName: 'timesp1' | 'timesp2';
+      distanceToUnit: DistanceUnit;
+      volumeToUnit: VolumeUnit;
+      timeToFormat: TimeFormat;
     };
   };
 };
@@ -48,6 +58,7 @@ export default function FMMSetup({route}: RouteType) {
   const [isLoading, setIsLoading] = useState(false);
   const theme = useTheme() as MyTheme;
   const navigation = useNavigation<FMMSetupScreenProps['navigation']>();
+
   const onValuesChange = (
     value: string,
     index: number,
@@ -92,6 +103,13 @@ export default function FMMSetup({route}: RouteType) {
 
       if (response.status >= 200 && response.status < 300) {
         console.log('Success response:', response);
+
+        await updateUnits({
+          distance: route.params.distanceToUnit,
+          volume: route.params.volumeToUnit,
+          time: route.params.timeToFormat,
+        });
+
         logoutHandler();
       } else if (response.status === 401) {
         console.log('Unauthorized. Redirecting to login...');

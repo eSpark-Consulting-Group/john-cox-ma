@@ -11,9 +11,10 @@ import {Gauge} from '../../assets';
 interface MyGaugeProps {
   value?: number;
   name: string;
+  volUnit: 'ltr' | 'gal';
 }
 
-function MyGauge({value = 0, name}: MyGaugeProps) {
+function MyGauge({value = 0, name, volUnit}: MyGaugeProps) {
   const theme = useTheme() as MyTheme;
 
   return (
@@ -69,7 +70,7 @@ function MyGauge({value = 0, name}: MyGaugeProps) {
           {value.toFixed(1)}
         </MyText>
         <MyText fontFamily="NotoSans-Regular" size={18}>
-          gal/hr
+          {volUnit}/hr
         </MyText>
       </View>
     </View>

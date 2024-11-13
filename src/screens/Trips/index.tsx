@@ -1,6 +1,10 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Platform, ScrollView, ToastAndroid, View} from 'react-native';
-import {useNavigation, useTheme} from '@react-navigation/native';
+import {
+  useFocusEffect,
+  useNavigation,
+  useTheme,
+} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import BackgroundService from 'react-native-background-actions';
 
@@ -15,7 +19,13 @@ import {
   MySwitch,
   MyText,
 } from '../../components';
-import {MyTheme, SocketJSON} from '../../types';
+import {
+  DistanceUnit,
+  MyTheme,
+  SocketJSON,
+  TimeFormat,
+  VolumeUnit,
+} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
 import {
   RenderModal,
@@ -27,6 +37,15 @@ import {styles} from './styles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as FileSystem from 'expo-file-system';
 import {useService} from '../../components/ServiceProvider';
+import {
+  convertConsumption,
+  distanceUnit,
+  distanceValue,
+  formatTime,
+  getUnits,
+  volumeUnit,
+  volumeValue,
+} from '../FMMSetup/utils';
 
 type TripsScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 
@@ -73,10 +92,46 @@ export default function Trips() {
       fuelBurned: [0, 0, 0, 0],
     },
   });
+  const [units, setUnits] = useState<{
+    distance: DistanceUnit;
+    volume: VolumeUnit;
+    time: TimeFormat;
+  }>();
+  const hasFocusedRef = useRef(false);
 
   const handleSwitchPress = (index: 1 | 2 | 3) => {
     setSelectedSwitch(index);
   };
+
+  const fetchUnits = async () => {
+    const unitsData = await getUnits();
+    console.log('Fetched Units Data:', unitsData);
+
+    if (unitsData) {
+      setUnits(unitsData);
+    }
+  };
+
+  // Only run when the screen comes into focus, once
+  useFocusEffect(
+    React.useCallback(() => {
+      if (hasFocusedRef.current) {
+        return;
+      }
+      fetchUnits();
+      hasFocusedRef.current = true;
+
+      return () => {
+        hasFocusedRef.current = false;
+      };
+    }, []),
+  );
+
+  useEffect(() => {
+    if (units) {
+      console.log('Units preference:', units);
+    }
+  }, [units]);
 
   const continueTrip = async (tripsState: any, tripRefs: any) => {
     const tripJSON = await AsyncStorage.getItem('tripData');
@@ -654,7 +709,7 @@ export default function Trips() {
     const tripStartRef = await AsyncStorage.getItem('tripStartRef');
     if (tripStartRef) {
       if (reset) {
-        setWarningVisible(true);        
+        setWarningVisible(true);
       }
       const trip = JSON.parse(tripStartRef);
       console.log({trip});
@@ -714,7 +769,7 @@ export default function Trips() {
             tripData[id].fuelBurned.reduce((a, b) => a + b, 0) /
             tripData[id].totalDistance;
           if (!Number.isNaN(result) && result !== Infinity) {
-            return result.toFixed(2);
+            return result!.toFixed(2);
           }
           return '0.00';
         };
@@ -801,7 +856,7 @@ export default function Trips() {
       allTripData[id].fuelBurned.reduce((a, b) => a + b, 0) /
       allTripData[id].totalDistance;
     if (!Number.isNaN(result) && result !== Infinity) {
-      return result.toFixed(2);
+      return result!.toFixed(2);
     }
     return '0.00';
   };
@@ -903,7 +958,10 @@ export default function Trips() {
               <RenderRow
                 title=""
                 unit="Time"
-                value={allTripData[selectedSwitch].time}
+                value={formatTime(
+                  allTripData[selectedSwitch].time,
+                  units?.time!,
+                )}
                 editable={false}
               />
             </MyCard>
@@ -918,15 +976,24 @@ export default function Trips() {
                   {allTripData[selectedSwitch].fuelBurned.map((fuel, index) => (
                     <RenderColumn
                       key={'fuel' + index}
-                      value={Number(fuel).toFixed(0)}
+                      value={volumeValue(
+                        Number(fuel),
+                        volumeUnit(units?.volume!),
+                      )!.toFixed(0)}
                       label={index + 1}
+                      volUnit={units?.volume!}
                     />
                   ))}
                   <RenderColumn
                     label={'Total'}
-                    value={allTripData[selectedSwitch].fuelBurned
-                      .reduce((a, b) => a + b, 0)
-                      .toFixed(2)}
+                    value={volumeValue(
+                      allTripData[selectedSwitch].fuelBurned.reduce(
+                        (a, b) => a + b,
+                        0,
+                      ),
+                      volumeUnit(units?.volume!),
+                    )!.toFixed(2)}
+                    volUnit={units?.volume!}
                   />
                 </View>
               </View>
@@ -935,10 +1002,11 @@ export default function Trips() {
             <MyCard>
               <RenderRow
                 title="Total Distance"
-                unit="N.Mile"
-                value={Number(
-                  allTripData[selectedSwitch].totalDistance,
-                ).toFixed(5)}
+                unit={distanceUnit(units?.distance!)}
+                value={distanceValue(
+                  Number(allTripData[selectedSwitch].totalDistance),
+                  distanceUnit(units?.distance!),
+                )!.toFixed(5)}
               />
               <RenderRow
                 title="Estimated Run Time"
@@ -947,13 +1015,21 @@ export default function Trips() {
               />
               <RenderRow
                 title="Average Speed"
-                value={Number(allTripData[selectedSwitch].speed).toFixed(3)} //xxx
+                value={Number(allTripData[selectedSwitch].speed)!.toFixed(3)} //xxx
                 unit="knots"
               />
               <RenderRow
                 title="Efficiency"
-                unit="Gal/N.Mile"
-                value={calculateEfficiency(selectedSwitch)}
+                unit={
+                  volumeUnit(units?.volume!) +
+                  '/' +
+                  distanceUnit(units?.distance!)
+                }
+                value={convertConsumption(
+                  Number(calculateEfficiency(selectedSwitch)),
+                  units?.volume!,
+                  units?.distance!,
+                )}
               />
             </MyCard>
             <GapView length={30} />

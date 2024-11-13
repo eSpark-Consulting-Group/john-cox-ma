@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -6,10 +6,13 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {useNavigation, useTheme} from '@react-navigation/native';
+import {
+  useFocusEffect,
+  useNavigation,
+  useTheme,
+} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {Ionicons} from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {
   MyButton,
@@ -20,13 +23,19 @@ import {
   GapView,
   MyGauge,
   MyCanvas,
-  Loader,
 } from '../../components';
-import {MyTheme} from '../../types';
+import {MyTheme, DistanceUnit, VolumeUnit} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
 import {useSocket} from '../../components/SocketProvider';
 import NauticalMile from './NauticalMilte';
 import {useService} from '../../components/ServiceProvider';
+import {
+  distanceUnit,
+  distanceValue,
+  getUnits,
+  volumeUnit,
+  volumeValue,
+} from '../FMMSetup/utils';
 
 type MainScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 
@@ -37,12 +46,11 @@ export default function Main() {
   const navigation = useNavigation<MainScreenProps['navigation']>();
   const [generatorRunning, setGeneratorRunning] = useState<'Yes' | 'No'>('Yes');
   const [confirmation, setConfirmation] = useState(false);
-  const [showLoader, setShowLoader] = useState(true);
-  const [prov, setProv] = useState<{timesp1: boolean; timesp2: boolean}>({
-    timesp1: false,
-    timesp2: false,
-  });
-  const [reloadAttempts, setReloadAttempts] = useState(0);
+  const [units, setUnits] = useState<{
+    distance: DistanceUnit;
+    volume: VolumeUnit;
+  }>();
+  const hasFocusedRef = useRef(false);
 
   const sumOfBurn = useMemo(() => {
     return (
@@ -111,11 +119,6 @@ export default function Main() {
       labelStyle: {fontSize: 16, height: 65, textAlignVertical: 'center'},
       onPress: async () => {
         navigation.navigate('Login');
-        // const token = await AsyncStorage.getItem('token');
-        // if (!token) {
-        // } else {
-        //   navigation.navigate('Setup');
-        // }
       },
     },
   ];
@@ -139,8 +142,39 @@ export default function Main() {
         fetchSocketData();
       }
     }, 5000); // Adjust interval duration as needed
+
     return () => clearInterval(interval);
   }, [resolvedService1, resolvedService2, enginesData1, enginesData2]);
+
+  const fetchUnits = async () => {
+    const unitsData = await getUnits();
+    console.log('Fetched Units Data:', unitsData);
+
+    if (unitsData) {
+      setUnits(unitsData);
+    }
+  };
+
+  // Only run when the screen comes into focus, once
+  useFocusEffect(
+    React.useCallback(() => {
+      if (hasFocusedRef.current) {
+        return;
+      }
+      fetchUnits();
+      hasFocusedRef.current = true;
+
+      return () => {
+        hasFocusedRef.current = false;
+      };
+    }, []),
+  );
+
+  useEffect(() => {
+    if (units) {
+      console.log('Units preference:', units);
+    }
+  }, [units]);
 
   return (
     <MyCanvas>
@@ -204,15 +238,27 @@ export default function Main() {
                       <MyGauge
                         key={item.name + item.position}
                         value={
-                          item?.SensorData?.fuel && item.enabled
-                            ? Number(item?.SensorData?.fuel)
+                          item?.FuelManagement.current_fuel_consumption &&
+                          item.enabled
+                            ? volumeValue(
+                                Number(
+                                  item?.FuelManagement.current_fuel_consumption,
+                                ),
+                                volumeUnit(units?.volume!),
+                              )
                             : NaN
                         }
                         name={item.position}
+                        volUnit={volumeUnit(units?.volume!)}
                       />
                     ))
                   : [1, 2].map((item, index) => (
-                      <MyGauge key={item} value={NaN} name="Reload" />
+                      <MyGauge
+                        key={item}
+                        value={NaN}
+                        name="Reload"
+                        volUnit={volumeUnit(units?.volume!)}
+                      />
                     ))}
               </View>
             )}
@@ -224,15 +270,27 @@ export default function Main() {
                       <MyGauge
                         key={item.name + item.position}
                         value={
-                          item?.SensorData?.fuel && item.enabled
-                            ? Number(item?.SensorData?.fuel)
+                          item?.FuelManagement.current_fuel_consumption &&
+                          item.enabled
+                            ? volumeValue(
+                                Number(
+                                  item?.FuelManagement.current_fuel_consumption,
+                                ),
+                                volumeUnit(units?.volume!),
+                              )
                             : NaN
                         }
                         name={item.position}
+                        volUnit={volumeUnit(units?.volume!)}
                       />
                     ))
                   : [1, 2].map((item, index) => (
-                      <MyGauge key={item} value={NaN} name="Reload" />
+                      <MyGauge
+                        key={item}
+                        value={NaN}
+                        name="Reload"
+                        volUnit={volumeUnit(units?.volume!)}
+                      />
                     ))}
               </View>
             )}
@@ -250,21 +308,27 @@ export default function Main() {
                 <View style={styles().fuelBurn}>
                   <MyBox
                     text="Total Fuel Burn"
-                    value={sumOfBurn}
-                    unit="gal/hr"
+                    value={volumeValue(sumOfBurn, volumeUnit(units?.volume!))}
+                    unit={volumeUnit(units?.volume!) + '/hr'}
                     width={'100%'}
                     gap={22}
                   />
                 </View>
               </View>
-              <NauticalMile />
+              <NauticalMile
+                volUnit={units?.volume}
+                distUnit={units?.distance}
+              />
               <View style={styles().range}>
                 <View style={{width: '50%'}}>
                   <MyBox
                     label="Range"
                     text="Fuel Remaining"
-                    value={remainingFuel}
-                    unit="gal"
+                    value={volumeValue(
+                      remainingFuel,
+                      volumeUnit(units?.volume!),
+                    )}
+                    unit={volumeUnit(units?.volume!)}
                   />
                 </View>
                 <View style={{width: '40%'}}>
@@ -285,8 +349,11 @@ export default function Main() {
               </View>
               <MyBox
                 text="Distance to Empty"
-                value={distanceToEmpty}
-                unit="N.Mile"
+                value={distanceValue(
+                  distanceToEmpty,
+                  distanceUnit(units?.distance!),
+                )}
+                unit={distanceUnit(units?.distance!)}
                 width={'70%'}
               />
             </View>
@@ -309,8 +376,6 @@ export default function Main() {
               labelStyle={{fontSize: 18}}
               onPress={() => {
                 setConfirmation(true);
-                // navigation.navigate('ScanDevies');
-                // console.log('Device Setup pe jayein');
               }}
             />
             <GapView length={70} />

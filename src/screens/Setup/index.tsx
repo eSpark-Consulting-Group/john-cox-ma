@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {ScrollView, StyleSheet, View, KeyboardAvoidingView} from 'react-native';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -13,11 +13,12 @@ import {
   MyHeader,
   MyText,
 } from '../../components';
-import {MyTheme} from '../../types';
+import {MyTheme, DistanceUnit, VolumeUnit, TimeFormat} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
 import {temp} from '../../constants';
 import LabelDropdown from '../../components/LabelDropdown';
 import {useSocket} from '../../components/SocketProvider';
+import {getUnits} from '../FMMSetup/utils';
 
 type SetupScreenProps = NativeStackScreenProps<RootStackParamsList, 'Setup'>;
 type RouteType = {
@@ -28,6 +29,7 @@ type RouteType = {
     };
   };
 };
+
 export default function Setup({route}: RouteType) {
   const {loggedinDomain, deviceName} = route.params;
   const theme = useTheme() as MyTheme;
@@ -36,6 +38,10 @@ export default function Setup({route}: RouteType) {
   const [config, setConfig] = useState(
     deviceName === 'timesp1' ? enginesData1 : enginesData2,
   );
+  const [distanceToUnit, setDistanceToUnit] = useState<DistanceUnit>();
+  const [volumeToUnit, setVolumeToUnit] = useState<VolumeUnit>();
+  const [temperatureToUnit, setTemperatureToUnit] = useState<string>(); // to be used
+  const [timeToFormat, setTimeToFormat] = useState<TimeFormat>(); // to be used
 
   const onPress = (index: number) => {
     const allConfig = [...config];
@@ -64,6 +70,42 @@ export default function Setup({route}: RouteType) {
       console.error('Error during logout:', error);
     }
   };
+
+  const fetchUnits = async () => {
+    const unitsData = await getUnits();
+    console.log('Fetched Units Data:', unitsData);
+
+    if (unitsData) {
+      setDistanceToUnit(unitsData.distance);
+      setVolumeToUnit(unitsData.volume);
+    }
+  };
+  useEffect(() => {
+    fetchUnits();
+  }, []);
+
+  const onVolumeUnitSelect = (value: VolumeUnit | 'US Gallons') => {
+    if (value == 'US Gallons') {
+      setVolumeToUnit('Gallons');
+    } else setVolumeToUnit(value);
+  };
+
+  const onDistanceUnitSelect = (value: DistanceUnit) => {
+    setDistanceToUnit(value);
+  };
+
+  const onTemperatureUnitSelect = (value: string) => {
+    setTemperatureToUnit(value);
+  };
+
+  const onClockFormatSelect = (value: '12-hour' | '24-hour') => {
+    if (value == '12-hour') {
+      setTimeToFormat('12');
+    } else {
+      setTimeToFormat('24');
+    }
+  };
+
   return (
     <MyCanvas>
       <ScrollView
@@ -82,17 +124,45 @@ export default function Setup({route}: RouteType) {
           <View style={{zIndex: 7}}>
             <MyCard>
               <GapView length={15} />
-              {temp.map((item, index) => (
-                <View key={index}>
-                  <LabelDropdown
-                    text={item.text}
-                    data={item.options}
-                    onSelect={() => {}}
-                    zIndex={item.zindez}
-                  />
-                  <GapView length={index != 3 ? 20 : 15} />
-                </View>
-              ))}
+              <LabelDropdown
+                text={temp.volume.text}
+                data={temp.volume.options}
+                onSelect={(value: VolumeUnit) => {
+                  onVolumeUnitSelect(value);
+                }}
+                zIndex={temp.volume.zindez}
+                value={volumeToUnit}
+              />
+              <GapView length={15} />
+              <LabelDropdown
+                text={temp.distance.text}
+                data={temp.distance.options}
+                onSelect={(value: DistanceUnit) => {
+                  onDistanceUnitSelect(value);
+                }}
+                zIndex={temp.distance.zindez}
+                value={distanceToUnit}
+              />
+              <GapView length={15} />
+              <LabelDropdown
+                text={temp.temperature.text}
+                data={temp.temperature.options}
+                onSelect={(value: string) => {
+                  onTemperatureUnitSelect(value);
+                }}
+                zIndex={temp.temperature.zindez}
+                value={temperatureToUnit}
+              />
+              <GapView length={15} />
+              <LabelDropdown
+                text={temp.clock.text}
+                data={['12-hour', '24-hour']}
+                onSelect={(value: '12-hour' | '24-hour') => {
+                  onClockFormatSelect(value);
+                }}
+                zIndex={temp.clock.zindez}
+                value={timeToFormat}
+              />
             </MyCard>
           </View>
           <GapView length={15} />
@@ -181,6 +251,9 @@ export default function Setup({route}: RouteType) {
                 config,
                 loggedinDomain,
                 deviceName,
+                distanceToUnit,
+                volumeToUnit,
+                timeToFormat,
               });
             }}
           />
