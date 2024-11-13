@@ -13,7 +13,7 @@ import {
   MyHeader,
   MyText,
 } from '../../components';
-import {MyTheme, DistanceUnit, VolumeUnit} from '../../types';
+import {MyTheme, DistanceUnit, VolumeUnit, TimeFormat} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
 import {temp} from '../../constants';
 import LabelDropdown from '../../components/LabelDropdown';
@@ -41,7 +41,7 @@ export default function Setup({route}: RouteType) {
   const [distanceToUnit, setDistanceToUnit] = useState<DistanceUnit>();
   const [volumeToUnit, setVolumeToUnit] = useState<VolumeUnit>();
   const [temperatureToUnit, setTemperatureToUnit] = useState<string>(); // to be used
-  const [clockToFormat, setClockToFormat] = useState<string>(); // to be used
+  const [timeToFormat, setTimeToFormat] = useState<TimeFormat>(); // to be used
 
   const onPress = (index: number) => {
     const allConfig = [...config];
@@ -98,8 +98,12 @@ export default function Setup({route}: RouteType) {
     setTemperatureToUnit(value);
   };
 
-  const onClockFormatSelect = (value: string) => {
-    setClockToFormat(value);
+  const onClockFormatSelect = (value: '12-hour' | '24-hour') => {
+    if (value == '12-hour') {
+      setTimeToFormat('12');
+    } else {
+      setTimeToFormat('24');
+    }
   };
 
   return (
@@ -147,17 +151,17 @@ export default function Setup({route}: RouteType) {
                   onTemperatureUnitSelect(value);
                 }}
                 zIndex={temp.temperature.zindez}
-                value={distanceToUnit}
+                value={temperatureToUnit}
               />
               <GapView length={15} />
               <LabelDropdown
                 text={temp.clock.text}
-                data={temp.clock.options}
-                onSelect={(value: string) => {
+                data={['12-hour', '24-hour']}
+                onSelect={(value: '12-hour' | '24-hour') => {
                   onClockFormatSelect(value);
                 }}
                 zIndex={temp.clock.zindez}
-                value={distanceToUnit}
+                value={timeToFormat}
               />
             </MyCard>
           </View>
@@ -249,6 +253,7 @@ export default function Setup({route}: RouteType) {
                 deviceName,
                 distanceToUnit,
                 volumeToUnit,
+                timeToFormat,
               });
             }}
           />

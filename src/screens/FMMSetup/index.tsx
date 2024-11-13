@@ -17,10 +17,10 @@ import {
 } from '../../components';
 import {
   EngineData,
-  Fonts,
   MyTheme,
   DistanceUnit,
   VolumeUnit,
+  TimeFormat,
 } from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
 import LabelDropdown from '../../components/LabelDropdown';
@@ -37,6 +37,7 @@ type RouteType = {
       deviceName: 'timesp1' | 'timesp2';
       distanceToUnit: DistanceUnit;
       volumeToUnit: VolumeUnit;
+      timeToFormat: TimeFormat;
     };
   };
 };
@@ -106,7 +107,9 @@ export default function FMMSetup({route}: RouteType) {
         await updateUnits({
           distance: route.params.distanceToUnit,
           volume: route.params.volumeToUnit,
+          time: route.params.timeToFormat,
         });
+
         logoutHandler();
       } else if (response.status === 401) {
         console.log('Unauthorized. Redirecting to login...');

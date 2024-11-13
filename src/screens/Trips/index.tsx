@@ -19,7 +19,13 @@ import {
   MySwitch,
   MyText,
 } from '../../components';
-import {DistanceUnit, MyTheme, SocketJSON, VolumeUnit} from '../../types';
+import {
+  DistanceUnit,
+  MyTheme,
+  SocketJSON,
+  TimeFormat,
+  VolumeUnit,
+} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
 import {
   RenderModal,
@@ -35,6 +41,7 @@ import {
   convertConsumption,
   distanceUnit,
   distanceValue,
+  formatTime,
   getUnits,
   volumeUnit,
   volumeValue,
@@ -88,6 +95,7 @@ export default function Trips() {
   const [units, setUnits] = useState<{
     distance: DistanceUnit;
     volume: VolumeUnit;
+    time: TimeFormat;
   }>();
   const hasFocusedRef = useRef(false);
 
@@ -950,7 +958,10 @@ export default function Trips() {
               <RenderRow
                 title=""
                 unit="Time"
-                value={allTripData[selectedSwitch].time}
+                value={formatTime(
+                  allTripData[selectedSwitch].time,
+                  units?.time!,
+                )}
                 editable={false}
               />
             </MyCard>

@@ -1,19 +1,22 @@
 // conversions.ts
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {DistanceUnit, VolumeUnit} from '../../../types';
+import {DistanceUnit, TimeFormat, VolumeUnit} from '../../../types';
 
 type volumeUnitsType = 'ltr' | 'gal';
 type distanceUnitsType = 'S.Mile' | 'N.Mile' | 'Km';
 // type temperatureUnitsType = 'ltr' | 'gal';
+type timeFormatType = '12' | '24';
 
 export const updateUnits = async (units: {
   distance: DistanceUnit;
   volume: VolumeUnit;
+  time: TimeFormat;
 }) => {
   try {
     AsyncStorage.setItem('units', JSON.stringify(units));
-    console.log('Units saved successfully');
+    const response = await AsyncStorage.getItem('units');
+    console.log('Units saved successfully', response);
   } catch (error) {
     console.error('Failed to save units:', error);
   }
@@ -22,8 +25,11 @@ export const updateUnits = async (units: {
 export const getUnits = async () => {
   const units = await AsyncStorage.getItem('units');
   if (units) {
-    const parsedUnits: {distance: DistanceUnit; volume: VolumeUnit} =
-      JSON.parse(units);
+    const parsedUnits: {
+      distance: DistanceUnit;
+      volume: VolumeUnit;
+      time: TimeFormat;
+    } = JSON.parse(units);
 
     return parsedUnits;
   }
@@ -39,6 +45,7 @@ export const distanceUnit = (value: DistanceUnit) => {
       return 'Km';
   }
 };
+
 export const volumeUnit = (value: VolumeUnit) => {
   switch (value) {
     case 'Gallons':
@@ -95,4 +102,29 @@ export const convertConsumption = (
     consumption *= 1.609;
   }
   return consumption;
+};
+
+export const formatTime = (time: string, timeFormat: TimeFormat) => {
+  const [hours, minutes] = time.split(':').map(Number);
+
+  if (timeFormat === '12') {
+    const formattedHours = hours % 12 || 12; // Convert 0 to 12 for midnight
+    const amPm = hours >= 12 ? 'PM' : 'AM';
+    console.log(
+      '12 hey: ',
+      `${formattedHours}:${String(minutes).padStart(2, '0')} ${amPm}`,
+    );
+
+    return `${formattedHours}:${String(minutes).padStart(2, '0')} ${amPm}`;
+  } else {
+    console.log(
+      '24 hey: ',
+      `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`,
+    );
+
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(
+      2,
+      '0',
+    )}`;
+  }
 };
