@@ -8,7 +8,6 @@ export type RootStackParamsList = {
   Trips: undefined;
   Main: undefined;
   Login: undefined;
-  // Login: {reolvedService?: Service | null};
   Setup: {loggedinDomain: string; deviceName: 'timesp1' | 'timesp2'};
   FMMSetup: {
     config: EngineData[];
