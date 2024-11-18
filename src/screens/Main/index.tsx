@@ -152,6 +152,9 @@ export default function Main() {
 
     if (unitsData) {
       setUnits(unitsData);
+    } else {
+      console.log('default set manually');
+      setUnits({distance: 'Kilometers', volume: 'Liters'});
     }
   };
 
@@ -316,8 +319,8 @@ export default function Main() {
                 </View>
               </View>
               <NauticalMile
-                volUnit={units?.volume}
-                distUnit={units?.distance}
+                volUnit={units?.volume!}
+                distUnit={units?.distance!}
               />
               <View style={styles().range}>
                 <View style={{width: '50%'}}>

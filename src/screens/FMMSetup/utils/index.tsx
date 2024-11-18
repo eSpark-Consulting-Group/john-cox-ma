@@ -84,7 +84,7 @@ export const volumeValue = (incomingVolume: number, unit: volumeUnitsType) => {
   if (incomingVolume && unit == 'gal') {
     return incomingVolume * conversionRates.litresToGallons;
   } else {
-    return incomingVolume;
+    return incomingVolume ? incomingVolume : NaN;
   }
 };
 

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {KeyboardAvoidingView, ScrollView, StyleSheet, View} from 'react-native';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -32,10 +32,26 @@ export default function Login() {
   const [selectedDevice, setSelectedDevice] = useState<'timesp1' | 'timesp2'>(
     'timesp1',
   );
+  //   username: 'ESP_409151',
+  //   password: 'fc3258',
   const [creds, setCreds] = useState({
-    username: 'ESP_409151',
+    username: '',
     password: '',
   });
+
+  useEffect(() => {
+    const loadUsername = async () => {
+      try {
+        const cachedUsername = await AsyncStorage.getItem('username');
+        if (cachedUsername) {
+          setCreds(prev => ({...prev, username: cachedUsername}));
+        }
+      } catch (err) {
+        console.log('Error fetching cached username:', err);
+      }
+    };
+    loadUsername();
+  }, []);
 
   const loginHandler = async () => {
     try {
@@ -50,7 +66,11 @@ export default function Login() {
 
       const response = await axios.post(`http://${domain}/userLogin`, creds);
       const data = response.data as {token: string};
-      await AsyncStorage.setItem('token', data.token);
+      // await AsyncStorage.setItem('token', data.token);
+      await AsyncStorage.multiSet([
+        ['token', data.token],
+        ['username', creds.username],
+      ]);
       navigation.navigate('Setup', {
         loggedinDomain: domain,
         deviceName: selectedDevice,
