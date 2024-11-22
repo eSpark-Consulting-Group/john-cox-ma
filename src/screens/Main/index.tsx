@@ -36,11 +36,12 @@ import {
   volumeUnit,
   volumeValue,
 } from '../FMMSetup/utils';
+import {sumOf} from '../Trips/utils';
 
 type MainScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 
 export default function Main() {
-  const {enginesData1, enginesData2, getSocketData, speed} = useSocket();
+  const {enginesData1, enginesData2, getSocketData, speed, tanks} = useSocket();
   const {resolvedService1, resolvedService2} = useService();
   const theme = useTheme() as MyTheme;
   const navigation = useNavigation<MainScreenProps['navigation']>();
@@ -67,18 +68,8 @@ export default function Main() {
   ]);
 
   const remainingFuel = useMemo(() => {
-    return (
-      Number(enginesData1[0]?.FuelManagement.remaining_fuel || 0) +
-      Number(enginesData1[1]?.FuelManagement.remaining_fuel || 0) +
-      Number(enginesData2[0]?.FuelManagement.remaining_fuel || 0) +
-      Number(enginesData2[1]?.FuelManagement.remaining_fuel || 0)
-    );
-  }, [
-    enginesData1[0]?.FuelManagement.remaining_fuel,
-    enginesData1[1]?.FuelManagement.remaining_fuel,
-    enginesData2[0]?.FuelManagement.remaining_fuel,
-    enginesData2[1]?.FuelManagement.remaining_fuel,
-  ]);
+    return sumOf(tanks);
+  }, [tanks]);
 
   const distanceToEmpty = useMemo(() => {
     return (
@@ -152,6 +143,9 @@ export default function Main() {
 
     if (unitsData) {
       setUnits(unitsData);
+    } else {
+      console.log('default set manually');
+      setUnits({distance: 'Kilometers', volume: 'Liters'});
     }
   };
 
@@ -316,8 +310,8 @@ export default function Main() {
                 </View>
               </View>
               <NauticalMile
-                volUnit={units?.volume}
-                distUnit={units?.distance}
+                volUnit={units?.volume!}
+                distUnit={units?.distance!}
               />
               <View style={styles().range}>
                 <View style={{width: '50%'}}>

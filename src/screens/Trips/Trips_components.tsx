@@ -60,17 +60,22 @@ export function RenderRow({
   unit,
   value,
   editable = true,
+  makeitstring,
 }: {
   title: string;
   unit: string;
-  value?: string | number;
+  value?: string | number | any;
   editable?: boolean;
+  makeitstring?: boolean;
 }) {
   return (
     <View style={styles.sectionContainer}>
       <MyText style={{width: '50%'}}>{title}</MyText>
       <View style={{width: '50%', paddingHorizontal: 15}}>
-        <MyInput value={value} editable={editable} />
+        <MyInput
+          value={makeitstring ? String(value) : value}
+          editable={editable}
+        />
         <MyText text={unit} fontFamily="NotoSans-Regular" />
       </View>
     </View>

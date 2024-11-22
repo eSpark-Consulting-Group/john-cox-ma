@@ -84,7 +84,7 @@ export const volumeValue = (incomingVolume: number, unit: volumeUnitsType) => {
   if (incomingVolume && unit == 'gal') {
     return incomingVolume * conversionRates.litresToGallons;
   } else {
-    return incomingVolume;
+    return incomingVolume ? incomingVolume : NaN;
   }
 };
 
@@ -93,38 +93,42 @@ export const convertConsumption = (
   volUnit: VolumeUnit,
   distUnit: DistanceUnit,
 ) => {
+  let result = consumption;
   if (volUnit === 'Gallons') {
-    consumption /= 3.78541;
+    result = result / 3.78541;
   }
   if (distUnit === 'Nautical Miles') {
-    consumption *= 1.852;
+    result = result * 1.852;
   } else if (distUnit === 'Statute Miles') {
-    consumption *= 1.609;
+    result = result * 1.609;
   }
-  return consumption;
+  return result;
 };
 
 export const formatTime = (time: string, timeFormat: TimeFormat) => {
   const [hours, minutes] = time.split(':').map(Number);
+  if (time) {
+    if (timeFormat === '12') {
+      const formattedHours = hours % 12 || 12; // Convert 0 to 12 for midnight
+      const amPm = hours >= 12 ? 'PM' : 'AM';
+      // console.log(
+      //   '12 hey: ',
+      //   `${formattedHours}:${String(minutes).padStart(2, '0')} ${amPm}`,
+      // );
 
-  if (timeFormat === '12') {
-    const formattedHours = hours % 12 || 12; // Convert 0 to 12 for midnight
-    const amPm = hours >= 12 ? 'PM' : 'AM';
-    console.log(
-      '12 hey: ',
-      `${formattedHours}:${String(minutes).padStart(2, '0')} ${amPm}`,
-    );
+      return `${formattedHours}:${String(minutes).padStart(2, '0')} ${amPm}`;
+    } else {
+      // console.log(
+      //   '24 hey: ',
+      //   `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`,
+      // );
 
-    return `${formattedHours}:${String(minutes).padStart(2, '0')} ${amPm}`;
+      return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(
+        2,
+        '0',
+      )}`;
+    }
   } else {
-    console.log(
-      '24 hey: ',
-      `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`,
-    );
-
-    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(
-      2,
-      '0',
-    )}`;
+    return '00:00';
   }
 };

@@ -6,8 +6,8 @@ import {DistanceUnit, VolumeUnit} from '../../types';
 import {convertConsumption} from '../FMMSetup/utils';
 
 interface NauticalMileProps {
-  volUnit?: VolumeUnit;
-  distUnit?: DistanceUnit;
+  volUnit: VolumeUnit;
+  distUnit: DistanceUnit;
 }
 
 const NauticalMile = ({volUnit, distUnit}: NauticalMileProps) => {

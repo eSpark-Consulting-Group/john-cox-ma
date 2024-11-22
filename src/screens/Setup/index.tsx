@@ -185,7 +185,17 @@ export default function Setup({route}: RouteType) {
                   <View key={index}>
                     <LabelDropdown
                       text={item.name}
-                      data={['drive engine', 'generator']}
+                      data={[
+                        'Port',
+                        'Starboard',
+                        'Keel',
+                        'Port1',
+                        'Port2',
+                        'Starboard3',
+                        'Starboard4',
+                        'Genset1',
+                        'Genset2',
+                      ]}
                       onSelect={e => {
                         onPositionSelect(e, index);
                       }}

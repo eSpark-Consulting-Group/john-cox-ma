@@ -25,10 +25,7 @@ const initialState = {
     timesp2: false,
   },
   speed: '0' as string | number,
-  tank1_fuel: 0 as number,
-  tank2_fuel: 0 as number,
-  tank3_fuel: 0 as number,
-  tank4_fuel: 0 as number,
+  tanks: [0, 0, 0, 0] as number[],
   getTimerValue: () => 0,
   getSocketData: (host: string, port: number, serviceName: string) => {},
 };
@@ -74,10 +71,7 @@ function SocketProvider({children}: {children: React.ReactNode}) {
   const [enginesData1, setEnginesData1] = useState<EngineData[]>([]);
   const [enginesData2, setEnginesData2] = useState<EngineData[]>([]);
   const [speed, setSpeed] = useState<number | string>('0');
-  const [tank1_fuel, setTank1_fuel] = useState<number>(0);
-  const [tank2_fuel, setTank2_fuel] = useState<number>(0);
-  const [tank3_fuel, setTank3_fuel] = useState<number>(0);
-  const [tank4_fuel, setTank4_fuel] = useState<number>(0);
+  const [tanks, setTanks] = useState<number[]>([0, 0, 0, 0]);
   const [provision, setProvision] = useState<ProvisionData>({
     timesp1: false,
     timesp2: false,
@@ -157,35 +151,17 @@ function SocketProvider({children}: {children: React.ReactNode}) {
     // console.log(enginesData.Engines);
 
     const currentSpeed = enginesData.speed || 0;
-    const current_tank1_fuel = enginesData.tank1_fuel;
-    const current_tank2_fuel = enginesData.tank2_fuel;
-    const current_tank3_fuel = enginesData.tank3_fuel;
-    const current_tank4_fuel = enginesData.tank4_fuel;
+    const current_tanks = enginesData.tanks || 0;
 
     if (currentSpeed !== undefined && currentSpeed !== null) {
       setSpeed(currentSpeed);
     } else {
       setSpeed('0');
     }
-    if (current_tank1_fuel !== undefined && current_tank1_fuel !== null) {
-      setTank1_fuel(current_tank1_fuel);
+    if (current_tanks !== undefined && current_tanks !== null) {
+      setTanks(current_tanks);
     } else {
-      setTank1_fuel(0);
-    }
-    if (current_tank2_fuel !== undefined && current_tank2_fuel !== null) {
-      setTank2_fuel(current_tank2_fuel);
-    } else {
-      setTank2_fuel(0);
-    }
-    if (current_tank3_fuel !== undefined && current_tank3_fuel !== null) {
-      setTank3_fuel(current_tank3_fuel);
-    } else {
-      setTank3_fuel(0);
-    }
-    if (current_tank4_fuel !== undefined && current_tank4_fuel !== null) {
-      setTank4_fuel(current_tank4_fuel);
-    } else {
-      setTank4_fuel(0);
+      setTanks([0, 0, 0, 0]);
     }
 
     if (
@@ -199,10 +175,7 @@ function SocketProvider({children}: {children: React.ReactNode}) {
   // Handle data for timesp2
   const handleTimesp2Data = (enginesData: SocketJSON) => {
     const currentSpeed = enginesData.speed || 0;
-    const current_tank1_fuel = enginesData.tank1_fuel;
-    const current_tank2_fuel = enginesData.tank2_fuel;
-    const current_tank3_fuel = enginesData.tank3_fuel;
-    const current_tank4_fuel = enginesData.tank4_fuel;
+    const current_tanks = enginesData.tanks;
 
     if (!wsRef.current.timesp1?.OPEN) {
       if (currentSpeed !== undefined && currentSpeed !== null) {
@@ -210,25 +183,10 @@ function SocketProvider({children}: {children: React.ReactNode}) {
       } else {
         setSpeed('0');
       }
-      if (current_tank1_fuel !== undefined && current_tank1_fuel !== null) {
-        setTank1_fuel(current_tank1_fuel);
+      if (current_tanks !== undefined && current_tanks !== null) {
+        setTanks(current_tanks);
       } else {
-        setTank1_fuel(0);
-      }
-      if (current_tank2_fuel !== undefined && current_tank2_fuel !== null) {
-        setTank2_fuel(current_tank2_fuel);
-      } else {
-        setTank2_fuel(0);
-      }
-      if (current_tank3_fuel !== undefined && current_tank3_fuel !== null) {
-        setTank3_fuel(current_tank3_fuel);
-      } else {
-        setTank3_fuel(0);
-      }
-      if (current_tank4_fuel !== undefined && current_tank4_fuel !== null) {
-        setTank4_fuel(current_tank4_fuel);
-      } else {
-        setTank4_fuel(0);
+        setTanks([0, 0, 0, 0]);
       }
     }
 
@@ -283,10 +241,7 @@ function SocketProvider({children}: {children: React.ReactNode}) {
         speed,
         provision,
         getTimerValue,
-        tank1_fuel,
-        tank2_fuel,
-        tank3_fuel,
-        tank4_fuel,
+        tanks,
       }}>
       {children}
     </SocketContext.Provider>
