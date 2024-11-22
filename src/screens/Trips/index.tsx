@@ -242,6 +242,9 @@ export default function Trips() {
       const initialFuelBurn = JSON.parse(
         (await AsyncStorage.getItem('initialFuelBurn')) || JSON.stringify({}),
       );
+      const initialFuelBurn2 = JSON.parse(
+        (await AsyncStorage.getItem('initialFuelBurn2')) || JSON.stringify({}),
+      );
       console.log('intitninit: ', initialFuelBurn);
 
       const keys = Object.keys(tripsState);
@@ -279,6 +282,7 @@ export default function Trips() {
             const o = JSON.parse(
               (await AsyncStorage.getItem('tripData')) || JSON.stringify({}),
             );
+            console.log('inintinintinit: ', initialFuelBurn);
 
             const currentFuelBurn = cachedData.Engines.map((e, i) => {
               const parsedFuel: number[] = initialFuelBurn?.[key] || [
@@ -290,17 +294,27 @@ export default function Trips() {
 
               return diff < 0 ? 0 : diff;
             });
+            // console.log('cajksbjkas', cachedData2);
+            console.log(
+              'iinininini1111111111',
+              initialFuelBurn,
+              initialFuelBurn2,
+            );
 
             const currentFuelBurn2 = cachedData2.Engines
               ? cachedData2.Engines.map((e, i) => {
-                  const parsedFuel: number[] = initialFuelBurn?.[key] || [
+                  const parsedFuel: number[] = initialFuelBurn2?.[key] || [
                     0, 0, 0, 0,
                   ];
+                  console.log('parsed:', parsedFuel);
+
                   const diff =
                     Number(e.FuelManagement.total_fuel_burned) - parsedFuel[i];
                   return diff < 0 ? 0 : diff;
                 })
               : [0, 0];
+
+            console.log('22222222: ', currentFuelBurn2);
 
             const [a, b] = currentFuelBurn;
 
@@ -446,12 +460,14 @@ export default function Trips() {
         Number(enginesData2.Engines[0]?.FuelManagement.total_fuel_burned) | 0,
         Number(enginesData2.Engines[1]?.FuelManagement.total_fuel_burned) | 0,
       ];
+
       await AsyncStorage.setItem(
         'initialFuelBurn2',
         JSON.stringify({
           [id]: initialFuelBurn2,
         }),
       );
+      console.log('ye dekhein: ', initialFuelBurn2);
     } else {
       await AsyncStorage.setItem('isStarted2', id?.toString()); //?
     }
@@ -504,6 +520,7 @@ export default function Trips() {
                 (await AsyncStorage.getItem('initialFuelBurn2')) ||
                   JSON.stringify({}),
               );
+              console.log('timesp2 keliye: ', initialFuelBurn);
 
               const currentFuelBurn = [
                 Number(
@@ -513,6 +530,8 @@ export default function Trips() {
                   enginesData.Engines[1]?.FuelManagement.total_fuel_burned,
                 ) | 0,
               ];
+              console.log('abhi pata chl jayega: ', currentFuelBurn);
+
               await AsyncStorage.setItem(
                 'initialFuelBurn2',
                 JSON.stringify({
@@ -859,22 +878,6 @@ export default function Trips() {
 
   const calculateEfficiency = (id: 1 | 2 | 3): string => {
     const tripData = allTripData[id];
-
-    if (
-      !Array.isArray(tripData.fuelBurned) ||
-      tripData.fuelBurned.length === 0
-    ) {
-      console.warn(`Invalid fuelBurned data for trip ID ${id}`);
-      return '0.00';
-    }
-
-    if (
-      typeof tripData.totalDistance !== 'number' ||
-      tripData.totalDistance <= 0
-    ) {
-      console.warn(`Invalid totalDistance for trip ID ${id}`);
-      return '0.00';
-    }
 
     const totalFuelBurned = tripData.fuelBurned.reduce((a, b) => a + b, 0);
     const result = totalFuelBurned / tripData.totalDistance;
