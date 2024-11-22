@@ -279,18 +279,11 @@ export default function Trips() {
             const o = JSON.parse(
               (await AsyncStorage.getItem('tripData')) || JSON.stringify({}),
             );
-            // console.log('oooooooooo: ', o);
 
             const currentFuelBurn = cachedData.Engines.map((e, i) => {
               const parsedFuel: number[] = initialFuelBurn?.[key] || [
                 0, 0, 0, 0,
               ];
-              // console.log('parsed: ', parsedFuel);
-              // console.log(
-              //   'currrrrrr',
-              //   cachedData.Engines[0].FuelManagement.total_fuel_burned,
-              //   cachedData.Engines[1].FuelManagement.total_fuel_burned,
-              // );
 
               const diff =
                 Number(e.FuelManagement.total_fuel_burned) - parsedFuel[i];
@@ -310,7 +303,6 @@ export default function Trips() {
               : [0, 0];
 
             const [a, b] = currentFuelBurn;
-            // console.log('abab: ', a, b);
 
             setAllTripData(prev => ({
               ...prev,
@@ -446,19 +438,6 @@ export default function Trips() {
         'initialFuelBurn',
         JSON.stringify({[id]: initialFuelBurn}),
       );
-      // const initialRemainingFuel = [
-      //   Number(enginesData.Engines[0]?.FuelManagement.remaining_fuel) | 0,
-      //   Number(enginesData.Engines[1]?.FuelManagement.remaining_fuel) | 0,
-      //   0,
-      //   0,
-      // ];
-      // await AsyncStorage.setItem(
-      //   'initialRemainingFuel',
-      //   JSON.stringify({
-      //     ...allInitialFuel,
-      //     [id]: initialRemainingFuel,
-      //   }),
-      // );
     } else {
       await AsyncStorage.setItem('isStarted', id?.toString()); //?
     }
@@ -520,24 +499,6 @@ export default function Trips() {
               | '3';
             if (isStarted2) {
               console.log('Eninge 2 start hua =======', isStarted2);
-              // const allInitialFuelBurn = JSON.parse(
-              //   (await AsyncStorage.getItem('initialFuelBurn2')) ||
-              //     JSON.stringify({}),
-              // );
-              // console.log({allInitialFuelBurn});
-              // const currentFuelBurn = [
-              //   Number(enginesData.Engines[0]?.FuelManagement.total_fuel_burned) |
-              //     0,
-              //   Number(enginesData.Engines[1]?.FuelManagement.total_fuel_burned) |
-              //     0,
-              // ];
-              // await AsyncStorage.setItem(
-              //   'initialRemainingFuel2',
-              //   JSON.stringify({
-              //     ...allInitialFuel,
-              //     [isStarted2]: initialRemainingFuel,
-              //   }),
-              // );
 
               const initialFuelBurn = JSON.parse(
                 (await AsyncStorage.getItem('initialFuelBurn2')) ||
@@ -621,23 +582,7 @@ export default function Trips() {
                 [isStarted]: currentFuelBurn,
               }),
             );
-            // const allInitialFuel = JSON.parse(
-            //   (await AsyncStorage.getItem('initialRemainingFuel')) ||
-            //     JSON.stringify({}),
-            // );
-            // const initialRemainingFuel = [
-            //   enginesData.Engines[0]?.FuelManagement.remaining_fuel | 0,
-            //   Number(enginesData.Engines[1]?.FuelManagement.remaining_fuel) | 0,
-            //   0,
-            //   0,
-            // ];
-            // await AsyncStorage.setItem(
-            //   'initialRemainingFuel',
-            //   JSON.stringify({
-            //     ...allInitialFuel,
-            //     [isStarted]: initialRemainingFuel,
-            //   }),
-            // );
+
             await AsyncStorage.removeItem('isStarted');
             return;
           }
@@ -685,8 +630,6 @@ export default function Trips() {
 
       const initialFuelBurn = await AsyncStorage.getItem('initialFuelBurn');
       const initialFuelBurn2 = await AsyncStorage.getItem('initialFuelBurn2');
-      // const allFuel = await AsyncStorage.getItem('initialRemainingFuel');
-      // const allFuel2 = await AsyncStorage.getItem('initialRemainingFuel2');
       let currentFuelBurn: number[] = [];
       if (initialFuelBurn) {
         currentFuelBurn = enginesData.Engines.map((e, i) => {
@@ -1124,7 +1067,6 @@ export default function Trips() {
                 width={80}
                 onPress={async () => {
                   if (!tripStarted[selectedSwitch]) {
-                    // handleStartTrip(selectedSwitch, Number(speed));
                     await BackgroundService.start(
                       () => startTrip(selectedSwitch),
                       options,
