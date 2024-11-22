@@ -139,7 +139,6 @@ export type FuelManagementData = {
   engine_id: number;
   current_fuel_consumption: number;
   distance_to_empty: number;
-  remaining_fuel: number;
   total_fuel_burned: number;
 };
 
@@ -166,10 +165,7 @@ export type EngineData = {
 export type SocketJSON = {
   Engines: EngineData[];
   speed: string;
-  tank1_fuel: number;
-  tank2_fuel: number;
-  tank3_fuel: number;
-  tank4_fuel: number;
+  tanks: number[]
 };
 
 export type TripData = {

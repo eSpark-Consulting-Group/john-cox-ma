@@ -12,7 +12,7 @@ const getFuelMGT = (jsonData: SocketJSON) => {
   let total_fuel_burned = 0;
 
   fuelData.forEach(item => {
-    remaining_fuel += +item.remaining_fuel || 0;
+    // remaining_fuel += +item.remaining_fuel || 0;
     distance_to_empty += +item.distance_to_empty || 0;
     total_fuel_burned += +item.total_fuel_burned || 0;
   });

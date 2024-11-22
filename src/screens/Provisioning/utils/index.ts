@@ -132,21 +132,33 @@ async function checkCompleteCacheForDomain(domainName: string) {
   console.log(' ---- timesp2 does not exist already ---- ');
   return false;
 }
-async function checkCompleteCacheForDomainRepitition(domainName: string) {
-  const keys = await AsyncStorage.getAllKeys();
-  let n = 0;
-  for (const key of keys) {
-    const data = await AsyncStorage.getItem(key);
-    console.log("cache repetition:" , data, '--------------');
-    if (data) {
-      const parsedData = JSON.parse(data);
-      if (parsedData.domain_name === domainName) {
-        console.log(' ---- domain exists ---- ', n + 1);
-        n += 1;
+async function checkCompleteCacheForDomainRepetition(domainName: string): Promise<number> {
+  try {
+    const keys = await AsyncStorage.getAllKeys();
+    
+    // Fetch all items in parallel
+    const items = await Promise.all(
+      keys.map(async (key) => {
+        const data = await AsyncStorage.getItem(key);
+        return data ? JSON.parse(data) : null;
+      })
+    );
+
+    // Count the matches for the domain name
+    const domainMatchCount = items.reduce((count, item) => {
+      if (item && item.domain_name === domainName) {
+        console.log('---- domain exists ----', count + 1);
+        return count + 1;
       }
-    }
+      return count;
+    }, 0);
+
+    return domainMatchCount;
+
+  } catch (error) {
+    console.error('Error checking domain repetition in cache:', error);
+    return 0; // Return 0 or handle the error as needed
   }
-  return n;
 }
 
 async function checkFileForDomainRepetition() {
@@ -197,19 +209,21 @@ async function handleDomainAssignment(device: ESPDevice, res1: any) {
       console.log('Checking cache and files...');
 
       const cachedData = await checkCache(res1.mac_address);
-      const timesp1Exists_Count = await checkCompleteCacheForDomainRepitition(
+      const timesp1Exists_Count = await checkCompleteCacheForDomainRepetition(
         'timesp1',
       );
-      const timesp2Exists_Count = await checkCompleteCacheForDomainRepitition(
+      const timesp2Exists_Count = await checkCompleteCacheForDomainRepetition(
         'timesp2',
       );
+
       if (cachedData) {
         if (timesp1Exists_Count == 2) {
           await checkAndAssignDomain(device, 'timesp2');
-          ('timesp1 repeated assignment');
+          console.log('timesp1 repeated assignment');
+         
         } else if (timesp2Exists_Count == 2) {
           await checkAndAssignDomain(device, 'timesp1');
-          ('timesp2 repeated assignment');
+          console.log('timesp2 repeated assignment');
         } else {
           console.log("cachedData.domainName: ", cachedData.domain_name);          
           await checkAndAssignDomain(device, cachedData.domain_name);
@@ -222,10 +236,10 @@ async function handleDomainAssignment(device: ESPDevice, res1: any) {
             await checkFileForDomainRepetition();
           if (timesp1Count == 2) {
             await checkAndAssignDomain(device, 'timesp2');
-            ('timesp1 repeated assignment');
+            console.log('timesp1 repeated assignment');
           } else if (timesp2Count == 2) {
             await checkAndAssignDomain(device, 'timesp1');
-            ('timesp2 repeated assignment');
+            console.log('timesp2 repeated assignment');
           } else {
             await checkAndAssignDomain(device, cachedData.domain_name);
           }

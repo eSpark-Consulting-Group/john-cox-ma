@@ -93,15 +93,16 @@ export const convertConsumption = (
   volUnit: VolumeUnit,
   distUnit: DistanceUnit,
 ) => {
+  let result = consumption;
   if (volUnit === 'Gallons') {
-    consumption /= 3.78541;
+    result = result / 3.78541;
   }
   if (distUnit === 'Nautical Miles') {
-    consumption *= 1.852;
+    result = result * 1.852;
   } else if (distUnit === 'Statute Miles') {
-    consumption *= 1.609;
+    result = result * 1.609;
   }
-  return consumption;
+  return result;
 };
 
 export const formatTime = (time: string, timeFormat: TimeFormat) => {
