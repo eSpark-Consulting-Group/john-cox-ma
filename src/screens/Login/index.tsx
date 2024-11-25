@@ -86,22 +86,24 @@ export default function Login() {
   return (
     <MyCanvas>
       <ScrollView
-        contentContainerStyle={{flexGrow: 1}}
+        contentContainerStyle={{
+          flexGrow: 1,
+        }}
         showsVerticalScrollIndicator={false}>
         <KeyboardAvoidingView
           style={{
             alignItems: 'center',
             justifyContent: 'center',
+            flex: 1,
           }}>
           <MyHeader />
-          <GapView length={150} />
           <MyText
             text="Login"
             size={20}
             fontFamily="NotoSans-Bold"
             style={{
               alignSelf: 'flex-start',
-              paddingLeft: 18,
+              paddingLeft: '5%',
               paddingBottom: 20,
             }}
           />
@@ -110,17 +112,19 @@ export default function Login() {
             <LabelInput
               inputValue={creds.username}
               onChange={value => setCreds(prev => ({...prev, username: value}))}
-              text="Username:"
-              width={130}
+              placeholder="Enter username"
+              width={180}
               height={30}
               size={18}
+              text="Username:"
             />
             <GapView length={20} />
             <LabelInput
               inputValue={creds.password}
               onChange={value => setCreds(prev => ({...prev, password: value}))}
               text="Password:"
-              width={130}
+              placeholder="Enter password"
+              width={180}
               height={30}
               size={18}
               password
@@ -134,6 +138,7 @@ export default function Login() {
                 onSelect={e => {
                   setSelectedDevice(e as 'timesp1' | 'timesp2');
                 }}
+                style={{width: 180}}
               />
             </View>
             {isLoading ? (

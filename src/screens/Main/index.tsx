@@ -1,5 +1,6 @@
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {
+  BackHandler,
   ScrollView,
   StyleSheet,
   TextStyle,
@@ -169,6 +170,19 @@ export default function Main() {
       console.log('Units preference:', units);
     }
   }, [units]);
+
+  useEffect(() => {
+    const onBackPress = () => {
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      onBackPress,
+    );
+
+    return () => backHandler.remove();
+  }, [navigation]);
 
   return (
     <MyCanvas>

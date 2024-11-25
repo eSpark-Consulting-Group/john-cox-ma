@@ -28,11 +28,11 @@ export default function Proof({route}: ProofScreenProps) {
   const [pop, setPop] = useState('');
   const theme = useTheme() as MyTheme;
 
-  const connectDevice = async (device: any) => {
+  const connectDevice = async (device: any, pop: string) => {
     try {
       console.log('Starting connection process...');
       console.log('Device:', device);
-      console.log('Product key:', 'abcd1234');
+      console.log('Product key:', pop);
 
       WifiManager.connectToProtectedSSID(device.name, '', false, false).then(
         async a => {
@@ -43,27 +43,52 @@ export default function Proof({route}: ProofScreenProps) {
           });
           console.log('ESPDevice:', dev);
 
-          const connectedDev: any = await dev.connect('abcd1234');
-          console.log('Connected device:' + connectedDev);
+          const connectedDev: any = await dev.connect(pop);
+          console.log('Connected device:', connectedDev);
 
-          if (connectedDev?.status == 'connected') {
-            console.log('Device connected successfully:' + connectedDev);
-            const res = await sendingData(device);
-            console.log(res!);
-            navigation.navigate('ScanNetworks', {device});
+          if (connectedDev?.status === 'connected') {
+            console.log('Device connected successfully:', connectedDev);
+
+            try {
+              const res = await sendingData(device);
+
+              // Check for success or error in 'res'
+              if (res && !res.toString().toLowerCase().includes('error')) {
+                console.log('Data sent successfully:', res);
+                navigation.navigate('ScanNetworks', {device});
+              } else {
+                console.log('Error in sending data:', res);
+                setError(true);
+                navigateWithDelay();
+              }
+            } catch (dataError) {
+              console.log('Error during sending data:', dataError);
+              setError(true);
+              navigateWithDelay();
+            }
           } else {
             console.log('Unable to connect');
             setError(true);
-            console.log('Unable to connect');
+            navigateWithDelay();
           }
         },
         e => {
           console.log('Connection failed!', e);
+          setError(true);
+          navigateWithDelay();
         },
       );
     } catch (error) {
       console.log('Error:', error);
+      setError(true);
+      navigateWithDelay();
     }
+  };
+
+  const navigateWithDelay = () => {
+    setTimeout(() => {
+      navigation.navigate('ScanDevices');
+    }, 3000); // Delay of 3 seconds
   };
 
   return (
@@ -96,7 +121,7 @@ export default function Proof({route}: ProofScreenProps) {
             label="Next"
             style={{paddingHorizontal: 45}}
             labelStyle={{fontSize: 18}}
-            onPress={() => connectDevice(device)}
+            onPress={() => connectDevice(device, pop)}
             textColor={theme.colors.proSecondary}
           />
           <GapView length={20} />
@@ -111,7 +136,10 @@ export default function Proof({route}: ProofScreenProps) {
             gradient
             style={{width: 150}}
           />
-          <GapView length={60} />
+          <GapView length={10} />
+          <MyText>{error && 'Error connecting to device'}</MyText>
+          <MyText>{error && 'Navigating Back to Scan devices'}</MyText>
+          <GapView length={50} />
         </View>
         <MyFooter />
       </KeyboardAvoidingView>

@@ -1030,6 +1030,7 @@ export default function Trips() {
             <MyCard>
               <RenderRow
                 title="Total Distance"
+                editable={false}
                 unit={distanceUnit(units?.distance!)}
                 value={distanceValue(
                   Number(allTripData[selectedSwitch].totalDistance),
@@ -1039,14 +1040,17 @@ export default function Trips() {
               <RenderRow
                 title="Estimated Run Time"
                 unit="hours/minute"
+                editable={false}
                 value={allTripData[selectedSwitch].estimatedTime?.toString()}
               />
               <RenderRow
                 title="Average Speed"
                 value={Number(allTripData[selectedSwitch].speed)!.toFixed(3)} //xxx
                 unit="knots"
+                editable={false}
               />
               <RenderRow
+                editable={false}
                 title="Efficiency"
                 unit={
                   volumeUnit(units?.volume!) +
@@ -1070,10 +1074,12 @@ export default function Trips() {
                 width={80}
                 onPress={async () => {
                   if (!tripStarted[selectedSwitch]) {
-                    await BackgroundService.start(
-                      () => startTrip(selectedSwitch),
-                      options,
-                    );
+                    if (allTripData[selectedSwitch].name) {
+                      await BackgroundService.start(
+                        () => startTrip(selectedSwitch),
+                        options,
+                      );
+                    }
                   } else {
                     endTrip(selectedSwitch);
                   }
@@ -1095,7 +1101,7 @@ export default function Trips() {
               }}
               gradient
             />
-            <GapView length={70} />
+            <GapView length={300} />
             <MyFooter />
           </>
         )}

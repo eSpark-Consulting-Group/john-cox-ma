@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {
+  BackHandler,
   FlatList,
   KeyboardAvoidingView,
   Modal,
@@ -68,6 +69,19 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const onBackPress = () => {
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      onBackPress,
+    );
+
+    return () => backHandler.remove();
+  }, [navigation]);
 
   useEffect(() => {
     if (isVisible) {
