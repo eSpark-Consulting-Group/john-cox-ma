@@ -103,7 +103,11 @@ export default function Proof({route}: ProofScreenProps) {
           <MyButton
             label="Back"
             labelStyle={{fontSize: 18}}
-            onPress={() => {}}
+            onPress={() => {
+              if (navigation.canGoBack()) {
+                navigation.goBack();
+              }
+            }}
             gradient
             style={{width: 150}}
           />
