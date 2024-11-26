@@ -965,6 +965,7 @@ export default function Trips() {
               <TripSection label="Trip Name">
                 <View style={styles.inputContainer}>
                   <MyInput
+                    editable={allTripData[selectedSwitch].date ? false : true}
                     placeholder="Enter Name"
                     onChange={text => {
                       setAllTripData(prev => ({

@@ -89,7 +89,7 @@ const styles = (theme?: MyTheme) =>
     name: {
       position: 'absolute',
       bottom: 30,
-      right: 25,
+      textAlign: 'center',
       width: '50%',
     },
     textBox: {

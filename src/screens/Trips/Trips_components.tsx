@@ -86,10 +86,12 @@ export function RenderColumn({
   label,
   value,
   volUnit,
+  size,
 }: {
   label: number | string;
   value: number | string;
   volUnit: VolumeUnit;
+  size?: number;
 }) {
   const theme = useTheme() as MyTheme;
   return (
@@ -104,6 +106,7 @@ export function RenderColumn({
         value={value || '00'}
         textColor={theme.colors.primary}
         fontFamily="CrimsonText-Bold"
+        size={size}
       />
       <MyText text={volUnit == 'Gallons' ? 'gal' : 'ltr'} />
     </View>
