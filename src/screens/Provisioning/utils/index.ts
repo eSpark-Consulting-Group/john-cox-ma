@@ -10,28 +10,17 @@ import * as FileSystem from 'expo-file-system';
 export async function checkPermissions() {
   try {
     const status = await checkMultiple([
-      PERMISSIONS.ANDROID.BLUETOOTH_SCAN,
-      PERMISSIONS.ANDROID.BLUETOOTH_CONNECT,
       PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
     ]);
     console.log('check Granted permissions HERE:---------------------------');
 
-    console.log(
-      'Bluetooth Scan Permission:',
-      status[PERMISSIONS.ANDROID.BLUETOOTH_SCAN],
-    );
-    console.log(
-      'Bluetooth Connect Permission:',
-      status[PERMISSIONS.ANDROID.BLUETOOTH_CONNECT],
-    );
+   
     console.log(
       'Location Permission:',
       status[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION],
     );
 
     if (
-      status[PERMISSIONS.ANDROID.BLUETOOTH_SCAN] == 'granted' &&
-      status[PERMISSIONS.ANDROID.BLUETOOTH_CONNECT] == 'granted' &&
       status[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION] == 'granted'
     ) {
       console.log('All permissions granted. HERE');
@@ -50,29 +39,18 @@ export async function checkPermissions() {
 async function requestPermissions() {
   try {
     const status = await requestMultiple([
-      PERMISSIONS.ANDROID.BLUETOOTH_SCAN,
-      PERMISSIONS.ANDROID.BLUETOOTH_CONNECT,
       PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
     ]);
 
     console.log('check Granted permissions:---------------------------');
 
-    console.log(
-      'Bluetooth Scan Permission:',
-      status[PERMISSIONS.ANDROID.BLUETOOTH_SCAN],
-    );
-    console.log(
-      'Bluetooth Connect Permission:',
-      status[PERMISSIONS.ANDROID.BLUETOOTH_CONNECT],
-    );
+    
     console.log(
       'Location Permission:',
       status[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION],
     );
 
     if (
-      status[PERMISSIONS.ANDROID.BLUETOOTH_SCAN] == 'granted' &&
-      status[PERMISSIONS.ANDROID.BLUETOOTH_CONNECT] == 'granted' &&
       status[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION] == 'granted'
     ) {
       console.log('All permissions granted.');
