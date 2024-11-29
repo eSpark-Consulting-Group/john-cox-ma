@@ -58,6 +58,7 @@ export default function FMMSetup({route}: RouteType) {
   const [isLoading, setIsLoading] = useState(false);
   const theme = useTheme() as MyTheme;
   const navigation = useNavigation<FMMSetupScreenProps['navigation']>();
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   const onValuesChange = (
     value: string,
@@ -165,6 +166,9 @@ export default function FMMSetup({route}: RouteType) {
                 onSelect={val => onValuesChange(val, index, 'fuel_type')}
                 value={item.fuel_type}
                 zIndex={56}
+                openDropdown={openDropdown}
+                setOpenDropdown={setOpenDropdown}
+                dropdownId={'fmm1' + index}
               />
               <LabelDropdown
                 text="Engine Type"
@@ -172,6 +176,9 @@ export default function FMMSetup({route}: RouteType) {
                 onSelect={val => onValuesChange(val, index, 'engine_type')}
                 value={item.engine_type}
                 zIndex={54}
+                openDropdown={openDropdown}
+                setOpenDropdown={setOpenDropdown}
+                dropdownId={'fmm2' + index}
               />
             </React.Fragment>
           ))}

@@ -42,6 +42,7 @@ export default function Setup({route}: RouteType) {
   const [volumeToUnit, setVolumeToUnit] = useState<VolumeUnit>();
   const [temperatureToUnit, setTemperatureToUnit] = useState<string>(); // to be used
   const [timeToFormat, setTimeToFormat] = useState<TimeFormat>(); // to be used
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   const onPress = (index: number) => {
     const allConfig = [...config];
@@ -132,6 +133,9 @@ export default function Setup({route}: RouteType) {
                 }}
                 zIndex={temp.volume.zindez}
                 value={volumeToUnit}
+                openDropdown={openDropdown}
+                setOpenDropdown={setOpenDropdown}
+                dropdownId="8"
               />
               <GapView length={15} />
               <LabelDropdown
@@ -142,6 +146,9 @@ export default function Setup({route}: RouteType) {
                 }}
                 zIndex={temp.distance.zindez}
                 value={distanceToUnit}
+                openDropdown={openDropdown}
+                setOpenDropdown={setOpenDropdown}
+                dropdownId="9"
               />
               <GapView length={15} />
               <LabelDropdown
@@ -152,6 +159,9 @@ export default function Setup({route}: RouteType) {
                 }}
                 zIndex={temp.temperature.zindez}
                 value={temperatureToUnit}
+                openDropdown={openDropdown}
+                setOpenDropdown={setOpenDropdown}
+                dropdownId="7"
               />
               <GapView length={15} />
               <LabelDropdown
@@ -162,6 +172,9 @@ export default function Setup({route}: RouteType) {
                 }}
                 zIndex={temp.clock.zindez}
                 value={timeToFormat}
+                openDropdown={openDropdown}
+                setOpenDropdown={setOpenDropdown}
+                dropdownId="6"
               />
             </MyCard>
           </View>
@@ -205,6 +218,9 @@ export default function Setup({route}: RouteType) {
                       onPress={() => onPress(index)}
                       status
                       value={item.position}
+                      openDropdown={openDropdown}
+                      setOpenDropdown={setOpenDropdown}
+                      dropdownId={index.toString()}
                     />
                     <GapView length={index != 3 ? 20 : 15} />
                   </View>
@@ -227,6 +243,9 @@ export default function Setup({route}: RouteType) {
                 onSelect={() => {}}
                 zIndex={54}
                 dropdnHeight={170}
+                openDropdown={openDropdown}
+                setOpenDropdown={setOpenDropdown}
+                dropdownId="5"
               />
               <GapView length={5} />
               <View style={styles().fuelBurn}>
@@ -248,6 +267,9 @@ export default function Setup({route}: RouteType) {
                 text="Speed Source"
                 onSelect={() => {}}
                 zIndex={52}
+                openDropdown={openDropdown}
+                setOpenDropdown={setOpenDropdown}
+                dropdownId="4"
               />
             </MyCard>
           </View>

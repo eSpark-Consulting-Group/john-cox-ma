@@ -38,6 +38,7 @@ export default function Login() {
     username: '',
     password: '',
   });
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   useEffect(() => {
     const loadUsername = async () => {
@@ -139,6 +140,9 @@ export default function Login() {
                   setSelectedDevice(e as 'timesp1' | 'timesp2');
                 }}
                 style={{width: 180}}
+                openDropdown={openDropdown}
+                setOpenDropdown={setOpenDropdown}
+                dropdownId="login"
               />
             </View>
             {isLoading ? (

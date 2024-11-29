@@ -23,7 +23,14 @@ function LabelDropdown({
   onPress,
   engineId,
   value,
-}: LabelDropdownProps) {
+  openDropdown,
+  setOpenDropdown,
+  dropdownId,
+}: LabelDropdownProps & {
+  openDropdown: string | null;
+  setOpenDropdown: (id: string | null) => void;
+  dropdownId: string;
+}) {
   const theme = useTheme() as MyTheme;
   const activeHanlder = () => {
     if (onPress) {
@@ -53,6 +60,9 @@ function LabelDropdown({
           height={height}
           dropdnHeight={dropdnHeight}
           value={value}
+          openDropdown={openDropdown}
+          setOpenDropdown={setOpenDropdown}
+          dropdownId={dropdownId}
         />
       </View>
     </View>
