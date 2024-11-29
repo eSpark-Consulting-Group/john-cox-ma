@@ -112,197 +112,208 @@ export default function Setup({route}: RouteType) {
       <ScrollView
         onTouchStart={() => setOpenDropdown(null)}
         contentContainerStyle={[styles().screen]}
-        showsVerticalScrollIndicator={false}>
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps={'always'}>
         <KeyboardAvoidingView
-          style={[styles().screen, {width: '100%', height: '100%'}]}>
+          style={[
+            styles().screen,
+            {width: '100%', height: '100%', justifyContent: 'space-between'},
+          ]}>
           <MyHeader />
-          <GapView length={90} />
-          <MyText
-            text="Setup"
-            size={18}
-            fontFamily="NotoSans-Bold"
-            style={styles().title}
-          />
-          <View style={{zIndex: 7}}>
-            <MyCard>
-              <GapView length={15} />
-              <LabelDropdown
-                text={temp.volume.text}
-                data={temp.volume.options}
-                onSelect={(value: VolumeUnit) => {
-                  onVolumeUnitSelect(value);
-                }}
-                zIndex={temp.volume.zindez}
-                value={volumeToUnit}
-                openDropdown={openDropdown}
-                setOpenDropdown={setOpenDropdown}
-                dropdownId="8"
-              />
-              <GapView length={15} />
-              <LabelDropdown
-                text={temp.distance.text}
-                data={temp.distance.options}
-                onSelect={(value: DistanceUnit) => {
-                  onDistanceUnitSelect(value);
-                }}
-                zIndex={temp.distance.zindez}
-                value={distanceToUnit}
-                openDropdown={openDropdown}
-                setOpenDropdown={setOpenDropdown}
-                dropdownId="9"
-              />
-              <GapView length={15} />
-              <LabelDropdown
-                text={temp.temperature.text}
-                data={temp.temperature.options}
-                onSelect={(value: string) => {
-                  onTemperatureUnitSelect(value);
-                }}
-                zIndex={temp.temperature.zindez}
-                value={temperatureToUnit}
-                openDropdown={openDropdown}
-                setOpenDropdown={setOpenDropdown}
-                dropdownId="7"
-              />
-              <GapView length={15} />
-              <LabelDropdown
-                text={temp.clock.text}
-                data={['12-hour', '24-hour']}
-                onSelect={(value: '12-hour' | '24-hour') => {
-                  onClockFormatSelect(value);
-                }}
-                zIndex={temp.clock.zindez}
-                value={timeToFormat}
-                openDropdown={openDropdown}
-                setOpenDropdown={setOpenDropdown}
-                dropdownId="6"
-              />
-            </MyCard>
-          </View>
-          <GapView length={15} />
-          <View style={{zIndex: 6}}>
-            <MyCard>
-              <GapView length={10} />
-              <View style={styles().card2}>
-                {['Engines', 'Active', 'Position'].map((item, index) => (
-                  <MyText
-                    key={index}
-                    text={item}
-                    fontFamily="NotoSans-BoldItalic"
-                  />
-                ))}
-              </View>
-
-              {config.map((item, index) => {
-                count += 2;
-                return (
-                  <View key={index}>
-                    <LabelDropdown
-                      text={item.name}
-                      data={[
-                        'Port',
-                        'Starboard',
-                        'Keel',
-                        'Port1',
-                        'Port2',
-                        'Starboard3',
-                        'Starboard4',
-                        'Genset1',
-                        'Genset2',
-                      ]}
-                      onSelect={e => {
-                        onPositionSelect(e, index);
-                      }}
-                      isActive={item.enabled === '0' ? false : true}
-                      zIndex={58 - count}
-                      engineId={item.id.toString()}
-                      onPress={() => onPress(index)}
-                      status
-                      value={item.position}
-                      openDropdown={openDropdown}
-                      setOpenDropdown={setOpenDropdown}
-                      dropdownId={index.toString()}
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '100%',
+            }}>
+            <GapView length={90} />
+            <MyText
+              text="Setup"
+              size={18}
+              fontFamily="NotoSans-Bold"
+              style={styles().title}
+            />
+            <View style={{zIndex: 7}}>
+              <MyCard>
+                <GapView length={15} />
+                <LabelDropdown
+                  text={temp.volume.text}
+                  data={temp.volume.options}
+                  onSelect={(value: VolumeUnit) => {
+                    onVolumeUnitSelect(value);
+                  }}
+                  zIndex={temp.volume.zindez}
+                  value={volumeToUnit}
+                  openDropdown={openDropdown}
+                  setOpenDropdown={setOpenDropdown}
+                  dropdownId="8"
+                />
+                <GapView length={15} />
+                <LabelDropdown
+                  text={temp.distance.text}
+                  data={temp.distance.options}
+                  onSelect={(value: DistanceUnit) => {
+                    onDistanceUnitSelect(value);
+                  }}
+                  zIndex={temp.distance.zindez}
+                  value={distanceToUnit}
+                  openDropdown={openDropdown}
+                  setOpenDropdown={setOpenDropdown}
+                  dropdownId="9"
+                />
+                <GapView length={15} />
+                <LabelDropdown
+                  text={temp.temperature.text}
+                  data={temp.temperature.options}
+                  onSelect={(value: string) => {
+                    onTemperatureUnitSelect(value);
+                  }}
+                  zIndex={temp.temperature.zindez}
+                  value={temperatureToUnit}
+                  openDropdown={openDropdown}
+                  setOpenDropdown={setOpenDropdown}
+                  dropdownId="7"
+                />
+                <GapView length={15} />
+                <LabelDropdown
+                  text={temp.clock.text}
+                  data={['12-hour', '24-hour']}
+                  onSelect={(value: '12-hour' | '24-hour') => {
+                    onClockFormatSelect(value);
+                  }}
+                  zIndex={temp.clock.zindez}
+                  value={timeToFormat}
+                  openDropdown={openDropdown}
+                  setOpenDropdown={setOpenDropdown}
+                  dropdownId="6"
+                />
+              </MyCard>
+            </View>
+            <GapView length={15} />
+            <View style={{zIndex: 6}}>
+              <MyCard>
+                <GapView length={10} />
+                <View style={styles().card2}>
+                  {['Engines', 'Active', 'Position'].map((item, index) => (
+                    <MyText
+                      key={index}
+                      text={item}
+                      fontFamily="NotoSans-BoldItalic"
                     />
-                    <GapView length={index != 3 ? 20 : 15} />
-                  </View>
-                );
-              })}
-            </MyCard>
-          </View>
-          <GapView length={15} />
+                  ))}
+                </View>
 
-          <View style={{zIndex: 5}}>
-            <MyCard>
-              <GapView length={15} />
-              <LabelDropdown
-                data={[
-                  'Opt:1 No Gen. Present',
-                  'Opt:2 Genset fuel measured',
-                  'Opt:3 Genset fuel flow estimated',
-                ]}
-                text="Generator Config"
-                onSelect={() => {}}
-                zIndex={54}
-                dropdnHeight={170}
-                openDropdown={openDropdown}
-                setOpenDropdown={setOpenDropdown}
-                dropdownId="5"
-              />
-              <GapView length={5} />
-              <View style={styles().fuelBurn}>
-                <MyText
-                  text="Generator Fuel burn when in use "
-                  style={{width: '50%'}}
-                />
-                {/* todo: component confusion** */}
-                <View
-                  style={{
-                    width: 114,
-                    height: 20,
-                    backgroundColor: '#70726F73',
-                  }} //temp
-                />
-              </View>
-              <LabelDropdown
-                data={['N2k SOG', 'N2k SOW', 'UI Device GPS']}
-                text="Speed Source"
-                onSelect={() => {}}
-                zIndex={52}
-                openDropdown={openDropdown}
-                setOpenDropdown={setOpenDropdown}
-                dropdownId="4"
-              />
-            </MyCard>
-          </View>
-          <GapView length={30} />
-          <MyButton
-            label="Next"
-            labelStyle={{fontSize: 20}}
-            style={styles().signin}
-            onPress={() => {
-              navigation.navigate('FMMSetup', {
-                config,
-                loggedinDomain,
-                deviceName,
-                distanceToUnit,
-                volumeToUnit,
-                timeToFormat,
-              });
-            }}
-          />
-          <GapView length={25} />
+                {config.map((item, index) => {
+                  count += 2;
+                  return (
+                    <View key={index}>
+                      <LabelDropdown
+                        text={item.name}
+                        data={[
+                          'Port',
+                          'Starboard',
+                          'Keel',
+                          'Port1',
+                          'Port2',
+                          'Starboard3',
+                          'Starboard4',
+                          'Genset1',
+                          'Genset2',
+                        ]}
+                        onSelect={e => {
+                          onPositionSelect(e, index);
+                        }}
+                        isActive={item.enabled === '0' ? false : true}
+                        zIndex={58 - count}
+                        engineId={item.id.toString()}
+                        onPress={() => onPress(index)}
+                        status
+                        value={item.position}
+                        openDropdown={openDropdown}
+                        setOpenDropdown={setOpenDropdown}
+                        dropdownId={index.toString()}
+                      />
+                      <GapView length={index != 3 ? 20 : 15} />
+                    </View>
+                  );
+                })}
+              </MyCard>
+            </View>
+            <GapView length={15} />
 
-          <MyButton
-            label="Back"
-            style={styles().button}
-            labelStyle={{fontSize: 20}}
-            onPress={() => {
-              logoutHandler();
-              console.log('Wapis jayein');
-            }}
-            gradient
-          />
-          <GapView length={70} />
+            <View style={{zIndex: 5}}>
+              <MyCard>
+                <GapView length={15} />
+                <LabelDropdown
+                  data={[
+                    'Opt:1 No Gen. Present',
+                    'Opt:2 Genset fuel measured',
+                    'Opt:3 Genset fuel flow estimated',
+                  ]}
+                  text="Generator Config"
+                  onSelect={() => {}}
+                  zIndex={54}
+                  dropdnHeight={170}
+                  openDropdown={openDropdown}
+                  setOpenDropdown={setOpenDropdown}
+                  dropdownId="5"
+                />
+                <GapView length={5} />
+                <View style={styles().fuelBurn}>
+                  <MyText
+                    text="Generator Fuel burn when in use "
+                    style={{width: '50%'}}
+                  />
+                  {/* todo: component confusion** */}
+                  <View
+                    style={{
+                      width: 114,
+                      height: 20,
+                      backgroundColor: '#70726F73',
+                    }} //temp
+                  />
+                </View>
+                <LabelDropdown
+                  data={['N2k SOG', 'N2k SOW', 'UI Device GPS']}
+                  text="Speed Source"
+                  onSelect={() => {}}
+                  zIndex={52}
+                  openDropdown={openDropdown}
+                  setOpenDropdown={setOpenDropdown}
+                  dropdownId="4"
+                />
+              </MyCard>
+            </View>
+            <GapView length={30} />
+            <MyButton
+              label="Next"
+              labelStyle={{fontSize: 20}}
+              style={styles().signin}
+              onPress={() => {
+                navigation.navigate('FMMSetup', {
+                  config,
+                  loggedinDomain,
+                  deviceName,
+                  distanceToUnit,
+                  volumeToUnit,
+                  timeToFormat,
+                });
+              }}
+            />
+            <GapView length={25} />
+
+            <MyButton
+              label="Back"
+              style={styles().button}
+              labelStyle={{fontSize: 20}}
+              onPress={() => {
+                logoutHandler();
+                console.log('Wapis jayein');
+              }}
+              gradient
+            />
+            <GapView length={70} />
+          </View>
           <MyFooter />
         </KeyboardAvoidingView>
       </ScrollView>
@@ -315,8 +326,9 @@ const styles = (theme?: MyTheme) =>
     screen: {
       alignItems: 'center',
       justifyContent: 'center',
+      flex: 1,
     },
-    title: {alignSelf: 'flex-start', paddingLeft: 18, paddingBottom: 20},
+    title: {alignSelf: 'flex-start', paddingLeft: 38, paddingBottom: 20},
     card2: {
       flexDirection: 'row',
       width: '100%',
@@ -328,7 +340,7 @@ const styles = (theme?: MyTheme) =>
       justifyContent: 'space-between',
       width: '100%',
     },
-    signin: {width: 130, alignSelf: 'center'},
+    signin: {width: 130, alignSelf: 'center', marginTop: '5%'},
     button: {width: 130, alignSelf: 'center'},
     modalContainer: {
       flex: 1,

@@ -91,6 +91,7 @@ export default function Login() {
         contentContainerStyle={{
           flexGrow: 1,
         }}
+        keyboardShouldPersistTaps={'always'}
         showsVerticalScrollIndicator={false}>
         <KeyboardAvoidingView
           style={{

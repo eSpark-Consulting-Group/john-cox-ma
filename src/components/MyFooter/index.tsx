@@ -6,6 +6,7 @@ import MyText from '../MyText';
 
 import {MyTheme} from '../../types';
 import {FooterBadge} from '../../assets';
+import GapView from '../GapView';
 
 function MyFooter() {
   const theme = useTheme() as MyTheme;
@@ -29,7 +30,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-evenly',
     alignSelf: 'center',
     alignItems: 'center',
-    paddingVertical: 20,
+    paddingVertical: 40,
     bottom: 0,
     position: 'absolute',
   },

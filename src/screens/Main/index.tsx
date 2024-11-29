@@ -187,7 +187,10 @@ export default function Main() {
   return (
     <MyCanvas>
       <ScrollView
-        contentContainerStyle={[styles().screen, {flex: confirmation ? 1 : 0}]}
+        contentContainerStyle={[
+          styles().screen,
+          {flex: confirmation ? 1 : 0, width: '100%', justifyContent: 'center'},
+        ]}
         showsVerticalScrollIndicator={false}>
         <MyHeader />
 
@@ -232,7 +235,12 @@ export default function Main() {
             <GapView length={90} />
           </>
         ) : (
-          <>
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '100%',
+            }}>
             <GapView length={90} />
             <TouchableOpacity
               style={{alignSelf: 'flex-end', paddingRight: '4%'}}
@@ -387,7 +395,7 @@ export default function Main() {
               }}
             />
             <GapView length={70} />
-          </>
+          </View>
         )}
 
         <MyFooter />
@@ -400,8 +408,8 @@ const styles = (theme?: MyTheme) =>
   StyleSheet.create({
     screen: {
       alignItems: 'center',
-      justifyContent: 'center',
-      width: '100%',
+      justifyContent: 'space-between',
+      height: '100%',
     },
     container: {alignItems: 'center', width: '90%'},
     row: {
