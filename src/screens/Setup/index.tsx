@@ -110,6 +110,7 @@ export default function Setup({route}: RouteType) {
   return (
     <MyCanvas>
       <ScrollView
+        onTouchStart={() => setOpenDropdown(null)}
         contentContainerStyle={[styles().screen]}
         showsVerticalScrollIndicator={false}>
         <KeyboardAvoidingView

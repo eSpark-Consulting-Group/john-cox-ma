@@ -128,6 +128,7 @@ export default function FMMSetup({route}: RouteType) {
   return (
     <MyCanvas>
       <ScrollView
+        onTouchStart={() => setOpenDropdown(null)}
         contentContainerStyle={styles().screen}
         showsVerticalScrollIndicator={false}>
         <MyHeader />
