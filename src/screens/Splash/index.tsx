@@ -27,19 +27,19 @@ export default function Splash() {
         useNativeDriver: true,
       }),
       Animated.timing(logoScale, {
-        toValue: 0.35, // Scale back to original size
+        toValue: 0.5, // Scale back to original size
         duration: 2000, // Zoom back duration (2 seconds)
         useNativeDriver: true,
       }),
       Animated.parallel([
         Animated.timing(logoTranslateX, {
-          toValue: -320, // Move to left (adjust value for desired position)
+          toValue: -570, // Move to left (adjust value for desired position)
           duration: 3000, // Flying duration (3 seconds)
           easing: Easing.out(Easing.ease), // Smooth ease out for flying
           useNativeDriver: true,
         }),
         Animated.timing(logoTranslateY, {
-          toValue: -900, // Move slightly up (adjust value for desired position)
+          toValue: -1100, // Move slightly up (adjust value for desired position)
           duration: 3000, // Flying duration (3 seconds)
           easing: Easing.out(Easing.ease), // Smooth ease out for flying
           useNativeDriver: true,

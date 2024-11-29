@@ -33,7 +33,11 @@ function LabelDropdown({
   return (
     <View style={styles.main}>
       <MyText text={text} size={size} />
-      <View style={styles.inner}>
+      <View
+        style={[
+          styles.inner,
+          status ? {justifyContent: 'space-between', width: '52.5%'} : {},
+        ]}>
         {status && (
           <TouchableOpacity onPress={activeHanlder}>
             {isActive ? <Active /> : <Inactive />}

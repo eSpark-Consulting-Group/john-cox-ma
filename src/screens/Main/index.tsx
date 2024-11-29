@@ -409,7 +409,7 @@ const styles = (theme?: MyTheme) =>
       alignItems: 'center',
       justifyContent: 'center',
     },
-    fuelBurn: {paddingTop: 1, width: '50%'},
+    fuelBurn: {paddingTop: 2, width: '50%'},
     range: {
       flexDirection: 'row',
       width: '100%',

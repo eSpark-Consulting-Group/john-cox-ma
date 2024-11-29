@@ -98,6 +98,7 @@ export default function Trips() {
     time: TimeFormat;
   }>();
   const hasFocusedRef = useRef(false);
+  const [nameError, setNameError] = useState(false);
 
   const handleSwitchPress = (index: 1 | 2 | 3) => {
     setSelectedSwitch(index);
@@ -132,10 +133,8 @@ export default function Trips() {
   }, [allTripData]);
 
   useEffect(() => {
-    if (units) {
-      console.log('Units preference:', units);
-    }
-  }, [units]);
+    setNameError(false);
+  }, [selectedSwitch]);
 
   const continueTrip = async (tripsState: any, tripRefs: any) => {
     const tripJSON = await AsyncStorage.getItem('tripData');
@@ -677,6 +676,9 @@ export default function Trips() {
         const [a, b] = currentFuelBurn;
         currentFuelBurn = [a, b, ...f];
       }
+
+      console.log('currrrr: ', currentFuelBurn);
+
       setAllTripData(prev => ({
         ...prev,
         [id]: {
@@ -966,7 +968,9 @@ export default function Trips() {
                 <View style={styles.inputContainer}>
                   <MyInput
                     editable={allTripData[selectedSwitch].date ? false : true}
-                    placeholder="Enter Name"
+                    placeholder={
+                      nameError ? 'Enter name to start trip' : 'Enter Name'
+                    }
                     onChange={text => {
                       setAllTripData(prev => ({
                         ...prev,
@@ -974,6 +978,7 @@ export default function Trips() {
                       }));
                     }}
                     value={allTripData[selectedSwitch].name}
+                    color={nameError ? 'red' : theme.colors.primary}
                   />
                 </View>
               </TripSection>
@@ -1080,6 +1085,9 @@ export default function Trips() {
                         () => startTrip(selectedSwitch),
                         options,
                       );
+                      setNameError(false);
+                    } else {
+                      setNameError(true);
                     }
                   } else {
                     endTrip(selectedSwitch);
