@@ -115,10 +115,7 @@ export default function Setup({route}: RouteType) {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps={'always'}>
         <KeyboardAvoidingView
-          style={[
-            styles().screen,
-            {width: '100%', height: '100%', justifyContent: 'space-between'},
-          ]}>
+          style={[styles().screen, {justifyContent: 'space-between'}]}>
           <MyHeader />
           <View
             style={{
@@ -326,7 +323,7 @@ const styles = (theme?: MyTheme) =>
     screen: {
       alignItems: 'center',
       justifyContent: 'center',
-      flex: 1,
+      flexGrow: 1,
     },
     title: {alignSelf: 'flex-start', paddingLeft: 38, paddingBottom: 20},
     card2: {

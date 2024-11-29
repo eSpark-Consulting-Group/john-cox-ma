@@ -29,7 +29,6 @@ function MyDropdown({
   setOpenDropdown: (id: string | null) => void;
   dropdownId: string;
 }) {
-  const [show, setShow] = useState(false);
   const [label, setLabel] = useState(value ?? 'Select');
   const [selectedItem, setSelectedItem] = useState<string | undefined>(value);
   const dropdownHeight =

@@ -394,7 +394,7 @@ export default function Main() {
                 setConfirmation(true);
               }}
             />
-            <GapView length={70} />
+            <GapView length={90} />
           </View>
         )}
 
@@ -409,7 +409,7 @@ const styles = (theme?: MyTheme) =>
     screen: {
       alignItems: 'center',
       justifyContent: 'space-between',
-      height: '100%',
+      // height: '100%',
     },
     container: {alignItems: 'center', width: '90%'},
     row: {

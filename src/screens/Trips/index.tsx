@@ -944,7 +944,12 @@ export default function Trips() {
             ) : null}
           </View>
         ) : (
-          <>
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '100%',
+            }}>
             <GapView length={90} />
             <View style={styles.titleContainer}>
               <MyText
@@ -1114,10 +1119,10 @@ export default function Trips() {
               }}
               gradient
             />
-            <GapView length={300} />
-            <MyFooter />
-          </>
+            <GapView length={80} />
+          </View>
         )}
+        <MyFooter />
       </ScrollView>
     </MyCanvas>
   );

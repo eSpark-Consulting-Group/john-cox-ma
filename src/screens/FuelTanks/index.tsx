@@ -131,13 +131,14 @@ export default function FuelTanks() {
             </MyCard>
           </CollapsableCard>
 
-          <GapView length={80} />
+          <GapView length={60} />
           <MyButton
             label="Back"
             style={styles().button}
             gradient
             onPress={() => navigation.goBack()}
           />
+          <GapView length={90} />
         </View>
         <MyFooter />
       </ScrollView>
