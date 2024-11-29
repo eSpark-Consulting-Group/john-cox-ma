@@ -440,6 +440,9 @@ export default function Trips() {
     console.log({enginesData});
 
     if (enginesData?.Engines?.length) {
+      const allInitialFuel = JSON.parse(
+        (await AsyncStorage.getItem('initialFuelBurn')) || JSON.stringify({}),
+      );
       const initialFuelBurn = [
         Number(enginesData.Engines[0]?.FuelManagement.total_fuel_burned) | 0,
         Number(enginesData.Engines[1]?.FuelManagement.total_fuel_burned) | 0,
@@ -449,12 +452,15 @@ export default function Trips() {
 
       await AsyncStorage.setItem(
         'initialFuelBurn',
-        JSON.stringify({[id]: initialFuelBurn}),
+        JSON.stringify({...allInitialFuel, [id]: initialFuelBurn}),
       );
     } else {
       await AsyncStorage.setItem('isStarted', id?.toString()); //?
     }
     if (enginesData2?.Engines?.length) {
+      const allInitialFuel = JSON.parse(
+        (await AsyncStorage.getItem('initialFuelBurn2')) || JSON.stringify({}),
+      );
       const initialFuelBurn2 = [
         Number(enginesData2.Engines[0]?.FuelManagement.total_fuel_burned) | 0,
         Number(enginesData2.Engines[1]?.FuelManagement.total_fuel_burned) | 0,
@@ -462,9 +468,7 @@ export default function Trips() {
 
       await AsyncStorage.setItem(
         'initialFuelBurn2',
-        JSON.stringify({
-          [id]: initialFuelBurn2,
-        }),
+        JSON.stringify({...allInitialFuel, [id]: initialFuelBurn2}),
       );
       console.log('ye dekhein: ', initialFuelBurn2);
     } else {
