@@ -98,6 +98,7 @@ export default function Trips() {
     time: TimeFormat;
   }>();
   const hasFocusedRef = useRef(false);
+  const [nameError, setNameError] = useState(false);
 
   const handleSwitchPress = (index: 1 | 2 | 3) => {
     setSelectedSwitch(index);
@@ -132,10 +133,8 @@ export default function Trips() {
   }, [allTripData]);
 
   useEffect(() => {
-    if (units) {
-      console.log('Units preference:', units);
-    }
-  }, [units]);
+    setNameError(false);
+  }, [selectedSwitch]);
 
   const continueTrip = async (tripsState: any, tripRefs: any) => {
     const tripJSON = await AsyncStorage.getItem('tripData');
@@ -441,6 +440,9 @@ export default function Trips() {
     console.log({enginesData});
 
     if (enginesData?.Engines?.length) {
+      const allInitialFuel = JSON.parse(
+        (await AsyncStorage.getItem('initialFuelBurn')) || JSON.stringify({}),
+      );
       const initialFuelBurn = [
         Number(enginesData.Engines[0]?.FuelManagement.total_fuel_burned) | 0,
         Number(enginesData.Engines[1]?.FuelManagement.total_fuel_burned) | 0,
@@ -450,12 +452,15 @@ export default function Trips() {
 
       await AsyncStorage.setItem(
         'initialFuelBurn',
-        JSON.stringify({[id]: initialFuelBurn}),
+        JSON.stringify({...allInitialFuel, [id]: initialFuelBurn}),
       );
     } else {
       await AsyncStorage.setItem('isStarted', id?.toString()); //?
     }
     if (enginesData2?.Engines?.length) {
+      const allInitialFuel = JSON.parse(
+        (await AsyncStorage.getItem('initialFuelBurn2')) || JSON.stringify({}),
+      );
       const initialFuelBurn2 = [
         Number(enginesData2.Engines[0]?.FuelManagement.total_fuel_burned) | 0,
         Number(enginesData2.Engines[1]?.FuelManagement.total_fuel_burned) | 0,
@@ -463,9 +468,7 @@ export default function Trips() {
 
       await AsyncStorage.setItem(
         'initialFuelBurn2',
-        JSON.stringify({
-          [id]: initialFuelBurn2,
-        }),
+        JSON.stringify({...allInitialFuel, [id]: initialFuelBurn2}),
       );
       console.log('ye dekhein: ', initialFuelBurn2);
     } else {
@@ -677,6 +680,9 @@ export default function Trips() {
         const [a, b] = currentFuelBurn;
         currentFuelBurn = [a, b, ...f];
       }
+
+      console.log('currrrr: ', currentFuelBurn);
+
       setAllTripData(prev => ({
         ...prev,
         [id]: {
@@ -938,7 +944,12 @@ export default function Trips() {
             ) : null}
           </View>
         ) : (
-          <>
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '100%',
+            }}>
             <GapView length={90} />
             <View style={styles.titleContainer}>
               <MyText
@@ -965,7 +976,10 @@ export default function Trips() {
               <TripSection label="Trip Name">
                 <View style={styles.inputContainer}>
                   <MyInput
-                    placeholder="Enter Name"
+                    editable={allTripData[selectedSwitch].date ? false : true}
+                    placeholder={
+                      nameError ? 'Enter name to start trip' : 'Enter Name'
+                    }
                     onChange={text => {
                       setAllTripData(prev => ({
                         ...prev,
@@ -973,6 +987,7 @@ export default function Trips() {
                       }));
                     }}
                     value={allTripData[selectedSwitch].name}
+                    color={nameError ? 'red' : theme.colors.primary}
                   />
                 </View>
               </TripSection>
@@ -1030,6 +1045,7 @@ export default function Trips() {
             <MyCard>
               <RenderRow
                 title="Total Distance"
+                editable={false}
                 unit={distanceUnit(units?.distance!)}
                 value={distanceValue(
                   Number(allTripData[selectedSwitch].totalDistance),
@@ -1039,14 +1055,17 @@ export default function Trips() {
               <RenderRow
                 title="Estimated Run Time"
                 unit="hours/minute"
+                editable={false}
                 value={allTripData[selectedSwitch].estimatedTime?.toString()}
               />
               <RenderRow
                 title="Average Speed"
                 value={Number(allTripData[selectedSwitch].speed)!.toFixed(3)} //xxx
                 unit="knots"
+                editable={false}
               />
               <RenderRow
+                editable={false}
                 title="Efficiency"
                 unit={
                   volumeUnit(units?.volume!) +
@@ -1070,10 +1089,15 @@ export default function Trips() {
                 width={80}
                 onPress={async () => {
                   if (!tripStarted[selectedSwitch]) {
-                    await BackgroundService.start(
-                      () => startTrip(selectedSwitch),
-                      options,
-                    );
+                    if (allTripData[selectedSwitch].name) {
+                      await BackgroundService.start(
+                        () => startTrip(selectedSwitch),
+                        options,
+                      );
+                      setNameError(false);
+                    } else {
+                      setNameError(true);
+                    }
                   } else {
                     endTrip(selectedSwitch);
                   }
@@ -1095,10 +1119,10 @@ export default function Trips() {
               }}
               gradient
             />
-            <GapView length={70} />
-            <MyFooter />
-          </>
+            <GapView length={80} />
+          </View>
         )}
+        <MyFooter />
       </ScrollView>
     </MyCanvas>
   );

@@ -1,5 +1,6 @@
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {
+  BackHandler,
   ScrollView,
   StyleSheet,
   TextStyle,
@@ -170,10 +171,26 @@ export default function Main() {
     }
   }, [units]);
 
+  useEffect(() => {
+    const onBackPress = () => {
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      onBackPress,
+    );
+
+    return () => backHandler.remove();
+  }, [navigation]);
+
   return (
     <MyCanvas>
       <ScrollView
-        contentContainerStyle={[styles().screen, {flex: confirmation ? 1 : 0}]}
+        contentContainerStyle={[
+          styles().screen,
+          {flex: confirmation ? 1 : 0, width: '100%', justifyContent: 'center'},
+        ]}
         showsVerticalScrollIndicator={false}>
         <MyHeader />
 
@@ -218,7 +235,12 @@ export default function Main() {
             <GapView length={90} />
           </>
         ) : (
-          <>
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '100%',
+            }}>
             <GapView length={90} />
             <TouchableOpacity
               style={{alignSelf: 'flex-end', paddingRight: '4%'}}
@@ -372,8 +394,8 @@ export default function Main() {
                 setConfirmation(true);
               }}
             />
-            <GapView length={70} />
-          </>
+            <GapView length={90} />
+          </View>
         )}
 
         <MyFooter />
@@ -386,8 +408,8 @@ const styles = (theme?: MyTheme) =>
   StyleSheet.create({
     screen: {
       alignItems: 'center',
-      justifyContent: 'center',
-      width: '100%',
+      justifyContent: 'space-between',
+      // height: '100%',
     },
     container: {alignItems: 'center', width: '90%'},
     row: {
@@ -395,7 +417,7 @@ const styles = (theme?: MyTheme) =>
       alignItems: 'center',
       justifyContent: 'center',
     },
-    fuelBurn: {paddingTop: 1, width: '50%'},
+    fuelBurn: {paddingTop: 2, width: '50%'},
     range: {
       flexDirection: 'row',
       width: '100%',

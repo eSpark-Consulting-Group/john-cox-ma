@@ -38,6 +38,7 @@ export default function Login() {
     username: '',
     password: '',
   });
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   useEffect(() => {
     const loadUsername = async () => {
@@ -61,6 +62,10 @@ export default function Login() {
         selectedDevice === 'timesp1'
           ? `${resolvedService1?.addresses[0]}:${resolvedService1?.port}`
           : `${resolvedService2?.addresses[0]}:${resolvedService2?.port}`;
+      navigation.navigate('Setup', {
+        loggedinDomain: domain,
+        deviceName: selectedDevice,
+      });
 
       console.log(`http://${domain}/userLogin`);
 
@@ -86,22 +91,29 @@ export default function Login() {
   return (
     <MyCanvas>
       <ScrollView
-        contentContainerStyle={{flexGrow: 1}}
+        onTouchStart={() => setOpenDropdown(null)}
+        contentContainerStyle={{
+          flexGrow: 1,
+        }}
+        keyboardShouldPersistTaps={'always'}
         showsVerticalScrollIndicator={false}>
         <KeyboardAvoidingView
           style={{
             alignItems: 'center',
             justifyContent: 'center',
+            flex: 1,
           }}>
           <MyHeader />
-          <GapView length={150} />
+
+          <GapView length={90} />
+
           <MyText
             text="Login"
             size={20}
             fontFamily="NotoSans-Bold"
             style={{
               alignSelf: 'flex-start',
-              paddingLeft: 18,
+              paddingLeft: '5%',
               paddingBottom: 20,
             }}
           />
@@ -110,17 +122,19 @@ export default function Login() {
             <LabelInput
               inputValue={creds.username}
               onChange={value => setCreds(prev => ({...prev, username: value}))}
-              text="Username:"
-              width={130}
+              placeholder="Enter username"
+              width={180}
               height={30}
               size={18}
+              text="Username:"
             />
             <GapView length={20} />
             <LabelInput
               inputValue={creds.password}
               onChange={value => setCreds(prev => ({...prev, password: value}))}
               text="Password:"
-              width={130}
+              placeholder="Enter password"
+              width={180}
               height={30}
               size={18}
               password
@@ -134,6 +148,10 @@ export default function Login() {
                 onSelect={e => {
                   setSelectedDevice(e as 'timesp1' | 'timesp2');
                 }}
+                style={{width: 180}}
+                openDropdown={openDropdown}
+                setOpenDropdown={setOpenDropdown}
+                dropdownId="login"
               />
             </View>
             {isLoading ? (

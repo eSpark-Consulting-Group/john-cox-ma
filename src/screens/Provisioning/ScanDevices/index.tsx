@@ -72,6 +72,7 @@ export default function ScanDevices() {
 
   const scanDevices = async () => {
     try {
+      setDevice(undefined);
       setError(false);
       setLoading(true); // Start loading
 

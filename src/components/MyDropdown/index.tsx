@@ -21,17 +21,28 @@ function MyDropdown({
   theme,
   dropdnHeight,
   value,
-}: DropdownProps) {
-  const [show, setShow] = useState(false);
+  openDropdown,
+  setOpenDropdown,
+  dropdownId,
+}: DropdownProps & {
+  openDropdown: string | null;
+  setOpenDropdown: (id: string | null) => void;
+  dropdownId: string;
+}) {
   const [label, setLabel] = useState(value ?? 'Select');
   const [selectedItem, setSelectedItem] = useState<string | undefined>(value);
-  const dropdownHeight = show ? dropdnHeight || data.length * height : height;
+  const dropdownHeight =
+    openDropdown === dropdownId ? dropdnHeight || data.length * height : height;
 
   const handleSelection = (item: string) => {
     setSelectedItem(item);
     onSelect(item);
     setLabel(item);
-    setShow(false);
+    setOpenDropdown(null);
+  };
+
+  const toggleDropdown = () => {
+    setOpenDropdown(openDropdown === dropdownId ? null : dropdownId);
   };
 
   return (
@@ -44,9 +55,7 @@ function MyDropdown({
             ...containerStyle,
           },
         ]}
-        onPress={() => {
-          setShow(!show);
-        }}>
+        onPress={toggleDropdown}>
         <MyText
           text={label}
           size={16}
@@ -54,12 +63,12 @@ function MyDropdown({
           fontFamily="CrimsonText-Bold"
         />
         <Entypo
-          name={!show ? 'chevron-down' : 'chevron-up'}
+          name={openDropdown === dropdownId ? 'chevron-up' : 'chevron-down'}
           color={theme.colors.semiSecondary}
           size={16}
         />
       </Pressable>
-      {show && (
+      {openDropdown === dropdownId && (
         <ScrollView
           showsVerticalScrollIndicator={false}
           style={styles(theme).scroll}

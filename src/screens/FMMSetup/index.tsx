@@ -58,6 +58,7 @@ export default function FMMSetup({route}: RouteType) {
   const [isLoading, setIsLoading] = useState(false);
   const theme = useTheme() as MyTheme;
   const navigation = useNavigation<FMMSetupScreenProps['navigation']>();
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   const onValuesChange = (
     value: string,
@@ -127,82 +128,104 @@ export default function FMMSetup({route}: RouteType) {
   return (
     <MyCanvas>
       <ScrollView
+        onTouchStart={() => setOpenDropdown(null)}
         contentContainerStyle={styles().screen}
-        showsVerticalScrollIndicator={false}>
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps={'always'}>
         <MyHeader />
-        <GapView length={90} />
-        <MyText
-          text="Fuel Mgt Module Setup"
-          size={18}
-          fontFamily="NotoSans-Bold"
-          style={{alignSelf: 'flex-start', paddingLeft: 18, paddingBottom: 20}}
-        />
-        <MyCard>
+        <View
+          style={{
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '100%',
+          }}>
+          <GapView length={90} />
           <MyText
-            text="FMM #1"
-            style={{alignSelf: 'flex-start'}}
+            text="Fuel Mgt Module Setup"
+            size={18}
             fontFamily="NotoSans-Bold"
-          />
-          {allConfig.map((item, index) => (
-            <React.Fragment key={item.engine_id}>
-              <MyText
-                text={item.name}
-                textColor={theme.colors.secondary}
-                style={{alignSelf: 'flex-start'}}
-                fontFamily="NotoSans-Bold"
-              />
-              <LabelInput
-                text={'Volume per cycle'}
-                width={150}
-                height={30}
-                placeholder="Enter here"
-                inputValue={item.volume_per_cycle}
-                onChange={val => onValuesChange(val, index, 'volume_per_cycle')}
-              />
-              <LabelDropdown
-                text="Fuel Type"
-                data={['Gasoline', 'Diesel', 'Biodiesel']}
-                onSelect={val => onValuesChange(val, index, 'fuel_type')}
-                value={item.fuel_type}
-                zIndex={56}
-              />
-              <LabelDropdown
-                text="Engine Type"
-                data={['drive engine', 'generator']}
-                onSelect={val => onValuesChange(val, index, 'engine_type')}
-                value={item.engine_type}
-                zIndex={54}
-              />
-            </React.Fragment>
-          ))}
-        </MyCard>
-
-        <GapView length={15} />
-        <GapView length={25} />
-        <View style={{width: '30%'}}>
-          {isLoading ? (
-            <Loader size="small" />
-          ) : (
-            <MyButton
-              label="Done"
-              labelStyle={{fontSize: 20}}
-              onPress={() => doneHandler()}
-              // onPress={() => {}}
-            />
-          )}
-
-          <GapView length={25} />
-          <MyButton
-            label="Back"
-            gradient
-            labelStyle={{fontSize: 20}}
-            onPress={() => {
-              navigation.navigate('Setup', {loggedinDomain, deviceName});
-              console.log('Wapis jayein');
+            style={{
+              alignSelf: 'flex-start',
+              paddingLeft: 38,
+              paddingBottom: 20,
             }}
           />
+          <MyCard>
+            <MyText
+              text="FMM #1"
+              style={{alignSelf: 'flex-start'}}
+              fontFamily="NotoSans-Bold"
+            />
+            {allConfig.map((item, index) => (
+              <React.Fragment key={item.engine_id}>
+                <MyText
+                  text={item.name}
+                  textColor={theme.colors.secondary}
+                  style={{alignSelf: 'flex-start'}}
+                  fontFamily="NotoSans-Bold"
+                />
+                <LabelInput
+                  text={'Volume per cycle'}
+                  width={150}
+                  height={30}
+                  placeholder="Enter here"
+                  inputValue={item.volume_per_cycle}
+                  onChange={val =>
+                    onValuesChange(val, index, 'volume_per_cycle')
+                  }
+                />
+                <LabelDropdown
+                  text="Fuel Type"
+                  data={['Gasoline', 'Diesel', 'Biodiesel']}
+                  onSelect={val => onValuesChange(val, index, 'fuel_type')}
+                  value={item.fuel_type}
+                  zIndex={56}
+                  openDropdown={openDropdown}
+                  setOpenDropdown={setOpenDropdown}
+                  dropdownId={'fmm1' + index}
+                />
+                <LabelDropdown
+                  text="Engine Type"
+                  data={['drive engine', 'generator']}
+                  onSelect={val => onValuesChange(val, index, 'engine_type')}
+                  value={item.engine_type}
+                  zIndex={54}
+                  openDropdown={openDropdown}
+                  setOpenDropdown={setOpenDropdown}
+                  dropdownId={'fmm2' + index}
+                />
+              </React.Fragment>
+            ))}
+          </MyCard>
+
+          <GapView length={15} />
+          <GapView length={25} />
+          <View style={{width: '30%'}}>
+            {isLoading ? (
+              <Loader size="small" />
+            ) : (
+              <MyButton
+                label="Done"
+                labelStyle={{fontSize: 20}}
+                onPress={() => doneHandler()}
+                style={{marginTop: '15%'}}
+              />
+            )}
+
+            <GapView length={25} />
+            <MyButton
+              label="Back"
+              gradient
+              labelStyle={{fontSize: 20}}
+              onPress={() => {
+                navigation.navigate('Setup', {loggedinDomain, deviceName});
+                console.log('Wapis jayein');
+              }}
+            />
+          </View>
+          <GapView length={70} />
         </View>
-        <GapView length={70} />
+
         <MyFooter />
       </ScrollView>
     </MyCanvas>
@@ -213,6 +236,7 @@ const styles = () =>
   StyleSheet.create({
     screen: {
       alignItems: 'center',
-      justifyContent: 'center',
+      justifyContent: 'space-between',
+      flex: 1,
     },
   });

@@ -19,6 +19,7 @@ import {MyTheme} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
 import {fuelData} from '../../constants';
 import {Empty, Full} from '../../assets';
+import {formatDate} from '../Trips/utils';
 
 type FuelTanksScreenProps = NativeStackScreenProps<
   RootStackParamsList,
@@ -36,98 +37,109 @@ export default function FuelTanks() {
         contentContainerStyle={styles().container}
         showsVerticalScrollIndicator={false}>
         <MyHeader />
-        <GapView length={90} />
-        <MyText
-          text="Fuel Update Utility"
-          size={22}
-          fontFamily="NotoSans-Bold"
-          style={styles().heading}
-        />
-        <MyCard>
-          <View style={styles().row}>
-            <MyText text="Available Fuel" textColor={theme.colors.secondary} />
-            <MyButton label="Update" labelStyle={{fontSize: 14}} />
-          </View>
-          <MyBox
-            text={'Fuel'}
-            // value={null}
-            unit="gal"
-            width={'80%'}
-            textSize={26}
-            unitSize={20}
+        <View
+          style={{
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '100%',
+          }}>
+          <GapView length={90} />
+          <MyText
+            text="Fuel Update Utility"
+            size={22}
+            fontFamily="NotoSans-Bold"
+            style={styles().heading}
           />
-          <View style={styles().lowerBoxes}>
-            <MyBox
-              text={'Date'}
-              //  value={null}
-              width={'50%'}
-              textSize={26}
-            />
-            <MyBox
-              text={'Time'}
-              // value={null}
-              // unit="PM"
-              width={'50%'}
-              textSize={26}
-            />
-          </View>
-        </MyCard>
-        <GapView length={20} />
-        <MyText textColor={theme.colors.secondary} style={styles().heading}>
-          Update Options
-        </MyText>
-        <GapView length={10} />
-        <CollapsableCard title={'Option 1'}>
           <MyCard>
-            <ScaleTanks fuelData={fuelData} />
-          </MyCard>
-        </CollapsableCard>
-        <GapView length={20} />
-        <CollapsableCard title={'Option 2'}>
-          <MyCard>
-            <MyText
-              textColor={theme.colors.secondary}
-              fontFamily="NotoSans-Bold"
-              style={{alignSelf: 'flex-start'}}>
-              Fuel Purchased
-            </MyText>
             <View style={styles().row}>
-              <View style={styles().inputs}>
-                <View style={styles().inputBox}>
-                  <MyInput placeholder="Enter" height={26} />
-                  <MyText text="Date" size={14} />
-                </View>
-                <View style={styles().inputBox}>
-                  <MyInput placeholder="Enter" height={26} />
-                  <MyText text="Gallons" size={14} />
-                </View>
-              </View>
-              <MyButton width={80} label="Add" labelStyle={{fontSize: 16}} />
-            </View>
-          </MyCard>
-        </CollapsableCard>
-        <GapView length={20} />
-        <CollapsableCard title={'Option 3'}>
-          <MyCard>
-            <View style={styles().inputs}>
-              <MyButton
-                label="Tank Full"
-                labelStyle={{fontSize: 16}}
-                onPress={() => setTankFull(!isTankFull)}
+              <MyText
+                text="Available Fuel"
+                textColor={theme.colors.secondary}
+                fontFamily="NotoSans-Bold"
               />
-              {isTankFull ? <Full /> : <Empty />}
+              <MyButton label="Update" labelStyle={{fontSize: 14}} />
+            </View>
+            <MyBox
+              text={'Fuel'}
+              // value={null}
+              unit="gal"
+              width={'80%'}
+              textSize={26}
+              unitSize={20}
+            />
+            <View style={styles().lowerBoxes}>
+              <MyBox
+                text={'Date'}
+                // value={null}
+                width={'50%'}
+                textSize={26}
+              />
+              <MyBox
+                text={'Time'}
+                // value={null}
+                // unit="PM"
+                width={'50%'}
+                textSize={26}
+              />
             </View>
           </MyCard>
-        </CollapsableCard>
+          <GapView length={20} />
+          <MyText textColor={theme.colors.secondary} style={styles().heading}>
+            Update Options
+          </MyText>
+          <GapView length={10} />
+          <CollapsableCard title={'Option 1'}>
+            <MyCard>
+              <ScaleTanks fuelData={fuelData} />
+            </MyCard>
+          </CollapsableCard>
+          <GapView length={20} />
+          <CollapsableCard title={'Option 2'}>
+            <MyCard>
+              <MyText
+                textColor={theme.colors.secondary}
+                fontFamily="NotoSans-Bold"
+                style={{alignSelf: 'flex-start'}}>
+                Fuel Purchased
+              </MyText>
+              <View style={styles().row}>
+                <View style={styles().inputs}>
+                  <View style={styles().inputBox}>
+                    <MyInput placeholder="Enter" height={26} />
+                    <MyText text="Date" size={14} />
+                  </View>
+                  <View style={styles().inputBox}>
+                    <MyInput placeholder="Enter" height={26} />
+                    <MyText text="Gallons" size={14} />
+                  </View>
+                </View>
+                <MyButton width={80} label="Add" labelStyle={{fontSize: 16}} />
+              </View>
+            </MyCard>
+          </CollapsableCard>
+          <GapView length={20} />
+          <CollapsableCard title={'Option 3'}>
+            <MyCard>
+              <View style={styles().inputs}>
+                <MyButton
+                  label="Tank Full"
+                  labelStyle={{fontSize: 16}}
+                  onPress={() => setTankFull(!isTankFull)}
+                />
+                {isTankFull ? <Full /> : <Empty />}
+              </View>
+            </MyCard>
+          </CollapsableCard>
 
-        <GapView length={80} />
-        <MyButton
-          label="Back"
-          style={styles().button}
-          gradient
-          onPress={() => navigation.goBack()}
-        />
-        <GapView length={70} />
+          <GapView length={60} />
+          <MyButton
+            label="Back"
+            style={styles().button}
+            gradient
+            onPress={() => navigation.goBack()}
+          />
+          <GapView length={90} />
+        </View>
         <MyFooter />
       </ScrollView>
     </MyCanvas>
@@ -163,7 +175,8 @@ const styles = (theme?: MyTheme) =>
   StyleSheet.create({
     container: {
       alignItems: 'center',
-      justifyContent: 'center',
+      justifyContent: 'space-between',
+      flexGrow: 1,
     },
     row: {
       flexDirection: 'row',
@@ -171,8 +184,8 @@ const styles = (theme?: MyTheme) =>
       justifyContent: 'space-between',
       alignItems: 'center',
     },
-    lowerBoxes: {flexDirection: 'row', width: '100%', marginTop: '-8%'},
-    heading: {alignSelf: 'flex-start', marginLeft: 18, paddingBottom: 10},
+    lowerBoxes: {flexDirection: 'row', width: '98%', marginTop: -40},
+    heading: {alignSelf: 'flex-start', marginLeft: 35, paddingBottom: 10},
     button: {width: 130, alignSelf: 'center'},
     total: {flexDirection: 'row', alignSelf: 'flex-start', gap: 10},
     inputs: {

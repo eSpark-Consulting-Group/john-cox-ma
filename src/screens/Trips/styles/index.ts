@@ -3,7 +3,8 @@ import {StyleSheet} from 'react-native';
 export const styles = StyleSheet.create({
   screen: {
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
+    flexGrow: 1
   },
   titleContainer: {
     width: '90%',
