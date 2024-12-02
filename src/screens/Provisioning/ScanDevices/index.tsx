@@ -82,6 +82,7 @@ export default function ScanDevices() {
           ESPTransport.softap,
           ESPSecurity.unsecure,
         );
+        console.log('🚀 ~ scanDevices ~ myDevices:', myDevices);
 
         if (myDevices.length === 0) {
           setError(true); // No devices found, show error
