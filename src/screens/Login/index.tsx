@@ -62,10 +62,6 @@ export default function Login() {
         selectedDevice === 'timesp1'
           ? `${resolvedService1?.addresses[0]}:${resolvedService1?.port}`
           : `${resolvedService2?.addresses[0]}:${resolvedService2?.port}`;
-      navigation.navigate('Setup', {
-        loggedinDomain: domain,
-        deviceName: selectedDevice,
-      });
 
       console.log(`http://${domain}/userLogin`);
 

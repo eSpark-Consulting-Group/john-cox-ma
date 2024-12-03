@@ -1,10 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import {Animated, Easing, StyleSheet, View} from 'react-native';
+import {Animated, Easing, StyleSheet, View, Dimensions} from 'react-native';
 import RNBootSplash from 'react-native-bootsplash';
 
 import RootNav from '../../navigation';
 import {MyCanvas} from '../../components';
 import {SplashIcon} from '../../assets';
+
+const {width: screenWidth, height: screenHeight} = Dimensions.get('window');
 
 export default function Splash() {
   const [appIsReady, setAppIsReady] = useState(false);
@@ -19,6 +21,9 @@ export default function Splash() {
     RNBootSplash.hide();
   }, []);
   const animateLogo = () => {
+    const targetTranslateX = -screenWidth / 1.45; // Move to the left edge
+    const targetTranslateY = -screenHeight / 1.2; // Move to the top edge
+
     Animated.sequence([
       Animated.timing(logoScale, {
         toValue: 1.25, // Scale to full size
@@ -33,13 +38,13 @@ export default function Splash() {
       }),
       Animated.parallel([
         Animated.timing(logoTranslateX, {
-          toValue: -570, // Move to left (adjust value for desired position)
+          toValue: targetTranslateX, // Move to left (adjust value for desired position)
           duration: 3000, // Flying duration (3 seconds)
           easing: Easing.out(Easing.ease), // Smooth ease out for flying
           useNativeDriver: true,
         }),
         Animated.timing(logoTranslateY, {
-          toValue: -1100, // Move slightly up (adjust value for desired position)
+          toValue: targetTranslateY, // Move slightly up (adjust value for desired position)
           duration: 3000, // Flying duration (3 seconds)
           easing: Easing.out(Easing.ease), // Smooth ease out for flying
           useNativeDriver: true,

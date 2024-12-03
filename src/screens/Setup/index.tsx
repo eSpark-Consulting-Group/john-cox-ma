@@ -1,5 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import {ScrollView, StyleSheet, View, KeyboardAvoidingView} from 'react-native';
+import {
+  ScrollView,
+  StyleSheet,
+  View,
+  KeyboardAvoidingView,
+  LogBox,
+} from 'react-native';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -110,7 +116,10 @@ export default function Setup({route}: RouteType) {
   return (
     <MyCanvas>
       <ScrollView
-        onTouchStart={() => setOpenDropdown(null)}
+        // onTouchStart={() => {
+        //   console.log('tap');
+        //   // setOpenDropdown(null);
+        // }}
         contentContainerStyle={[styles().screen]}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps={'always'}>

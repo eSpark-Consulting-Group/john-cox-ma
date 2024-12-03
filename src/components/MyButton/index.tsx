@@ -51,7 +51,10 @@ function MyButton({
           start={[0, 1]}
           end={[0.9, 1]}
           style={{borderRadius: 10}}>
-          <TouchableOpacity style={styles.inner} onPress={onPress}>
+          <TouchableOpacity
+            style={styles.inner}
+            onPress={onPress}
+            activeOpacity={1}>
             <LinearGradient
               colors={['#4d92e16f', '#090824']}
               style={[styles.gradient]}
@@ -72,7 +75,10 @@ function MyButton({
   }
 
   return (
-    <TouchableOpacity onPress={onPress} style={[buttonStyle, style]}>
+    <TouchableOpacity
+      onPress={onPress}
+      style={[buttonStyle, style]}
+      activeOpacity={1}>
       <MyText
         style={buttonTextStyle}
         fontFamily={fontFamily}
