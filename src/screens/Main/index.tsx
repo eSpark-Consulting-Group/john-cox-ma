@@ -337,8 +337,8 @@ export default function Main() {
                 </View>
               </View>
               <NauticalMile
-                volUnit={units?.volume! || 'Liters'}
-                distUnit={units?.distance! || 'Kilometers'}
+                volUnit={units?.volume ? units.volume : 'Liters'}
+                distUnit={units?.distance ? units?.distance : 'Kilometers'}
               />
               <View style={styles().range}>
                 <View style={{width: '50%'}}>
