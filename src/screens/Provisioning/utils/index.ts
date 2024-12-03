@@ -14,15 +14,12 @@ export async function checkPermissions() {
     ]);
     console.log('check Granted permissions HERE:---------------------------');
 
-   
     console.log(
       'Location Permission:',
       status[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION],
     );
 
-    if (
-      status[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION] == 'granted'
-    ) {
+    if (status[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION] == 'granted') {
       console.log('All permissions granted. HERE');
       return true;
     } else {
@@ -44,15 +41,12 @@ async function requestPermissions() {
 
     console.log('check Granted permissions:---------------------------');
 
-    
     console.log(
       'Location Permission:',
       status[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION],
     );
 
-    if (
-      status[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION] == 'granted'
-    ) {
+    if (status[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION] == 'granted') {
       console.log('All permissions granted.');
       return true;
     } else {
@@ -73,7 +67,6 @@ export const sendingData = async (device: ESPDevice) => {
     );
     console.log('Response:', res);
     if (res) {
-     
       const res1 = JSON.parse(res);
       await handleDomainAssignment(device, res1);
       return res;
@@ -98,7 +91,7 @@ async function checkCompleteCacheForDomain(domainName: string) {
   const keys = await AsyncStorage.getAllKeys();
   for (const key of keys) {
     const data = await AsyncStorage.getItem(key);
-    console.log("cache:" , data, '--------------');
+    console.log('cache:', data, '--------------');
     if (data) {
       const parsedData = JSON.parse(data);
       if (parsedData.domain_name === domainName) {
@@ -110,16 +103,18 @@ async function checkCompleteCacheForDomain(domainName: string) {
   console.log(' ---- timesp2 does not exist already ---- ');
   return false;
 }
-async function checkCompleteCacheForDomainRepetition(domainName: string): Promise<number> {
+async function checkCompleteCacheForDomainRepetition(
+  domainName: string,
+): Promise<number> {
   try {
     const keys = await AsyncStorage.getAllKeys();
-    
+
     // Fetch all items in parallel
     const items = await Promise.all(
-      keys.map(async (key) => {
+      keys.map(async key => {
         const data = await AsyncStorage.getItem(key);
         return data ? JSON.parse(data) : null;
-      })
+      }),
     );
 
     // Count the matches for the domain name
@@ -132,7 +127,6 @@ async function checkCompleteCacheForDomainRepetition(domainName: string): Promis
     }, 0);
 
     return domainMatchCount;
-
   } catch (error) {
     console.error('Error checking domain repetition in cache:', error);
     return 0; // Return 0 or handle the error as needed
@@ -198,12 +192,11 @@ async function handleDomainAssignment(device: ESPDevice, res1: any) {
         if (timesp1Exists_Count == 2) {
           await checkAndAssignDomain(device, 'timesp2');
           console.log('timesp1 repeated assignment');
-         
         } else if (timesp2Exists_Count == 2) {
           await checkAndAssignDomain(device, 'timesp1');
           console.log('timesp2 repeated assignment');
         } else {
-          console.log("cachedData.domainName: ", cachedData.domain_name);          
+          console.log('cachedData.domainName: ', cachedData.domain_name);
           await checkAndAssignDomain(device, cachedData.domain_name);
         }
         await updateFile(res1.mac_address, device);
@@ -309,6 +302,7 @@ async function checkFile(mac_address: string) {
   if (res && res[0] && res[2]) {
     const filePath = res[0]?.toString();
     if (filePath?.includes(`${mac_address.replaceAll(':', '_')}`)) {
+      console.log('🚀 ~ checkFile ~ filePath:', filePath);
       const readRes = await FileSystem.StorageAccessFramework.readAsStringAsync(
         filePath!,
       );
@@ -332,6 +326,7 @@ async function updateFile(mac_address: string, device: ESPDevice) {
       await createAndWriteFile(res[1].toString(), mac_address, device);
       console.log('File created --- ');
     }
+    console.log('🚀 ~ updateFile ~ filePath:', filePath);
     const readRes = await FileSystem.StorageAccessFramework.readAsStringAsync(
       filePath!,
     );
