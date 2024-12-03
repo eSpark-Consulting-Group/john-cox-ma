@@ -902,12 +902,16 @@ export default function Trips() {
       <ScrollView
         contentContainerStyle={[
           styles.screen,
-          {flex: showConfirmation ? 1 : 0},
+          {
+            flexGrow: 1,
+            flex: showConfirmation ? 1 : 0,
+            justifyContent: showConfirmation ? 'center' : 'space-between',
+          },
         ]}
         showsVerticalScrollIndicator={false}>
         <MyHeader />
         {showConfirmation ? (
-          <View style={styles.confirmation}>
+          <View style={[styles.confirmation, {padding: 20}]}>
             <View style={styles.inner}>
               <MyText size={24} style={styles.confirmationMessage}>
                 Are you sure you want to Reset Trip {selectedSwitch}?

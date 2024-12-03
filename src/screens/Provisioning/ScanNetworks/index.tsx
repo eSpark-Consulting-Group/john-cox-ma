@@ -31,6 +31,7 @@ import {Wifi, Connected} from '../../../assets';
 import {MyTheme} from '../../../types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useSocket} from '../../../components/SocketProvider';
+import {screenWidth} from '../../../constants';
 
 type ScanNetworksScreenProps = NativeStackScreenProps<
   RootStackParamsList,
@@ -307,15 +308,25 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
                 />
               </View>
               <GapView length={60} />
-              <MyButton
-                label="Connect"
-                width={120}
-                labelStyle={{fontSize: 20}}
-                onPress={() => {
-                  connectNetwork();
-                  setStep(1);
-                }}
-              />
+              <View style={{flexDirection: 'row', gap: 10}}>
+                <MyButton
+                  label="Back"
+                  labelStyle={{fontSize: 20}}
+                  onPress={() => {
+                    setStep(1);
+                  }}
+                  style={{width: screenWidth / 5.75}}
+                />
+                <MyButton
+                  label="Connect"
+                  labelStyle={{fontSize: 20}}
+                  onPress={() => {
+                    connectNetwork();
+                    setStep(1);
+                  }}
+                  style={{width: screenWidth / 5.75}}
+                />
+              </View>
               <GapView length={40} />
             </MyCard>
             <GapView length={150} />

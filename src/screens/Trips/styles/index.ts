@@ -3,7 +3,7 @@ import {StyleSheet} from 'react-native';
 export const styles = StyleSheet.create({
   screen: {
     alignItems: 'center',
-    justifyContent: 'space-between',
+    
     flexGrow: 1
   },
   titleContainer: {
@@ -28,7 +28,7 @@ export const styles = StyleSheet.create({
   },
   button: {width: 130, alignSelf: 'center'},
   confirmation: {
-    width: '100%',
+    width: '80%',
     alignItems: 'center',
     textAlign: 'center',
   },
