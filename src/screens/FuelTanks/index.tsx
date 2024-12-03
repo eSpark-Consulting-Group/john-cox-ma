@@ -23,7 +23,7 @@ import {formatDate} from '../Trips/utils';
 
 type FuelTanksScreenProps = NativeStackScreenProps<
   RootStackParamsList,
-  'Login'
+  'FuelTanks'
 >;
 
 export default function FuelTanks() {
