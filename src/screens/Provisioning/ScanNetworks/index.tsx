@@ -315,7 +315,6 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
                   onPress={() => {
                     setStep(1);
                   }}
-                  style={{width: screenWidth / 5.75}}
                 />
                 <MyButton
                   label="Connect"
@@ -324,7 +323,6 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
                     connectNetwork();
                     setStep(1);
                   }}
-                  style={{width: screenWidth / 5.75}}
                 />
               </View>
               <GapView length={40} />

@@ -28,7 +28,7 @@ export const styles = StyleSheet.create({
   },
   button: {width: 130, alignSelf: 'center'},
   confirmation: {
-    width: '80%',
+    width: '85%',
     alignItems: 'center',
     textAlign: 'center',
   },
@@ -40,7 +40,7 @@ export const styles = StyleSheet.create({
   confirmationMessage: {textAlign: 'center', paddingBottom: 5, lineHeight: 30},
   buttonRow: {
     flexDirection: 'row',
-    width: '90%',
+    width: '100%',
     alignItems: 'center',
     justifyContent: 'space-evenly',
   },
