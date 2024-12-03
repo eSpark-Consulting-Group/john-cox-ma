@@ -189,7 +189,12 @@ export default function Main() {
       <ScrollView
         contentContainerStyle={[
           styles().screen,
-          {flex: confirmation ? 1 : 0, width: '100%', justifyContent: 'center'},
+          {
+            flex: confirmation ? 1 : 0,
+            width: '100%',
+            justifyContent: 'center',
+            flexGrow: 1,
+          },
         ]}
         showsVerticalScrollIndicator={false}>
         <MyHeader />
@@ -332,8 +337,8 @@ export default function Main() {
                 </View>
               </View>
               <NauticalMile
-                volUnit={units?.volume!}
-                distUnit={units?.distance!}
+                volUnit={units?.volume! || 'Liters'}
+                distUnit={units?.distance! || 'Kilometers'}
               />
               <View style={styles().range}>
                 <View style={{width: '50%'}}>
