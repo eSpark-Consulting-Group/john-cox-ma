@@ -5,8 +5,7 @@ import RNBootSplash from 'react-native-bootsplash';
 import RootNav from '../../navigation';
 import {MyCanvas} from '../../components';
 import {SplashIcon} from '../../assets';
-
-const {width: screenWidth, height: screenHeight} = Dimensions.get('window');
+import {screenHeight, screenWidth} from '../../constants';
 
 export default function Splash() {
   const [appIsReady, setAppIsReady] = useState(false);

@@ -1,3 +1,7 @@
+import { Dimensions } from "react-native";
+
+export const {width: screenWidth, height: screenHeight} = Dimensions.get('window');
+
 export const temp = {
   volume: {text: 'Volume', options: ['US Gallons', 'Liters'], zindez: 64},
   distance: {
