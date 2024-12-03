@@ -11,7 +11,9 @@
     "test": "jest",
     "postinstall": "patch-package",
     "release": "cd android && ./gradlew assembleRelease",
-    "assembleDebug": "cd android && ./gradlew clean && ./gradlew assembleDebug"
+    "assembleDebug": "cd android && ./gradlew clean && ./gradlew assembleDebug",
+    "reverse:8081": "adb reverse tcp:8081 tcp:8081",
+    "assembleRelease": "cd android && ./gradlew clean && ./gradlew assembleRelease"
   },
   "dependencies": {
     "@espark-consultants/react-native-esp-idf-provisioning": "^0.0.4",

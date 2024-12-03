@@ -3,6 +3,7 @@ import {ScrollView, StyleSheet, View} from 'react-native';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {ApiResponse} from 'apisauce';
 
 import {
   GapView,
@@ -15,17 +16,17 @@ import {
   MyHeader,
   MyText,
 } from '../../components';
-import {MyTheme} from '../../types';
-import {RootStackParamsList} from '../../types/navigationParams';
+import {
+  EngineData,
+  MyTheme,
+  DistanceUnit,
+  VolumeUnit,
+  TimeFormat,
+} from '../../types';
+import {FMMSetupScreenProps} from '../../types/navigationParams';
 import LabelDropdown from '../../components/LabelDropdown';
 import {api} from '../../api';
-import {ApiResponse} from 'apisauce';
 import {updateUnits} from './utils';
-
-type FMMSetupScreenProps = NativeStackScreenProps<
-  RootStackParamsList,
-  'FMMSetup'
->;
 
 export default function FMMSetup({route}: FMMSetupScreenProps) {
   const {loggedinDomain, deviceName, config} = route.params;
@@ -92,9 +93,9 @@ export default function FMMSetup({route}: FMMSetupScreenProps) {
         console.log('Success response:', response);
 
         await updateUnits({
-          distance: route.params.distanceToUnit!,
-          volume: route.params.volumeToUnit!,
-          time: route.params.timeToFormat!,
+          distance: route?.params?.distanceToUnit!,
+          volume: route?.params?.volumeToUnit!,
+          time: route?.params?.timeToFormat!,
         });
 
         logoutHandler();

@@ -65,9 +65,9 @@ export const sendingData = async (device: ESPDevice) => {
       'domain-name',
       JSON.stringify({type: 'domain_request'}),
     );
-    console.log('Response:', res);
+    console.log('Response: sending data', res);
     if (res) {
-      const res1 = JSON.parse(res);
+      const res1 = JSON.parse(JSON.stringify(res));
       await handleDomainAssignment(device, res1);
       return res;
     }
@@ -93,7 +93,7 @@ async function checkCompleteCacheForDomain(domainName: string) {
     const data = await AsyncStorage.getItem(key);
     console.log('cache:', data, '--------------');
     if (data) {
-      const parsedData = JSON.parse(data);
+      const parsedData = JSON.parse(JSON.stringify(data));
       if (parsedData.domain_name === domainName) {
         console.log(' ---- timesp1 already exists ---- ');
         return true;
@@ -113,7 +113,7 @@ async function checkCompleteCacheForDomainRepetition(
     const items = await Promise.all(
       keys.map(async key => {
         const data = await AsyncStorage.getItem(key);
-        return data ? JSON.parse(data) : null;
+        return data ? JSON.parse(JSON.stringify(data)) : null;
       }),
     );
 
@@ -153,7 +153,7 @@ async function checkFileForDomainRepetition() {
           await FileSystem.StorageAccessFramework.readAsStringAsync(filePath);
 
         // Parse the file data and check for domain names
-        const parsedData = JSON.parse(fileContent);
+        const parsedData = JSON.parse(JSON.stringify(fileContent));
 
         if (parsedData.domain_name === 'timesp1') {
           timesp1Count += 1;
@@ -367,7 +367,7 @@ export async function checkCache(mac_address: string) {
   try {
     const data = await AsyncStorage.getItem(mac_address);
     if (data) {
-      const result = JSON.parse(data);
+      const result = JSON.parse(JSON.stringify(data));
       console.log('Cached data:', result);
       return result;
     } else {
@@ -393,7 +393,7 @@ async function checkAndAssignDomain(device: ESPDevice, domainName: string) {
 }
 
 async function setDev1(res: string) {
-  const res_JSON = JSON.parse(res);
+  const res_JSON = JSON.parse(JSON.stringify(res));
   try {
     await AsyncStorage.setItem(res_JSON.mac_address, res);
     console.log('Cache updated with:', res);
