@@ -87,7 +87,6 @@ export default function Login() {
   return (
     <MyCanvas>
       <ScrollView
-        onTouchStart={() => setOpenDropdown(null)}
         contentContainerStyle={{
           flexGrow: 1,
         }}

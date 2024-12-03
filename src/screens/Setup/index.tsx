@@ -116,10 +116,6 @@ export default function Setup({route}: RouteType) {
   return (
     <MyCanvas>
       <ScrollView
-        // onTouchStart={() => {
-        //   console.log('tap');
-        //   // setOpenDropdown(null);
-        // }}
         contentContainerStyle={[styles().screen]}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps={'always'}>
