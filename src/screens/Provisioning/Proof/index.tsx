@@ -1,4 +1,4 @@
-import {KeyboardAvoidingView, StyleSheet, View} from 'react-native';
+import {KeyboardAvoidingView, ScrollView, StyleSheet, View} from 'react-native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {ESPDevice} from '@espark-consultants/react-native-esp-idf-provisioning';
@@ -93,9 +93,21 @@ export default function Proof({route}: ProofScreenProps) {
 
   return (
     <MyCanvas>
-      <KeyboardAvoidingView style={styles.main} behavior="padding">
-        <MyHeader />
-        <View style={styles.wrapper}>
+      <ScrollView
+        contentContainerStyle={{
+          flexGrow: 1,
+        }}
+        keyboardShouldPersistTaps={'always'}
+        showsVerticalScrollIndicator={false}>
+        <KeyboardAvoidingView
+          style={{
+            alignItems: 'center',
+            justifyContent: 'center',
+            flex: 1,
+          }}>
+          <MyHeader />
+          <GapView length={90} />
+
           <MyText
             text="Enter Possession Proof"
             size={24}
@@ -140,9 +152,9 @@ export default function Proof({route}: ProofScreenProps) {
           <MyText>{error && 'Error connecting to device'}</MyText>
           <MyText>{error && 'Navigating Back to Scan devices'}</MyText>
           <GapView length={50} />
-        </View>
-        <MyFooter />
-      </KeyboardAvoidingView>
+          <MyFooter />
+        </KeyboardAvoidingView>
+      </ScrollView>
     </MyCanvas>
   );
 }
@@ -156,9 +168,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     alignSelf: 'center',
     width: '100%',
-    paddingBottom: '15%',
+    // paddingBottom: '15%',
   },
-  title: {alignSelf: 'flex-start', paddingLeft: 18, paddingBottom: 20},
+  title: {
+    alignSelf: 'flex-start',
+    paddingLeft: 18,
+    //  paddingBottom: 10
+  },
   reloadRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -169,7 +185,8 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     paddingTop: 30,
     lineHeight: 30,
-    width: '60%',
+    width: '100%',
+    // backgroundColor: 'pink',
     textAlign: 'center',
   },
   flatlist: {height: 240, width: '100%'},

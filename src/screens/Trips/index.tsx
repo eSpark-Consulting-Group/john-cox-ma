@@ -947,30 +947,32 @@ export default function Trips() {
         <MyHeader />
         {showConfirmation ? (
           <View style={[styles.confirmation]}>
-            <View style={styles.inner}>
-              <MyText size={24} style={styles.confirmationMessage}>
-                Are you sure you want to Reset Trip {selectedSwitch}?
-              </MyText>
-              <MyText
-                textColor={theme.colors.secondary}
-                style={styles.confirmation}
-                size={18}>
-                Resetting will over-write prior data
-              </MyText>
-              <View style={styles.buttonRow}>
-                <MyButton
-                  label="NO"
-                  labelStyle={styles.rowButtons}
-                  onPress={() => setShowConfirmation(false)}
-                />
-                <MyButton
-                  label="YES"
-                  textColor="#B81106"
-                  labelStyle={styles.rowButtons}
-                  onPress={() => endTrip(selectedSwitch, true)}
-                />
+            {!resetVisible && !warningVisible ? (
+              <View style={styles.inner}>
+                <MyText size={24} style={styles.confirmationMessage}>
+                  Are you sure you want to Reset Trip {selectedSwitch}?
+                </MyText>
+                <MyText
+                  textColor={theme.colors.secondary}
+                  style={styles.confirmation}
+                  size={18}>
+                  Resetting will over-write prior data
+                </MyText>
+                <View style={styles.buttonRow}>
+                  <MyButton
+                    label="NO"
+                    labelStyle={styles.rowButtons}
+                    onPress={() => setShowConfirmation(false)}
+                  />
+                  <MyButton
+                    label="YES"
+                    textColor="#B81106"
+                    labelStyle={styles.rowButtons}
+                    onPress={() => endTrip(selectedSwitch, true)}
+                  />
+                </View>
               </View>
-            </View>
+            ) : null}
             {!resetVisible && !warningVisible ? (
               <MyButton
                 label="Back"
