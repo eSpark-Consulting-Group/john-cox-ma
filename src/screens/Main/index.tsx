@@ -42,7 +42,15 @@ import {sumOf} from '../Trips/utils';
 type MainScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 
 export default function Main() {
-  const {enginesData1, enginesData2, getSocketData, speed, tanks} = useSocket();
+  const {
+    enginesData1,
+    enginesData2,
+    getSocketData,
+    speed,
+    tanks,
+    isService1Resolved,
+    isService2Resolved,
+  } = useSocket();
   const {resolvedService1, resolvedService2} = useService();
   const theme = useTheme() as MyTheme;
   const navigation = useNavigation<MainScreenProps['navigation']>();
@@ -116,27 +124,35 @@ export default function Main() {
   ];
 
   const fetchSocketData = () => {
-    if (resolvedService1 && enginesData1.length === 0) {
-      getSocketData(resolvedService1.host, resolvedService1.port, 'timesp1');
+    if (isService1Resolved && enginesData1.length === 0) {
+      getSocketData(
+        resolvedService1?.host!,
+        resolvedService1?.port!,
+        'timesp1',
+      );
     }
-    if (resolvedService2 && enginesData2.length === 0) {
-      getSocketData(resolvedService2.host, resolvedService2.port, 'timesp2');
+    if (isService2Resolved && enginesData2.length === 0) {
+      getSocketData(
+        resolvedService2?.host!,
+        resolvedService2?.port!,
+        'timesp2',
+      );
     }
   };
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (
-        (resolvedService1 && enginesData1.length === 0) ||
-        (resolvedService2 && enginesData2.length === 0)
-      ) {
-        console.log('reconnecting socket');
-        fetchSocketData();
-      }
-    }, 5000); // Adjust interval duration as needed
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     if (
+  //       (resolvedService1 && enginesData1.length === 0) ||
+  //       (resolvedService2 && enginesData2.length === 0)
+  //     ) {
+  //       console.log('reconnecting socket');
+  //       fetchSocketData();
+  //     }
+  //   }, 5000); // Adjust interval duration as needed
 
-    return () => clearInterval(interval);
-  }, [resolvedService1, resolvedService2, enginesData1, enginesData2]);
+  //   return () => clearInterval(interval);
+  // }, [resolvedService1, resolvedService2, enginesData1, enginesData2]);
 
   const fetchUnits = async () => {
     const unitsData = await getUnits();
@@ -252,7 +268,7 @@ export default function Main() {
               onPress={fetchSocketData}>
               <Ionicons name="reload" size={35} color={theme.colors.primary} />
             </TouchableOpacity>
-            {resolvedService1 && (
+            {isService1Resolved && (
               <View style={styles().GaugeRow}>
                 {enginesData1.length
                   ? enginesData1.map((item, index) => (
@@ -284,7 +300,7 @@ export default function Main() {
               </View>
             )}
             <GapView length={20} />
-            {resolvedService2 && (
+            {isService2Resolved && (
               <View style={styles().GaugeRow}>
                 {enginesData2.length
                   ? enginesData2.map((item, index) => (

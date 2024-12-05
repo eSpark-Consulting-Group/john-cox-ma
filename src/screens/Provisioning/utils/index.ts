@@ -283,18 +283,17 @@ async function checkFileForDomainRepetition() {
               await FileSystem.StorageAccessFramework.readAsStringAsync(
                 filePath,
               );
-
-            try {
-              // Parse the file data and check for domain names
-              const parsedData = JSON.parse(fileContent);
-
-              if (parsedData.domain_name === 'timesp1') {
-                timesp1Count += 1;
-              } else if (parsedData.domain_name === 'timesp2') {
-                timesp2Count += 1;
-              }
-            } catch (parseError) {
-              console.log(`Error parsing JSON file ${filePath}:`, parseError);
+            console.log(
+              '🚀 ~ checkFileForDomainRepetition ~ fileContent:',
+              fileContent,
+            );
+            // Parse the file data and check for domain names
+            const parsedData = JSON.parse(fileContent); //! is me masla ha !
+            if (parsedData?.domain_name === 'timesp1') {
+              timesp1Count += 1;
+            } else if (parsedData?.domain_name === 'timesp2') {
+              timesp2Count += 1;
+            } else {
             }
           }
         }
@@ -337,11 +336,12 @@ async function handleDomainAssignment(device: ESPDevice, res1: any) {
           await checkAndAssignDomain(device, 'timesp1');
           console.log('timesp2 repeated assignment');
         } else {
-          console.log('cachedData.domainName: ', cachedData.domain_name);
-          await checkAndAssignDomain(device, cachedData.domain_name);
+          console.log('cachedData.domainName: ', cachedData?.domain_name);
+          await checkAndAssignDomain(device, cachedData?.domain_name);
         }
         await updateFile(res1.mac_address, device);
       } else {
+        //! Checking in File System
         const fileData = await checkFile(res1.mac_address);
         console.log(
           '🚀 ~ handleDomainAssignment ~ res1.mac_address:',
@@ -350,14 +350,25 @@ async function handleDomainAssignment(device: ESPDevice, res1: any) {
         if (fileData) {
           const {timesp1Count, timesp2Count} =
             await checkFileForDomainRepetition();
+          console.log(
+            '🚀 ~ handleDomainAssignment ~ timesp1Count:xxxxxxxxxxxxxxxxxxx',
+            timesp1Count,
+            timesp2Count,
+            fileData,
+          );
           if (timesp1Count == 2) {
-            await checkAndAssignDomain(device, 'timesp2');
             console.log('timesp1 repeated assignment');
+            await checkAndAssignDomain(device, 'timesp2');
           } else if (timesp2Count == 2) {
-            await checkAndAssignDomain(device, 'timesp1');
             console.log('timesp2 repeated assignment');
+            await checkAndAssignDomain(device, 'timesp1');
           } else {
-            await checkAndAssignDomain(device, cachedData.domain_name);
+            console.log('Both counts are 1');
+            const parsedFileData = JSON.parse(fileData);
+            await checkAndAssignDomain(
+              device,
+              parsedFileData?.domain_name as string,
+            );
           }
           await updateFile(res1.mac_address, device);
         } else {
@@ -463,6 +474,7 @@ async function updateFile(
 ): Promise<void> {
   try {
     const res = await checkDirectoryPermission(mac_address);
+    console.log('🚀 ~ res:-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', res);
 
     if (!res || !res[1] || !res[2]) {
       console.error('Directory permission not granted or invalid result');
