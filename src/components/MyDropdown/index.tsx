@@ -1,4 +1,4 @@
-import React, {memo, useState} from 'react';
+import React, {memo, useEffect, useState} from 'react';
 import {
   Pressable,
   ScrollView,
@@ -29,10 +29,16 @@ function MyDropdown({
   setOpenDropdown: (id: string | null) => void;
   dropdownId: string;
 }) {
-  const [label, setLabel] = useState(value ?? 'Select');
+  const [label, setLabel] = useState('Select');
   const [selectedItem, setSelectedItem] = useState<string | undefined>(value);
   const dropdownHeight =
     openDropdown === dropdownId ? dropdnHeight || data.length * height : height;
+
+  useEffect(() => {
+    if (value) {
+      setLabel(value ?? 'Select');
+    }
+  }, [value]);
 
   const handleSelection = (item: string) => {
     setSelectedItem(item);

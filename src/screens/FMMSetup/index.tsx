@@ -27,6 +27,7 @@ import {FMMSetupScreenProps} from '../../types/navigationParams';
 import LabelDropdown from '../../components/LabelDropdown';
 import {api} from '../../api';
 import {updateUnits} from './utils';
+import {KeyboardAvoidingView} from 'react-native';
 
 export default function FMMSetup({route}: FMMSetupScreenProps) {
   const {loggedinDomain, deviceName, config} = route.params;
@@ -92,10 +93,13 @@ export default function FMMSetup({route}: FMMSetupScreenProps) {
       if (response.status >= 200 && response.status < 300) {
         console.log('Success response:', response);
 
+        console.log('🚀 ~ doneHandler ~ route?.params:', route?.params);
+
         await updateUnits({
           distance: route?.params?.distanceToUnit!,
           volume: route?.params?.volumeToUnit!,
           time: route?.params?.timeToFormat!,
+          temp: route?.params?.temperatureToUnit!,
         });
 
         logoutHandler();
@@ -194,7 +198,7 @@ export default function FMMSetup({route}: FMMSetupScreenProps) {
                 label="Done"
                 labelStyle={{fontSize: 20}}
                 onPress={() => doneHandler()}
-                style={{marginTop: '15%'}}
+                style={{marginTop: '15%', width: '100%'}}
               />
             )}
 
@@ -202,7 +206,7 @@ export default function FMMSetup({route}: FMMSetupScreenProps) {
             <MyButton
               label="Back"
               gradient
-              labelStyle={{fontSize: 20}}
+              labelStyle={{fontSize: 20, width: '100%'}}
               onPress={() => {
                 navigation.navigate('Setup', {loggedinDomain, deviceName});
                 console.log('Wapis jayein');
@@ -211,7 +215,6 @@ export default function FMMSetup({route}: FMMSetupScreenProps) {
           </View>
           <GapView length={70} />
         </View>
-
         <MyFooter />
       </ScrollView>
     </MyCanvas>
@@ -223,6 +226,6 @@ const styles = () =>
     screen: {
       alignItems: 'center',
       justifyContent: 'space-between',
-      flex: 1,
+      flexGrow: 1,
     },
   });

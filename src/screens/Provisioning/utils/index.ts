@@ -142,7 +142,7 @@ async function requestBlePermissions() {
 export async function sendingData(device: ESPDevice) {
   if (!device) {
     console.error('Device object is null or undefined');
-    return 'error: invalid device object';
+    return {res: null, domain: null, error: 'invalid device object'};
   }
   try {
     const res = await device.sendData(
@@ -159,19 +159,23 @@ export async function sendingData(device: ESPDevice) {
         // Check if res1 is null or undefined
         if (res1 == null) {
           console.error('Parsed response is null or undefined');
-          return 'error: null response';
+          return {res: null, domain: null, error: 'error: null response'};
         }
 
         // Check if domain_name property exists, even if it's an empty string
         if ('domain_name' in res1) {
-          await handleDomainAssignment(device, res1);
-          return res;
+          const domain = await handleDomainAssignment(device, res1);
+          console.log(
+            '🚀 ~ sendingData ~ domain:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+            domain,
+          );
+          return {res, domain, error: null};
         } else {
           console.error(
             'Invalid response format: missing domain_name property',
             res1,
           );
-          return 'error: invalid response format';
+          return {res: null, domain: null, error: 'invalid response format'};
         }
       } catch (parseError) {
         console.error(
@@ -180,15 +184,15 @@ export async function sendingData(device: ESPDevice) {
           'Raw response:',
           res,
         );
-        return 'error: invalid JSON response';
+        return {res: null, domain: null, error: 'invalid JSON response'};
       }
     } else {
       console.error('No response received from device');
-      return 'error: no response from device';
+      return {res: null, domain: null, error: 'no response from device'};
     }
   } catch (error) {
     console.error('Error sending data:', error);
-    return 'error sending data';
+    return {res: null, domain: null, error: 'sending data'};
   }
 }
 
@@ -329,17 +333,20 @@ async function handleDomainAssignment(device: ESPDevice, res1: any) {
       );
 
       if (cachedData) {
+        await updateFile(res1.mac_address, device);
         if (timesp1Exists_Count == 2) {
           await checkAndAssignDomain(device, 'timesp2');
           console.log('timesp1 repeated assignment');
+          return 'timesp2';
         } else if (timesp2Exists_Count == 2) {
           await checkAndAssignDomain(device, 'timesp1');
           console.log('timesp2 repeated assignment');
+          return 'timesp1';
         } else {
           console.log('cachedData.domainName: ', cachedData?.domain_name);
           await checkAndAssignDomain(device, cachedData?.domain_name);
+          return cachedData?.domain_name;
         }
-        await updateFile(res1.mac_address, device);
       } else {
         //! Checking in File System
         const fileData = await checkFile(res1.mac_address);
@@ -356,12 +363,15 @@ async function handleDomainAssignment(device: ESPDevice, res1: any) {
             timesp2Count,
             fileData,
           );
+          await updateFile(res1.mac_address, device);
           if (timesp1Count == 2) {
             console.log('timesp1 repeated assignment');
             await checkAndAssignDomain(device, 'timesp2');
+            return 'timesp2';
           } else if (timesp2Count == 2) {
             console.log('timesp2 repeated assignment');
             await checkAndAssignDomain(device, 'timesp1');
+            return 'timesp1';
           } else {
             console.log('Both counts are 1');
             const parsedFileData = JSON.parse(fileData);
@@ -369,8 +379,8 @@ async function handleDomainAssignment(device: ESPDevice, res1: any) {
               device,
               parsedFileData?.domain_name as string,
             );
+            return parsedFileData?.domain_name;
           }
-          await updateFile(res1.mac_address, device);
         } else {
           // Check complete cache for "timesp1"
           const timesp1Exists = await checkCompleteCacheForDomain('timesp1');
@@ -382,9 +392,9 @@ async function handleDomainAssignment(device: ESPDevice, res1: any) {
           );
           await checkAndAssignDomain(device, domainToAssign);
           await updateFile(res1.mac_address, device);
+          return domainToAssign;
         }
       }
-      break;
     case 'timesp1':
       console.log('timeesp1 aya ha ===================>>>>>>>>>>>>>>');
       break;
@@ -392,8 +402,7 @@ async function handleDomainAssignment(device: ESPDevice, res1: any) {
       console.log('domain received from device---', res1.domain_name);
       await checkAndAssignDomain(device, res1.domain_name);
       await updateFile(res1.mac_address, device);
-      break;
-
+      return res1.domain_name;
     default:
       break;
   }

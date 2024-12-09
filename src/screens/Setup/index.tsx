@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useLayoutEffect, useState} from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -19,7 +19,13 @@ import {
   MyHeader,
   MyText,
 } from '../../components';
-import {MyTheme, DistanceUnit, VolumeUnit, TimeFormat} from '../../types';
+import {
+  MyTheme,
+  DistanceUnit,
+  VolumeUnit,
+  TimeFormat,
+  TempUnit,
+} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
 import {temp} from '../../constants';
 import LabelDropdown from '../../components/LabelDropdown';
@@ -46,7 +52,7 @@ export default function Setup({route}: RouteType) {
   );
   const [distanceToUnit, setDistanceToUnit] = useState<DistanceUnit>();
   const [volumeToUnit, setVolumeToUnit] = useState<VolumeUnit>();
-  const [temperatureToUnit, setTemperatureToUnit] = useState<string>(); // to be used
+  const [temperatureToUnit, setTemperatureToUnit] = useState<TempUnit>(); // to be used
   const [timeToFormat, setTimeToFormat] = useState<TimeFormat>(); // to be used
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
@@ -83,11 +89,16 @@ export default function Setup({route}: RouteType) {
     console.log('Fetched Units Data:', unitsData);
 
     if (unitsData) {
+      console.log('set Units Data:', unitsData);
+
       setDistanceToUnit(unitsData.distance);
       setVolumeToUnit(unitsData.volume);
+      setTimeToFormat(unitsData.time);
+      setTemperatureToUnit(unitsData.temp);
     }
   };
-  useEffect(() => {
+
+  useLayoutEffect(() => {
     fetchUnits();
   }, []);
 
@@ -101,7 +112,7 @@ export default function Setup({route}: RouteType) {
     setDistanceToUnit(value);
   };
 
-  const onTemperatureUnitSelect = (value: string) => {
+  const onTemperatureUnitSelect = (value: TempUnit) => {
     setTemperatureToUnit(value);
   };
 
@@ -167,7 +178,7 @@ export default function Setup({route}: RouteType) {
                 <LabelDropdown
                   text={temp.temperature.text}
                   data={temp.temperature.options}
-                  onSelect={(value: string) => {
+                  onSelect={(value: TempUnit) => {
                     onTemperatureUnitSelect(value);
                   }}
                   zIndex={temp.temperature.zindez}
@@ -299,6 +310,7 @@ export default function Setup({route}: RouteType) {
                   distanceToUnit,
                   volumeToUnit,
                   timeToFormat,
+                  temperatureToUnit,
                 });
               }}
             />

@@ -412,6 +412,9 @@ export default function Main() {
               label="Re-Provision"
               labelStyle={{fontSize: 18}}
               onPress={() => {
+                if (isService1Resolved && isService2Resolved) {
+                  return;
+                }
                 setConfirmation(true);
               }}
             />

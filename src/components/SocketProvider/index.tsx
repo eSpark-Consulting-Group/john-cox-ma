@@ -345,6 +345,8 @@ function SocketProvider({children}: {children: React.ReactNode}) {
         }
         if (isProvisioned) {
           const data = JSON.parse(isProvisioned) as ProvisionData;
+          console.log('provision hoa ===============+++++++++++++', data);
+
           setProvision(data);
         }
       } catch (error) {

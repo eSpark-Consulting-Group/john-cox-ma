@@ -17,6 +17,7 @@ import {RootStackParamsList} from '../../../types/navigationParams';
 import {sendingData} from '../utils';
 import {useState} from 'react';
 import {MyTheme} from '../../../types';
+import {useSocket} from '../../../components/SocketProvider';
 
 type ProofScreenProps = NativeStackScreenProps<RootStackParamsList, 'Proof'>;
 
@@ -27,6 +28,7 @@ export default function Proof({route}: ProofScreenProps) {
   const [error, setError] = useState<boolean>();
   const [pop, setPop] = useState('');
   const theme = useTheme() as MyTheme;
+  const {provision, setProvision} = useSocket();
 
   const connectDevice = async (device: any, pop: string) => {
     try {
@@ -50,12 +52,16 @@ export default function Proof({route}: ProofScreenProps) {
             console.log('Device connected successfully:', connectedDev);
 
             try {
-              const res = await sendingData(device);
-
+              const {res, domain, error} = await sendingData(device);
               // Check for success or error in 'res'
               if (res && !res.toString().toLowerCase().includes('error')) {
                 console.log('Data sent successfully:', res);
                 navigation.navigate('ScanNetworks', {device});
+                if (domain) {
+                  setProvision(state => {
+                    return {...state, domain: false};
+                  });
+                }
               } else {
                 console.log('Error in sending data:', res);
                 setError(true);

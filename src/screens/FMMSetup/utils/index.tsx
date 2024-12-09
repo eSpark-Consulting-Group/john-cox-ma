@@ -1,7 +1,7 @@
 // conversions.ts
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {DistanceUnit, TimeFormat, VolumeUnit} from '../../../types';
+import {DistanceUnit, TempUnit, TimeFormat, VolumeUnit} from '../../../types';
 
 type volumeUnitsType = 'ltr' | 'gal';
 type distanceUnitsType = 'S.Mile' | 'N.Mile' | 'Km';
@@ -12,6 +12,7 @@ export const updateUnits = async (units: {
   distance: DistanceUnit;
   volume: VolumeUnit;
   time: TimeFormat;
+  temp: TempUnit;
 }) => {
   try {
     AsyncStorage.setItem('units', JSON.stringify(units));
@@ -29,6 +30,7 @@ export const getUnits = async () => {
       distance: DistanceUnit;
       volume: VolumeUnit;
       time: TimeFormat;
+      temp: TempUnit;
     } = JSON.parse(units);
 
     return parsedUnits;
