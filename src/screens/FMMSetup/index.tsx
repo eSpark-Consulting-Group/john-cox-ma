@@ -26,7 +26,12 @@ import {
 import {FMMSetupScreenProps} from '../../types/navigationParams';
 import LabelDropdown from '../../components/LabelDropdown';
 import {api} from '../../api';
-import {updateUnits} from './utils';
+import {
+  EngineUnits,
+  getEngineUnits,
+  updateEngineUnits,
+  updateUnits,
+} from './utils';
 import {KeyboardAvoidingView} from 'react-native';
 
 export default function FMMSetup({route}: FMMSetupScreenProps) {
@@ -60,6 +65,7 @@ export default function FMMSetup({route}: FMMSetupScreenProps) {
     };
     setAllConfig(conf);
   };
+
   const logoutHandler = async () => {
     try {
       await AsyncStorage.removeItem('token');
@@ -92,6 +98,7 @@ export default function FMMSetup({route}: FMMSetupScreenProps) {
 
       if (response.status >= 200 && response.status < 300) {
         console.log('Success response:', response);
+        const res = await getEngineUnits();
 
         console.log('🚀 ~ doneHandler ~ route?.params:', route?.params);
 
@@ -101,6 +108,20 @@ export default function FMMSetup({route}: FMMSetupScreenProps) {
           time: route?.params?.timeToFormat!,
           temp: route?.params?.temperatureToUnit!,
         });
+
+        const engineData = {
+          ...res,
+          [deviceName]: {
+            distance: route?.params?.distanceToUnit!,
+            volume: route?.params?.volumeToUnit!,
+            time: route?.params?.timeToFormat!,
+            temp: route?.params?.temperatureToUnit!,
+          },
+        };
+
+        console.log('🚀 ~ doneHandler ~ engineData:', engineData);
+
+        await updateEngineUnits(engineData as EngineUnits);
 
         logoutHandler();
       } else if (response.status === 401) {

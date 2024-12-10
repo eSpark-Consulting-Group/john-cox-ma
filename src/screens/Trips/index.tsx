@@ -136,7 +136,8 @@ export default function Trips() {
         (total, value) => total + (value || 0),
         0,
       ),
-      volumeUnit(units?.volume!),
+      // volumeUnit(units?.volume!),
+      volumeUnit('Gallons'),
     )?.toFixed(2);
     setTotalFuel(sumFuel);
     console.log(sumFuel);
@@ -1062,16 +1063,23 @@ export default function Trips() {
                       key={'fuel' + index}
                       value={volumeValue(
                         Number(fuel),
-                        volumeUnit(units?.volume!),
+                        // volumeUnit(units?.volume!),
+                        volumeUnit('Gallons'),
                       )!.toFixed(0)}
                       label={index + 1}
-                      volUnit={units?.volume!}
+                      volUnit={
+                        // units?.volume!
+                        'Gallons'
+                      }
                     />
                   ))}
                   <RenderColumn
                     label={'Total'}
                     value={totalFuel}
-                    volUnit={units?.volume!}
+                    volUnit={
+                      // units?.volume!
+                      'Gallons'
+                    }
                   />
                 </View>
               </View>
@@ -1103,14 +1111,14 @@ export default function Trips() {
                 editable={false}
                 title="Efficiency"
                 unit={
-                  volumeUnit(units?.volume!) +
-                  '/' +
-                  distanceUnit(units?.distance!)
+                  // volumeUnit(units?.volume!)
+                  volumeUnit('Gallons') + '/' + distanceUnit(units?.distance!)
                 }
                 value={Number(
                   convertConsumption(
                     parseFloat(calculateEfficiency(selectedSwitch)), // Use parseFloat for safety
-                    units?.volume!,
+                    // units?.volume!,
+                    'Gallons',
                     units?.distance!,
                   ),
                 )}

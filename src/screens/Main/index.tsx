@@ -33,6 +33,8 @@ import {useService} from '../../components/ServiceProvider';
 import {
   distanceUnit,
   distanceValue,
+  EngineUnits,
+  getEngineUnits,
   getUnits,
   volumeUnit,
   volumeValue,
@@ -60,6 +62,7 @@ export default function Main() {
     distance: DistanceUnit;
     volume: VolumeUnit;
   }>();
+  const [engineUnits, setEngineUnits] = useState<EngineUnits>();
   const hasFocusedRef = useRef(false);
 
   const sumOfBurn = useMemo(() => {
@@ -156,6 +159,7 @@ export default function Main() {
 
   const fetchUnits = async () => {
     const unitsData = await getUnits();
+    const engineUnits = await getEngineUnits();
     console.log('Fetched Units Data:', unitsData);
 
     if (unitsData) {
@@ -163,6 +167,26 @@ export default function Main() {
     } else {
       console.log('default set manually');
       setUnits({distance: 'Kilometers', volume: 'Liters'});
+    }
+
+    if (engineUnits) {
+      setEngineUnits(engineUnits);
+    } else {
+      console.log('default set manually');
+      setEngineUnits({
+        timesp1: {
+          distance: 'Kilometers',
+          volume: 'Gallons',
+          temp: 'Fahrenheit',
+          time: '24',
+        },
+        timesp2: {
+          distance: 'Kilometers',
+          volume: 'Gallons',
+          temp: 'Fahrenheit',
+          time: '24',
+        },
+      });
     }
   };
 
@@ -185,7 +209,10 @@ export default function Main() {
     if (units) {
       console.log('Units preference:', units);
     }
-  }, [units]);
+    if (engineUnits) {
+      console.log('Units preference: Engine ==============', engineUnits);
+    }
+  }, [units, engineUnits]);
 
   useEffect(() => {
     const onBackPress = () => {
@@ -281,12 +308,12 @@ export default function Main() {
                                 Number(
                                   item?.FuelManagement.current_fuel_consumption,
                                 ),
-                                volumeUnit(units?.volume!),
+                                volumeUnit(engineUnits?.timesp1?.volume!),
                               )
                             : NaN
                         }
                         name={item.position}
-                        volUnit={volumeUnit(units?.volume!)}
+                        volUnit={volumeUnit(engineUnits?.timesp1?.volume!)}
                       />
                     ))
                   : [1, 2].map((item, index) => (
@@ -294,7 +321,7 @@ export default function Main() {
                         key={item}
                         value={NaN}
                         name="Reload"
-                        volUnit={volumeUnit(units?.volume!)}
+                        volUnit={volumeUnit(engineUnits?.timesp1?.volume!)}
                       />
                     ))}
               </View>
@@ -313,12 +340,12 @@ export default function Main() {
                                 Number(
                                   item?.FuelManagement.current_fuel_consumption,
                                 ),
-                                volumeUnit(units?.volume!),
+                                volumeUnit(engineUnits?.timesp2?.volume!),
                               )
                             : NaN
                         }
                         name={item.position}
-                        volUnit={volumeUnit(units?.volume!)}
+                        volUnit={volumeUnit(engineUnits?.timesp2?.volume!)}
                       />
                     ))
                   : [1, 2].map((item, index) => (
@@ -326,7 +353,7 @@ export default function Main() {
                         key={item}
                         value={NaN}
                         name="Reload"
-                        volUnit={volumeUnit(units?.volume!)}
+                        volUnit={volumeUnit(engineUnits?.timesp2?.volume!)}
                       />
                     ))}
               </View>
@@ -345,15 +372,25 @@ export default function Main() {
                 <View style={styles().fuelBurn}>
                   <MyBox
                     text="Total Fuel Burn"
-                    value={volumeValue(sumOfBurn, volumeUnit(units?.volume!))}
-                    unit={volumeUnit(units?.volume!) + '/hr'}
+                    value={volumeValue(
+                      sumOfBurn,
+                      // volumeUnit(units?.volume!)
+                      'gal',
+                    )}
+                    unit={
+                      // volumeUnit(units?.volume!)
+                      volumeUnit('Gallons') + '/hr'
+                    }
                     width={'100%'}
                     gap={22}
                   />
                 </View>
               </View>
               <NauticalMile
-                volUnit={units?.volume ? units.volume : 'Liters'}
+                volUnit={
+                  // units?.volume ? units.volume : 'Liters'
+                  'Gallons'
+                }
                 distUnit={units?.distance ? units?.distance : 'Kilometers'}
               />
               <View style={styles().range}>
@@ -363,9 +400,13 @@ export default function Main() {
                     text="Fuel Remaining"
                     value={volumeValue(
                       remainingFuel,
-                      volumeUnit(units?.volume!),
+                      // volumeUnit(units?.volume!),
+                      'gal',
                     )}
-                    unit={volumeUnit(units?.volume!)}
+                    unit={
+                      // volumeUnit(units?.volume!)
+                      volumeUnit('Gallons')
+                    }
                   />
                 </View>
                 <View style={{width: '40%'}}>

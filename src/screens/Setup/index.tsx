@@ -30,7 +30,7 @@ import {RootStackParamsList} from '../../types/navigationParams';
 import {temp} from '../../constants';
 import LabelDropdown from '../../components/LabelDropdown';
 import {useSocket} from '../../components/SocketProvider';
-import {getUnits} from '../FMMSetup/utils';
+import {getEngineUnits, getUnits} from '../FMMSetup/utils';
 
 type SetupScreenProps = NativeStackScreenProps<RootStackParamsList, 'Setup'>;
 type RouteType = {
@@ -85,20 +85,20 @@ export default function Setup({route}: RouteType) {
   };
 
   const fetchUnits = async () => {
-    const unitsData = await getUnits();
+    const unitsData = await getEngineUnits();
     console.log('Fetched Units Data:', unitsData);
 
     if (unitsData) {
       console.log('set Units Data:', unitsData);
 
-      setDistanceToUnit(unitsData.distance);
-      setVolumeToUnit(unitsData.volume);
-      setTimeToFormat(unitsData.time);
-      setTemperatureToUnit(unitsData.temp);
+      setDistanceToUnit(unitsData[deviceName].distance);
+      setVolumeToUnit(unitsData[deviceName].volume);
+      setTimeToFormat(unitsData[deviceName].time);
+      setTemperatureToUnit(unitsData[deviceName].temp);
     }
   };
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     fetchUnits();
   }, []);
 
