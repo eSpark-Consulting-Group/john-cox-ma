@@ -1,5 +1,15 @@
 import React, {useEffect, useState} from 'react';
-import {Animated, Easing, StyleSheet, View, Dimensions} from 'react-native';
+import {
+  Animated,
+  Easing,
+  StyleSheet,
+  View,
+  Image,
+  StatusBar,
+  Platform,
+  UIManager,
+  LayoutAnimation,
+} from 'react-native';
 import RNBootSplash from 'react-native-bootsplash';
 
 import RootNav from '../../navigation';
@@ -18,20 +28,29 @@ export default function Splash() {
 
   useEffect(() => {
     RNBootSplash.hide();
+    if (Platform.OS === 'android') {
+      if (UIManager.setLayoutAnimationEnabledExperimental) {
+        UIManager.setLayoutAnimationEnabledExperimental(true);
+      }
+    }
   }, []);
+
   const animateLogo = () => {
-    const targetTranslateX = -screenWidth / 1.45; // Move to the left edge
-    const targetTranslateY = -screenHeight / 1.2; // Move to the top edge
+    const targetTranslateX = -screenWidth / 2 + 60; // Move to the left edge
+    const targetTranslateY =
+      StatusBar?.currentHeight && StatusBar?.currentHeight > 24
+        ? -screenHeight / 2 + 50 - Math.ceil(StatusBar?.currentHeight) / 2
+        : -screenHeight / 2 + 50; // Move to the top edge
 
     Animated.sequence([
       Animated.timing(logoScale, {
-        toValue: 1.25, // Scale to full size
+        toValue: 2.25, // Scale to full size
         duration: 2000, // Zoom duration (2 seconds)
         easing: Easing.elastic(0.5), // Bouncy easing for zoom
         useNativeDriver: true,
       }),
       Animated.timing(logoScale, {
-        toValue: 0.5, // Scale back to original size
+        toValue: 1, // Scale back to original size
         duration: 2000, // Zoom back duration (2 seconds)
         useNativeDriver: true,
       }),
@@ -58,6 +77,7 @@ export default function Splash() {
     ]).start(() => {
       // Animation finished, navigate after a delay
       setTimeout(() => {
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.linear);
         setAppIsReady(true);
       }, 1000); // Delay navigation after animation (1 second)
     });
@@ -74,8 +94,7 @@ export default function Splash() {
   ) : (
     <MyCanvas>
       <View style={styles.main}>
-        <Animated.Image
-          source={SplashIcon}
+        <Animated.View
           style={{
             transform: [
               {scale: logoScale},
@@ -83,8 +102,15 @@ export default function Splash() {
               {translateY: logoTranslateY},
             ],
             opacity: logoOpacity,
-          }}
-        />
+          }}>
+          <Image
+            source={SplashIcon}
+            style={{
+              width: 77,
+              height: 62,
+            }}
+          />
+        </Animated.View>
       </View>
     </MyCanvas>
   );
