@@ -1,5 +1,5 @@
 import React, {memo} from 'react';
-import {Image, StyleSheet, View} from 'react-native';
+import {Image, StatusBar, StyleSheet, View} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 
 import MyText from '../MyText';
@@ -16,7 +16,9 @@ function MyHeader() {
         source={SplashIcon}
         style={{
           left: -(77 / 2) + 60,
-          top: -(62 / 2) - 11 + 50,
+          top: StatusBar.currentHeight
+            ? -(62 / 2) - StatusBar?.currentHeight / 2 + 50
+            : -(62 / 2) - 10 / 2 + 50,
           width: 77,
           height: 62,
         }}
@@ -35,11 +37,8 @@ function MyHeader() {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    // justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
-    // paddingHorizontal: 10,
-    // paddingTop: 20,
     top: 0,
     position: 'absolute',
   },

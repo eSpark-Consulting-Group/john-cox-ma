@@ -33,7 +33,6 @@ export default function Splash() {
         UIManager.setLayoutAnimationEnabledExperimental(true);
       }
     }
-    console.log('-screenWidth / 1 + 20', StatusBar?.currentHeight);
   }, []);
 
   const animateLogo = () => {
@@ -107,23 +106,11 @@ export default function Splash() {
           <Image
             source={SplashIcon}
             style={{
-              // left: -(77 / 2) + 18 + 30,
               width: 77,
               height: 62,
             }}
           />
         </Animated.View>
-        {/* <Animated.Image
-          source={SplashIcon}
-          style={{
-            transform: [
-              {scale: logoScale},
-              {translateX: logoTranslateX},
-              {translateY: logoTranslateY},
-            ],
-            opacity: logoOpacity,
-          }}
-        /> */}
       </View>
     </MyCanvas>
   );
