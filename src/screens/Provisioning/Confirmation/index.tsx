@@ -12,6 +12,7 @@ import {
 } from '../../../components';
 import {RootStackParamsList} from '../../../types/navigationParams';
 import {useService} from '../../../components/ServiceProvider';
+import {useEffect, useState} from 'react';
 
 type ConfirmationScreenProps = NativeStackScreenProps<
   RootStackParamsList,
@@ -20,7 +21,16 @@ type ConfirmationScreenProps = NativeStackScreenProps<
 
 export default function Confirmation() {
   const navigation = useNavigation<ConfirmationScreenProps['navigation']>();
+  const [allServicesFound, setAllServicesFound] = useState(false);
   const {resolvedService1, resolvedService2, serviceFound} = useService();
+
+  useEffect(() => {
+    console.log('🚀 ~ useEffect ~ serviceFound.timesp2:', serviceFound.timesp2);
+    console.log('🚀 ~ useEffect ~ serviceFound.timesp1:', serviceFound.timesp1);
+    if (serviceFound.timesp1 && serviceFound.timesp2) {
+      setAllServicesFound(true);
+    }
+  }, [serviceFound]);
 
   return (
     <MyCanvas>
@@ -49,13 +59,15 @@ export default function Confirmation() {
             />
             <MyButton
               label="YES"
-              labelStyle={{fontSize: 20}}
+              labelStyle={{
+                fontSize: 20,
+                opacity: allServicesFound ? 0.5 : 1,
+              }}
               textColor={'red'}
               onPress={() => {
-                if (serviceFound.timesp1 && serviceFound.timesp2) {
-                  return;
+                if (!allServicesFound) {
+                  navigation.navigate('ScanDevices');
                 }
-                navigation.navigate('ScanDevices');
               }}
             />
           </View>

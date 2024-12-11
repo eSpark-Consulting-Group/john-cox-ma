@@ -5,6 +5,7 @@ import {
   KeyboardAvoidingView,
   Modal,
   Pressable,
+  ScrollView,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -54,7 +55,7 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
   const [loading, setLoading] = useState(false);
   const [animationIndex, setAnimationIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
-  const [network, setNetwork] = useState<ESPWifiList>();
+  const [network, setNetwork] = useState<ESPWifiList | undefined>();
   const [password, setPassword] = useState('');
   const [step, setStep] = useState(1);
   const [count, setCount] = useState(0);
@@ -74,6 +75,13 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
     } finally {
       setLoading(false);
     }
+  };
+
+  const navigateWithDelay = () => {
+    setTimeout(() => {
+      navigation.navigate('ScanDevices');
+      setStep(1);
+    }, 3000); // Delay of 3 seconds
   };
 
   useEffect(() => {
@@ -201,6 +209,9 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
         } catch (error) {
           console.error('Error during device provisioning:', error);
           setAuthError(true);
+          setPassword('');
+          setNetwork(undefined);
+          navigateWithDelay();
         }
       } else {
         console.error('Network SSID is undefined');
@@ -208,7 +219,10 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
       }
     } catch (error) {
       console.error('Error during network provisioning:', error);
+      setPassword('');
+      setNetwork(undefined);
       setIsLoading(false);
+      navigateWithDelay();
     } finally {
       setIsLoading(false);
     }
@@ -300,6 +314,7 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
       case 2:
         return (
           <>
+            <GapView length={80} />
             <MyText
               text="Enter Password"
               size={24}
@@ -365,11 +380,17 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
           </View>
         </MyCanvas>
       </Modal>
-      <KeyboardAvoidingView style={styles.main} behavior="padding">
-        <MyHeader />
-        {renderStep()}
-        <MyFooter />
-      </KeyboardAvoidingView>
+      <ScrollView
+        scrollEnabled={step !== 1 ? true : false}
+        contentContainerStyle={{
+          flexGrow: 1,
+        }}>
+        <View style={styles.main}>
+          <MyHeader />
+          {renderStep()}
+          <MyFooter />
+        </View>
+      </ScrollView>
     </MyCanvas>
   );
 }

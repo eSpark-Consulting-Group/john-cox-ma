@@ -11,7 +11,13 @@ interface NauticalMileProps {
 }
 
 const NauticalMile = ({volUnit, distUnit}: NauticalMileProps) => {
-  const {getTimerValue, provision, speed} = useSocket();
+  const {
+    getTimerValue,
+    provision,
+    speed,
+    isService1Resolved,
+    isService2Resolved,
+  } = useSocket();
   const [time, setTime] = useState(0);
 
   const interval = useRef<NodeJS.Timeout>();
@@ -26,11 +32,16 @@ const NauticalMile = ({volUnit, distUnit}: NauticalMileProps) => {
   }, [provision.timesp1]);
 
   useEffect(() => {
-    startTimer();
+    if (isService1Resolved || isService2Resolved) {
+      startTimer();
+    }
+    if (!isService1Resolved && !isService2Resolved) {
+      clearInterval(interval.current);
+    }
     return () => {
       clearInterval(interval.current);
     };
-  }, []);
+  }, [isService1Resolved, isService2Resolved]);
 
   const calculateConsumption = (speed: string | number, time: number) => {
     // return (Number(speed) * time) / 60;

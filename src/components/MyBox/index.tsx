@@ -74,6 +74,7 @@ export default memo(MyBox);
 
 const styles = StyleSheet.create({
   box: {
+    flex: 1,
     borderWidth: 2.22,
     width: '100%',
     paddingHorizontal: 20,
