@@ -68,7 +68,7 @@ export interface MyInputProps {
   placeholder?: string;
   value?: string | number | any;
   editable?: boolean;
-  color?: string
+  color?: string;
 }
 
 export interface LabelInputProps {
@@ -166,7 +166,7 @@ export type EngineData = {
 export type SocketJSON = {
   Engines: EngineData[];
   speed: string;
-  tanks: number[]
+  tanks: number[];
 };
 
 export type TripData = {
@@ -183,5 +183,6 @@ export type TripData = {
 };
 
 export type DistanceUnit = 'Kilometers' | 'Statute Miles' | 'Nautical Miles';
-export type VolumeUnit = 'Gallons' | 'Liters' ;
-export type TimeFormat = '12' | '24' ;
+export type VolumeUnit = 'Gallons' | 'Liters';
+export type TempUnit = 'Fahrenheit' | 'Celsius';
+export type TimeFormat = '12' | '24';

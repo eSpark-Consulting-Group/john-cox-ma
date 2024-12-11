@@ -1,5 +1,5 @@
 import {ESPDevice} from '@espark-consultants/react-native-esp-idf-provisioning';
-import {EngineData, DistanceUnit, VolumeUnit, TimeFormat} from '.';
+import {EngineData, DistanceUnit, VolumeUnit, TimeFormat, TempUnit} from '.';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 
 export type RootStackParamsList = {
@@ -17,6 +17,7 @@ export type RootStackParamsList = {
     distanceToUnit?: DistanceUnit;
     volumeToUnit?: VolumeUnit;
     timeToFormat?: TimeFormat;
+    temperatureToUnit?: TempUnit;
   };
   FuelTanks: undefined;
   ScanDevices: undefined;

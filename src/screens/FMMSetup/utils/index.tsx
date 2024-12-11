@@ -1,17 +1,25 @@
 // conversions.ts
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {DistanceUnit, TimeFormat, VolumeUnit} from '../../../types';
+import {DistanceUnit, TempUnit, TimeFormat, VolumeUnit} from '../../../types';
 
 type volumeUnitsType = 'ltr' | 'gal';
 type distanceUnitsType = 'S.Mile' | 'N.Mile' | 'Km';
 // type temperatureUnitsType = 'ltr' | 'gal';
 type timeFormatType = '12' | '24';
 
+interface Units {
+  distance: DistanceUnit;
+  volume: VolumeUnit;
+  time: TimeFormat;
+  temp: TempUnit;
+}
+
 export const updateUnits = async (units: {
   distance: DistanceUnit;
   volume: VolumeUnit;
   time: TimeFormat;
+  temp: TempUnit;
 }) => {
   try {
     AsyncStorage.setItem('units', JSON.stringify(units));
@@ -29,8 +37,32 @@ export const getUnits = async () => {
       distance: DistanceUnit;
       volume: VolumeUnit;
       time: TimeFormat;
+      temp: TempUnit;
     } = JSON.parse(units);
 
+    return parsedUnits;
+  }
+};
+
+export interface EngineUnits {
+  timesp1: Units;
+  timesp2: Units;
+}
+
+export const updateEngineUnits = async (units: EngineUnits) => {
+  try {
+    AsyncStorage.setItem('engineUnits', JSON.stringify(units));
+    const response = await AsyncStorage.getItem('engineUnits');
+    console.log('Units saved successfully', response);
+  } catch (error) {
+    console.error('Failed to save units:', error);
+  }
+};
+
+export const getEngineUnits = async () => {
+  const units = await AsyncStorage.getItem('engineUnits');
+  if (units) {
+    const parsedUnits: EngineUnits = JSON.parse(units);
     return parsedUnits;
   }
 };
@@ -76,7 +108,10 @@ export const distanceValue = (
   } else return NaN;
 };
 
-export const volumeValue = (incomingVolume: number, unit: volumeUnitsType) => {
+export const volumeValue = (
+  incomingVolume: number,
+  unit: volumeUnitsType = 'gal',
+) => {
   const conversionRates = {
     litresToGallons: 0.264172,
   };

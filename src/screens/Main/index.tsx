@@ -33,6 +33,8 @@ import {useService} from '../../components/ServiceProvider';
 import {
   distanceUnit,
   distanceValue,
+  EngineUnits,
+  getEngineUnits,
   getUnits,
   volumeUnit,
   volumeValue,
@@ -42,7 +44,15 @@ import {sumOf} from '../Trips/utils';
 type MainScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 
 export default function Main() {
-  const {enginesData1, enginesData2, getSocketData, speed, tanks} = useSocket();
+  const {
+    enginesData1,
+    enginesData2,
+    getSocketData,
+    speed,
+    tanks,
+    isService1Resolved,
+    isService2Resolved,
+  } = useSocket();
   const {resolvedService1, resolvedService2} = useService();
   const theme = useTheme() as MyTheme;
   const navigation = useNavigation<MainScreenProps['navigation']>();
@@ -52,6 +62,7 @@ export default function Main() {
     distance: DistanceUnit;
     volume: VolumeUnit;
   }>();
+  const [engineUnits, setEngineUnits] = useState<EngineUnits>();
   const hasFocusedRef = useRef(false);
 
   const sumOfBurn = useMemo(() => {
@@ -116,30 +127,39 @@ export default function Main() {
   ];
 
   const fetchSocketData = () => {
-    if (resolvedService1 && enginesData1.length === 0) {
-      getSocketData(resolvedService1.host, resolvedService1.port, 'timesp1');
+    if (isService1Resolved && enginesData1.length === 0) {
+      getSocketData(
+        resolvedService1?.host!,
+        resolvedService1?.port!,
+        'timesp1',
+      );
     }
-    if (resolvedService2 && enginesData2.length === 0) {
-      getSocketData(resolvedService2.host, resolvedService2.port, 'timesp2');
+    if (isService2Resolved && enginesData2.length === 0) {
+      getSocketData(
+        resolvedService2?.host!,
+        resolvedService2?.port!,
+        'timesp2',
+      );
     }
   };
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (
-        (resolvedService1 && enginesData1.length === 0) ||
-        (resolvedService2 && enginesData2.length === 0)
-      ) {
-        console.log('reconnecting socket');
-        fetchSocketData();
-      }
-    }, 5000); // Adjust interval duration as needed
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     if (
+  //       (resolvedService1 && enginesData1.length === 0) ||
+  //       (resolvedService2 && enginesData2.length === 0)
+  //     ) {
+  //       console.log('reconnecting socket');
+  //       fetchSocketData();
+  //     }
+  //   }, 5000); // Adjust interval duration as needed
 
-    return () => clearInterval(interval);
-  }, [resolvedService1, resolvedService2, enginesData1, enginesData2]);
+  //   return () => clearInterval(interval);
+  // }, [resolvedService1, resolvedService2, enginesData1, enginesData2]);
 
   const fetchUnits = async () => {
     const unitsData = await getUnits();
+    const engineUnits = await getEngineUnits();
     console.log('Fetched Units Data:', unitsData);
 
     if (unitsData) {
@@ -147,6 +167,26 @@ export default function Main() {
     } else {
       console.log('default set manually');
       setUnits({distance: 'Kilometers', volume: 'Liters'});
+    }
+
+    if (engineUnits) {
+      setEngineUnits(engineUnits);
+    } else {
+      console.log('default set manually');
+      setEngineUnits({
+        timesp1: {
+          distance: 'Kilometers',
+          volume: 'Gallons',
+          temp: 'Fahrenheit',
+          time: '24',
+        },
+        timesp2: {
+          distance: 'Kilometers',
+          volume: 'Gallons',
+          temp: 'Fahrenheit',
+          time: '24',
+        },
+      });
     }
   };
 
@@ -169,7 +209,10 @@ export default function Main() {
     if (units) {
       console.log('Units preference:', units);
     }
-  }, [units]);
+    if (engineUnits) {
+      console.log('Units preference: Engine ==============', engineUnits);
+    }
+  }, [units, engineUnits]);
 
   useEffect(() => {
     const onBackPress = () => {
@@ -252,7 +295,7 @@ export default function Main() {
               onPress={fetchSocketData}>
               <Ionicons name="reload" size={35} color={theme.colors.primary} />
             </TouchableOpacity>
-            {resolvedService1 && (
+            {isService1Resolved && (
               <View style={styles().GaugeRow}>
                 {enginesData1.length
                   ? enginesData1.map((item, index) => (
@@ -265,12 +308,12 @@ export default function Main() {
                                 Number(
                                   item?.FuelManagement.current_fuel_consumption,
                                 ),
-                                volumeUnit(units?.volume!),
+                                volumeUnit(engineUnits?.timesp1?.volume!),
                               )
                             : NaN
                         }
                         name={item.position}
-                        volUnit={volumeUnit(units?.volume!)}
+                        volUnit={volumeUnit(engineUnits?.timesp1?.volume!)}
                       />
                     ))
                   : [1, 2].map((item, index) => (
@@ -278,13 +321,13 @@ export default function Main() {
                         key={item}
                         value={NaN}
                         name="Reload"
-                        volUnit={volumeUnit(units?.volume!)}
+                        volUnit={volumeUnit(engineUnits?.timesp1?.volume!)}
                       />
                     ))}
               </View>
             )}
             <GapView length={20} />
-            {resolvedService2 && (
+            {isService2Resolved && (
               <View style={styles().GaugeRow}>
                 {enginesData2.length
                   ? enginesData2.map((item, index) => (
@@ -297,12 +340,12 @@ export default function Main() {
                                 Number(
                                   item?.FuelManagement.current_fuel_consumption,
                                 ),
-                                volumeUnit(units?.volume!),
+                                volumeUnit(engineUnits?.timesp2?.volume!),
                               )
                             : NaN
                         }
                         name={item.position}
-                        volUnit={volumeUnit(units?.volume!)}
+                        volUnit={volumeUnit(engineUnits?.timesp2?.volume!)}
                       />
                     ))
                   : [1, 2].map((item, index) => (
@@ -310,7 +353,7 @@ export default function Main() {
                         key={item}
                         value={NaN}
                         name="Reload"
-                        volUnit={volumeUnit(units?.volume!)}
+                        volUnit={volumeUnit(engineUnits?.timesp2?.volume!)}
                       />
                     ))}
               </View>
@@ -329,15 +372,25 @@ export default function Main() {
                 <View style={styles().fuelBurn}>
                   <MyBox
                     text="Total Fuel Burn"
-                    value={volumeValue(sumOfBurn, volumeUnit(units?.volume!))}
-                    unit={volumeUnit(units?.volume!) + '/hr'}
+                    value={volumeValue(
+                      sumOfBurn,
+                      // volumeUnit(units?.volume!)
+                      'gal',
+                    )}
+                    unit={
+                      // volumeUnit(units?.volume!)
+                      volumeUnit('Gallons') + '/hr'
+                    }
                     width={'100%'}
                     gap={22}
                   />
                 </View>
               </View>
               <NauticalMile
-                volUnit={units?.volume ? units.volume : 'Liters'}
+                volUnit={
+                  // units?.volume ? units.volume : 'Liters'
+                  'Gallons'
+                }
                 distUnit={units?.distance ? units?.distance : 'Kilometers'}
               />
               <View style={styles().range}>
@@ -347,9 +400,13 @@ export default function Main() {
                     text="Fuel Remaining"
                     value={volumeValue(
                       remainingFuel,
-                      volumeUnit(units?.volume!),
+                      // volumeUnit(units?.volume!),
+                      'gal',
                     )}
-                    unit={volumeUnit(units?.volume!)}
+                    unit={
+                      // volumeUnit(units?.volume!)
+                      volumeUnit('Gallons')
+                    }
                   />
                 </View>
                 <View style={{width: '40%'}}>
@@ -396,6 +453,9 @@ export default function Main() {
               label="Re-Provision"
               labelStyle={{fontSize: 18}}
               onPress={() => {
+                if (isService1Resolved && isService2Resolved) {
+                  return;
+                }
                 setConfirmation(true);
               }}
             />

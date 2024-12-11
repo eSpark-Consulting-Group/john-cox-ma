@@ -20,6 +20,7 @@ import {
 import {MyTheme} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
 import {useService} from '../../components/ServiceProvider';
+import {screenHeight} from '../../constants';
 
 type LoginScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 
@@ -149,15 +150,24 @@ export default function Login() {
                 dropdownId="login"
               />
             </View>
-            {isLoading ? (
-              <Loader size="small" />
-            ) : (
-              <MyButton
-                label="Sign In"
-                style={styles().signin}
-                onPress={loginHandler}
-              />
-            )}
+            <View
+              style={{
+                // marginTop: 10,
+                // backgroundColor: 'pink',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: screenHeight * 0.08,
+              }}>
+              {isLoading ? (
+                <Loader size="small" />
+              ) : (
+                <MyButton
+                  label="Sign In"
+                  style={styles().signin}
+                  onPress={loginHandler}
+                />
+              )}
+            </View>
             <GapView length={30} />
             <MyText text={error} />
           </MyCard>

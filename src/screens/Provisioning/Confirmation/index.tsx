@@ -11,6 +11,7 @@ import {
   MyText,
 } from '../../../components';
 import {RootStackParamsList} from '../../../types/navigationParams';
+import {useService} from '../../../components/ServiceProvider';
 
 type ConfirmationScreenProps = NativeStackScreenProps<
   RootStackParamsList,
@@ -19,6 +20,8 @@ type ConfirmationScreenProps = NativeStackScreenProps<
 
 export default function Confirmation() {
   const navigation = useNavigation<ConfirmationScreenProps['navigation']>();
+  const {resolvedService1, resolvedService2, serviceFound} = useService();
+
   return (
     <MyCanvas>
       <View style={styles.main}>
@@ -49,6 +52,9 @@ export default function Confirmation() {
               labelStyle={{fontSize: 20}}
               textColor={'red'}
               onPress={() => {
+                if (serviceFound.timesp1 && serviceFound.timesp2) {
+                  return;
+                }
                 navigation.navigate('ScanDevices');
               }}
             />

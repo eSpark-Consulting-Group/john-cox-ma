@@ -25,6 +25,7 @@ import {
   MyHeader,
   MyInput,
   MyText,
+  OverlayLoader,
 } from '../../../components';
 import {RootStackParamsList} from '../../../types/navigationParams';
 import {Wifi, Connected} from '../../../assets';
@@ -32,6 +33,7 @@ import {MyTheme} from '../../../types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useSocket} from '../../../components/SocketProvider';
 import {screenWidth} from '../../../constants';
+import {useService} from '../../../components/ServiceProvider';
 
 type ScanNetworksScreenProps = NativeStackScreenProps<
   RootStackParamsList,
@@ -42,7 +44,8 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
   const theme = useTheme() as MyTheme;
   const navigation = useNavigation<ScanNetworksScreenProps['navigation']>();
   const {device} = route.params;
-  const {setProvision} = useSocket();
+  const {setProvision, provision, isService1Resolved, isService2Resolved} =
+    useSocket();
 
   const [error, setError] = useState<boolean>();
   const [authError, setAuthError] = useState<boolean>();
@@ -56,9 +59,11 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
   const [step, setStep] = useState(1);
   const [count, setCount] = useState(0);
   const [animationInterval, setAnimationInterval] = useState<NodeJS.Timeout>();
+  const {resolvedService1, resolvedService2, serviceFound} = useService();
 
   const scanWifiList = async () => {
     setLoading(true);
+
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
       const wifiList = await device?.scanWifiList();
@@ -85,6 +90,7 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
   }, [navigation]);
 
   useEffect(() => {
+    console.log('prererererererer', serviceFound);
     if (isVisible) {
       const timeout = setTimeout(() => {
         setCount(count + 1);
@@ -92,15 +98,20 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
           navigation.navigate('Main');
           setIsVisible(false);
           setStep(1);
+        }
+        if (serviceFound.timesp1 && serviceFound.timesp2) {
+          navigation.navigate('Main');
+          setIsVisible(false);
+          setStep(1);
         } else {
           setIsVisible(false);
           navigation.navigate('Confirmation');
         }
-      }, 2000);
+      }, 5);
 
       return () => clearTimeout(timeout);
     }
-  }, [isVisible]);
+  }, [isVisible, serviceFound]);
 
   useEffect(() => {
     if (isLoading) {
@@ -332,8 +343,10 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
         );
     }
   }
+
   return (
     <MyCanvas>
+      <OverlayLoader isShow={isLoading as boolean} />
       <Modal visible={isVisible} animationType="slide" transparent>
         <MyCanvas>
           <View style={[styles.modalContent]}>

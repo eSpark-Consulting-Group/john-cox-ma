@@ -1,13 +1,35 @@
 import {createContext, useContext, useEffect, useState} from 'react';
 import Zeroconf, {Service} from 'react-native-zeroconf';
 
-const initialState = {
-  resolvedService1: {} as Service | null,
-  resolvedService2: {} as Service | null,
+type ServiceContextType = {
+  resolvedService1: Service | null;
+  resolvedService2: Service | null;
+  serviceFound: {timesp1: boolean; timesp2: boolean};
 };
 
-const ServiceContext = createContext(initialState);
-export const useService = () => useContext(ServiceContext);
+const initialState: ServiceContextType = {
+  resolvedService1: null,
+  resolvedService2: null,
+  serviceFound: {timesp1: false, timesp2: false},
+};
+
+const ServiceContext = createContext<ServiceContextType>(initialState);
+
+export function useService(): ServiceContextType;
+export function useService(serviceName: 'timesp1'): Service | null;
+export function useService(serviceName: 'timesp2'): Service | null;
+export function useService(
+  serviceName?: 'timesp1' | 'timesp2',
+): ServiceContextType | Service | null {
+  const context = useContext(ServiceContext);
+  if (!context) {
+    throw new Error('useService must be used within a ServiceProvider');
+  }
+  if (serviceName === 'timesp1') return context.resolvedService1;
+  if (serviceName === 'timesp2') return context.resolvedService2;
+  return context;
+}
+
 const zeroconf = new Zeroconf();
 
 const ServiceProvider = ({children}: {children: React.ReactNode}) => {
@@ -17,13 +39,30 @@ const ServiceProvider = ({children}: {children: React.ReactNode}) => {
   const [resolvedService2, setResolvedService2] = useState<Service | null>(
     null,
   );
+  const [serviceFound, setServiceFound] = useState<{
+    timesp1: boolean;
+    timesp2: boolean;
+  }>({timesp1: false, timesp2: false});
   useEffect(() => {
     const onStart = () => {
       console.log('Zeroconf scan started.');
     };
 
     const onFound = (serviceName: string) => {
-      console.log('Service found:', serviceName);
+      console.log(
+        'Service found:+++++++++++++++++++++++++++++++++++++',
+        serviceName,
+      );
+      if (serviceName === 'timesp1') {
+        setServiceFound(state => {
+          return {...state, timesp1: true};
+        });
+      }
+      if (serviceName === 'timesp2') {
+        setServiceFound(state => {
+          return {...state, timesp2: true};
+        });
+      }
     };
 
     const onResolved = (service: Service) => {
@@ -36,7 +75,11 @@ const ServiceProvider = ({children}: {children: React.ReactNode}) => {
       ) {
         setResolvedService1(service);
       }
-      if (service.name === 'timesp2' && service.addresses.length > 0) {
+      if (
+        service.name === 'timesp2' &&
+        service.addresses.length > 0 &&
+        !resolvedService2
+      ) {
         console.log('setting resolvedService2:  ');
         setResolvedService2(service);
       }
@@ -70,7 +113,8 @@ const ServiceProvider = ({children}: {children: React.ReactNode}) => {
   }, [resolvedService1, resolvedService2]);
 
   return (
-    <ServiceContext.Provider value={{resolvedService1, resolvedService2}}>
+    <ServiceContext.Provider
+      value={{resolvedService1, resolvedService2, serviceFound}}>
       {children}
     </ServiceContext.Provider>
   );

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useLayoutEffect, useState} from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -19,12 +19,18 @@ import {
   MyHeader,
   MyText,
 } from '../../components';
-import {MyTheme, DistanceUnit, VolumeUnit, TimeFormat} from '../../types';
+import {
+  MyTheme,
+  DistanceUnit,
+  VolumeUnit,
+  TimeFormat,
+  TempUnit,
+} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
 import {temp} from '../../constants';
 import LabelDropdown from '../../components/LabelDropdown';
 import {useSocket} from '../../components/SocketProvider';
-import {getUnits} from '../FMMSetup/utils';
+import {getEngineUnits, getUnits} from '../FMMSetup/utils';
 
 type SetupScreenProps = NativeStackScreenProps<RootStackParamsList, 'Setup'>;
 type RouteType = {
@@ -46,7 +52,7 @@ export default function Setup({route}: RouteType) {
   );
   const [distanceToUnit, setDistanceToUnit] = useState<DistanceUnit>();
   const [volumeToUnit, setVolumeToUnit] = useState<VolumeUnit>();
-  const [temperatureToUnit, setTemperatureToUnit] = useState<string>(); // to be used
+  const [temperatureToUnit, setTemperatureToUnit] = useState<TempUnit>(); // to be used
   const [timeToFormat, setTimeToFormat] = useState<TimeFormat>(); // to be used
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
@@ -79,14 +85,19 @@ export default function Setup({route}: RouteType) {
   };
 
   const fetchUnits = async () => {
-    const unitsData = await getUnits();
+    const unitsData = await getEngineUnits();
     console.log('Fetched Units Data:', unitsData);
 
     if (unitsData) {
-      setDistanceToUnit(unitsData.distance);
-      setVolumeToUnit(unitsData.volume);
+      console.log('set Units Data:', unitsData);
+
+      setDistanceToUnit(unitsData[deviceName].distance);
+      setVolumeToUnit(unitsData[deviceName].volume);
+      setTimeToFormat(unitsData[deviceName].time);
+      setTemperatureToUnit(unitsData[deviceName].temp);
     }
   };
+
   useEffect(() => {
     fetchUnits();
   }, []);
@@ -101,7 +112,7 @@ export default function Setup({route}: RouteType) {
     setDistanceToUnit(value);
   };
 
-  const onTemperatureUnitSelect = (value: string) => {
+  const onTemperatureUnitSelect = (value: TempUnit) => {
     setTemperatureToUnit(value);
   };
 
@@ -167,7 +178,7 @@ export default function Setup({route}: RouteType) {
                 <LabelDropdown
                   text={temp.temperature.text}
                   data={temp.temperature.options}
-                  onSelect={(value: string) => {
+                  onSelect={(value: TempUnit) => {
                     onTemperatureUnitSelect(value);
                   }}
                   zIndex={temp.temperature.zindez}
@@ -299,6 +310,7 @@ export default function Setup({route}: RouteType) {
                   distanceToUnit,
                   volumeToUnit,
                   timeToFormat,
+                  temperatureToUnit,
                 });
               }}
             />
