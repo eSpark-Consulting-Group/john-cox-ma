@@ -333,19 +333,25 @@ async function handleDomainAssignment(device: ESPDevice, res1: any) {
       );
 
       if (cachedData) {
-        await updateFile(res1.mac_address, device);
+        
         if (timesp1Exists_Count == 2) {
           await checkAndAssignDomain(device, 'timesp2');
           console.log('timesp1 repeated assignment');
+        await updateFile(res1.mac_address, device);
+
           return 'timesp2';
         } else if (timesp2Exists_Count == 2) {
           await checkAndAssignDomain(device, 'timesp1');
+        await updateFile(res1.mac_address, device);
+
           console.log('timesp2 repeated assignment');
           return 'timesp1';
         } else {
           console.log('cachedData.domainName: ', cachedData?.domain_name);
           await checkAndAssignDomain(device, cachedData?.domain_name);
+          await updateFile(res1.mac_address, device);
           return cachedData?.domain_name;
+
         }
       } else {
         //! Checking in File System
