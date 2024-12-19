@@ -11,7 +11,13 @@ interface NauticalMileProps {
 }
 
 const NauticalMile = ({volUnit, distUnit}: NauticalMileProps) => {
-  const {getTimerValue, provision, speed} = useSocket();
+  const {
+    getTimerValue,
+    provision,
+    speed,
+    isService1Resolved,
+    isService2Resolved,
+  } = useSocket();
   const [time, setTime] = useState(0);
 
   const interval = useRef<NodeJS.Timeout>();
@@ -41,7 +47,11 @@ const NauticalMile = ({volUnit, distUnit}: NauticalMileProps) => {
   return (
     <MyBox
       text={`${volUnit} per ${distUnit}`}
-      value={calculateConsumption(speed, time)}
+      value={
+        !isService1Resolved && !isService2Resolved
+          ? NaN
+          : calculateConsumption(speed, time)
+      }
       width="70%"
     />
   );

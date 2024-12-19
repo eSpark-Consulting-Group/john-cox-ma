@@ -93,12 +93,6 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
     console.log('prererererererer', serviceFound);
     if (isVisible) {
       const timeout = setTimeout(() => {
-        setCount(count + 1);
-        if (count % 2 != 0) {
-          navigation.navigate('Main');
-          setIsVisible(false);
-          setStep(1);
-        }
         if (serviceFound.timesp1 && serviceFound.timesp2) {
           navigation.navigate('Main');
           setIsVisible(false);
@@ -107,7 +101,7 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
           setIsVisible(false);
           navigation.navigate('Confirmation');
         }
-      }, 5);
+      }, 5000);
 
       return () => clearTimeout(timeout);
     }
