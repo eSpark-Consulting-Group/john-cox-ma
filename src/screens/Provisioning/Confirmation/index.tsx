@@ -44,7 +44,7 @@ export default function Confirmation() {
               label="NO"
               labelStyle={{fontSize: 20}}
               onPress={() => {
-                navigation.navigate('Main');
+                navigation.navigate('Main', {isConfirmation: false});
               }}
             />
             <MyButton

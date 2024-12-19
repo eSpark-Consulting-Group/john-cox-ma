@@ -69,7 +69,7 @@ export default function FMMSetup({route}: FMMSetupScreenProps) {
   const logoutHandler = async () => {
     try {
       await AsyncStorage.removeItem('token');
-      navigation.navigate('Main');
+      navigation.navigate('Main', {isConfirmation: false});
     } catch (error) {
       console.error('Error during logout:', error);
     }

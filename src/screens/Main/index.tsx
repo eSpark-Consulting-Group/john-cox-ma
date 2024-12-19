@@ -41,9 +41,16 @@ import {
 } from '../FMMSetup/utils';
 import {sumOf} from '../Trips/utils';
 
-type MainScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
+type MainScreenProps = NativeStackScreenProps<RootStackParamsList, 'Main'>;
+type RouteType = {
+  route: {
+    params: {
+      isConfirmation?: boolean;
+    };
+  };
+};
 
-export default function Main() {
+export default function Main({route}: RouteType) {
   const {
     enginesData1,
     enginesData2,
@@ -53,17 +60,37 @@ export default function Main() {
     isService1Resolved,
     isService2Resolved,
   } = useSocket();
-  const {resolvedService1, resolvedService2} = useService();
+  const {resolvedService1, resolvedService2, serviceFound} = useService();
   const theme = useTheme() as MyTheme;
   const navigation = useNavigation<MainScreenProps['navigation']>();
+  const {isConfirmation} = route.params;
+
   const [generatorRunning, setGeneratorRunning] = useState<'Yes' | 'No'>('Yes');
   const [confirmation, setConfirmation] = useState(false);
+  const [isConfirmationVisible, setIsConfirmationVisible] = useState(false);
   const [units, setUnits] = useState<{
     distance: DistanceUnit;
     volume: VolumeUnit;
   }>();
   const [engineUnits, setEngineUnits] = useState<EngineUnits>();
   const hasFocusedRef = useRef(false);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+
+    if (isConfirmation) {
+      timer = setTimeout(() => {
+        // Execute the logic you want to start after 5 seconds
+        if (!(serviceFound.timesp1 && serviceFound.timesp2)) {
+          setIsConfirmationVisible(true);
+        }
+      }, 5000); // 5 seconds delay
+    }
+
+    return () => {
+      clearTimeout(timer); // Cleanup the timeout when the component unmounts or isConfirmation changes
+    };
+  }, [isConfirmation]);
 
   const sumOfBurn = useMemo(() => {
     return (
@@ -142,20 +169,6 @@ export default function Main() {
       );
     }
   };
-
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     if (
-  //       (resolvedService1 && enginesData1.length === 0) ||
-  //       (resolvedService2 && enginesData2.length === 0)
-  //     ) {
-  //       console.log('reconnecting socket');
-  //       fetchSocketData();
-  //     }
-  //   }, 5000); // Adjust interval duration as needed
-
-  //   return () => clearInterval(interval);
-  // }, [resolvedService1, resolvedService2, enginesData1, enginesData2]);
 
   const fetchUnits = async () => {
     const unitsData = await getUnits();
@@ -241,8 +254,39 @@ export default function Main() {
         ]}
         showsVerticalScrollIndicator={false}>
         <MyHeader />
-
-        {confirmation ? (
+        {isConfirmationVisible ? (
+          <>
+            <MyText
+              text="Do you want another network?"
+              size={26}
+              style={styles().caption}
+            />
+            <GapView length={85} />
+            <View
+              style={{
+                justifyContent: 'space-between',
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 10,
+              }}>
+              <MyButton
+                label="NO"
+                labelStyle={{fontSize: 20}}
+                onPress={() => {
+                  setIsConfirmationVisible(false);
+                }}
+              />
+              <MyButton
+                label="YES"
+                labelStyle={{fontSize: 20}}
+                textColor={'red'}
+                onPress={() => {
+                  navigation.navigate('ScanDevices');
+                }}
+              />
+            </View>
+          </>
+        ) : confirmation ? (
           <>
             <MyText
               text="Are you sure you want to Re-provision?"
@@ -267,7 +311,7 @@ export default function Main() {
                 labelStyle={{fontSize: 20}}
                 onPress={() => {
                   setConfirmation(false);
-                  navigation.navigate('Main');
+                  navigation.navigate('Main', {isConfirmation: false});
                 }}
               />
               <MyButton
