@@ -197,7 +197,7 @@ export default function ScanDevices() {
             }}
             labelStyle={{fontSize: 18}}
             onPress={() => {
-              navigation.navigate('Main', {isConfirmation: false});
+              navigation.navigate('Main');
             }}
             textColor={theme.colors.proSecondary}
           />

@@ -44,15 +44,8 @@ import {sumOf} from '../Trips/utils';
 import useUpdateEffect from '../../hooks/useUpdateEffect';
 
 type MainScreenProps = NativeStackScreenProps<RootStackParamsList, 'Main'>;
-type RouteType = {
-  route: {
-    params: {
-      isConfirmation?: boolean;
-    };
-  };
-};
 
-export default function Main({route}: RouteType) {
+export default function Main() {
   const {
     enginesData1,
     enginesData2,
@@ -65,7 +58,6 @@ export default function Main({route}: RouteType) {
   const {resolvedService1, resolvedService2, serviceFound} = useService();
   const theme = useTheme() as MyTheme;
   const navigation = useNavigation<MainScreenProps['navigation']>();
-
   const [generatorRunning, setGeneratorRunning] = useState<'Yes' | 'No'>('Yes');
   const [confirmation, setConfirmation] = useState(false);
   const [units, setUnits] = useState<{
@@ -262,7 +254,7 @@ export default function Main({route}: RouteType) {
                 labelStyle={{fontSize: 20}}
                 onPress={() => {
                   setConfirmation(false);
-                  navigation.navigate('Main', {isConfirmation: false});
+                  navigation.navigate('Main');
                 }}
               />
               <MyButton

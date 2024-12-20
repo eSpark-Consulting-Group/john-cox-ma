@@ -78,7 +78,7 @@ export default function Setup({route}: RouteType) {
   const logoutHandler = async () => {
     try {
       await AsyncStorage.removeItem('token');
-      navigation.navigate('Main', {isConfirmation: false});
+      navigation.navigate('Main');
     } catch (error) {
       console.error('Error during logout:', error);
     }
