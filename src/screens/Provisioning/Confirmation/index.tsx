@@ -25,22 +25,21 @@ type ConfirmationScreenProps = NativeStackScreenProps<
 export default function Confirmation() {
   const theme = useTheme() as MyTheme;
   const navigation = useNavigation<ConfirmationScreenProps['navigation']>();
-  const {resolvedService1, resolvedService2, serviceFound} = useService();
+  const {serviceFound} = useService();
   const [loading, setLoading] = useState(true);
   const [disable, setDisable] = useState(false);
 
   useEffect(() => {
-    // Show loader for 10 seconds initially
     const timeout = setTimeout(() => {
       setLoading(false); // Hide loader after 10 seconds
     }, 10000);
     if (serviceFound.timesp1 && serviceFound.timesp2) {
       console.log('both devices connected');
       setDisable(true);
-      return; // Do nothing if condition is met
+      return;
     }
 
-    return () => clearTimeout(timeout); // Cleanup timeout on unmount
+    return () => clearTimeout(timeout);
   }, []);
 
   const handleYesPress = () => {
@@ -49,7 +48,7 @@ export default function Confirmation() {
       return;
     }
     console.log('yes pressed');
-    navigation.navigate('ScanDevices'); // Navigate if condition is not met
+    navigation.navigate('ScanDevices');
   };
 
   return (
@@ -58,7 +57,6 @@ export default function Confirmation() {
         <MyHeader />
         <View style={styles.wrapper}>
           {loading ? (
-            // Show loader initially
             <Loader size="large" />
           ) : (
             <>

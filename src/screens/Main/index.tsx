@@ -41,7 +41,6 @@ import {
   volumeValue,
 } from '../FMMSetup/utils';
 import {sumOf} from '../Trips/utils';
-import useUpdateEffect from '../../hooks/useUpdateEffect';
 
 type MainScreenProps = NativeStackScreenProps<RootStackParamsList, 'Main'>;
 
@@ -55,7 +54,7 @@ export default function Main() {
     isService1Resolved,
     isService2Resolved,
   } = useSocket();
-  const {resolvedService1, resolvedService2, serviceFound} = useService();
+  const {resolvedService1, resolvedService2} = useService();
   const theme = useTheme() as MyTheme;
   const navigation = useNavigation<MainScreenProps['navigation']>();
   const [generatorRunning, setGeneratorRunning] = useState<'Yes' | 'No'>('Yes');
