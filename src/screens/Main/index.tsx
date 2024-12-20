@@ -24,6 +24,7 @@ import {
   GapView,
   MyGauge,
   MyCanvas,
+  Loader,
 } from '../../components';
 import {MyTheme, DistanceUnit, VolumeUnit} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
@@ -40,6 +41,7 @@ import {
   volumeValue,
 } from '../FMMSetup/utils';
 import {sumOf} from '../Trips/utils';
+import useUpdateEffect from '../../hooks/useUpdateEffect';
 
 type MainScreenProps = NativeStackScreenProps<RootStackParamsList, 'Main'>;
 type RouteType = {
@@ -68,6 +70,7 @@ export default function Main({route}: RouteType) {
   const [generatorRunning, setGeneratorRunning] = useState<'Yes' | 'No'>('Yes');
   const [confirmation, setConfirmation] = useState(false);
   const [isConfirmationVisible, setIsConfirmationVisible] = useState(false);
+  const [loaderVisible, setLoaderVisible] = useState(false);
   const [units, setUnits] = useState<{
     distance: DistanceUnit;
     volume: VolumeUnit;
@@ -77,20 +80,41 @@ export default function Main({route}: RouteType) {
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
-
     if (isConfirmation) {
+      setLoaderVisible(true);
       timer = setTimeout(() => {
         // Execute the logic you want to start after 5 seconds
-        if (!(serviceFound.timesp1 && serviceFound.timesp2)) {
+        if (
+          !(serviceFound.timesp1 && serviceFound.timesp2) ||
+          !(resolvedService1?.name && resolvedService2?.name)
+        ) {
+          console.log('both connected');
+
+          setLoaderVisible(false);
           setIsConfirmationVisible(true);
         }
-      }, 5000); // 5 seconds delay
+      }, 6000); // 5 seconds delay
     }
 
     return () => {
       clearTimeout(timer); // Cleanup the timeout when the component unmounts or isConfirmation changes
     };
   }, [isConfirmation]);
+
+  useUpdateEffect(() => {
+    if (
+      (resolvedService1 && resolvedService2) ||
+      (serviceFound.timesp1 && serviceFound.timesp1)
+    ) {
+      setLoaderVisible(false);
+      setIsConfirmationVisible(false);
+    }
+  }, [
+    resolvedService1,
+    resolvedService2,
+    serviceFound.timesp1,
+    serviceFound.timesp1,
+  ]);
 
   const sumOfBurn = useMemo(() => {
     return (
@@ -254,7 +278,9 @@ export default function Main({route}: RouteType) {
         ]}
         showsVerticalScrollIndicator={false}>
         <MyHeader />
-        {isConfirmationVisible ? (
+        {loaderVisible ? (
+          <Loader size="large" />
+        ) : isConfirmationVisible ? (
           <>
             <MyText
               text="Do you want another network?"

@@ -63,9 +63,8 @@ export default function ScanDevices() {
     useCallback(() => {
       requestPermissionsAndScan();
       if (granted) {
-        console.log('scanning devices again');
-
         scanDevices();
+        console.log('scanning devices again');
       }
     }, [granted]),
   );

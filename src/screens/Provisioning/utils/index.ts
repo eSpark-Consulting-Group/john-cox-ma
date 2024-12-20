@@ -14,11 +14,11 @@ export async function checkPermissions() {
       PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
     ]);
     const bleStatus = await checkBlePermissions();
-    console.log('check Granted permissions HERE:---------------------------');
-    console.log(
-      'Location Permission:',
-      status[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION],
-    );
+    // console.log('check Granted permissions HERE:---------------------------');
+    // console.log(
+    //   'Location Permission:',
+    //   status[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION],
+    // );
 
     if (
       status[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION] == 'granted' &&
