@@ -31,15 +31,22 @@ export default function Confirmation() {
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      setLoading(false); // Hide loader after 10 seconds
-    }, 10000);
-    if (serviceFound.timesp1 && serviceFound.timesp2) {
-      console.log('both devices connected');
-      setDisable(true);
-      return;
-    }
+      // Check serviceFound conditions after 5 seconds
+      console.log('checking...');
+
+      if (serviceFound.timesp1 && serviceFound.timesp2) {
+        console.log('both devices connected');
+        setDisable(true);
+      }
+      setLoading(false); // Hide loader after conditions check
+    }, 5000);
 
     return () => clearTimeout(timeout);
+  }, [serviceFound]);
+
+  useEffect(() => {
+    // Ensure loader visibility is only controlled by loading state
+    setLoading(true);
   }, []);
 
   const handleYesPress = () => {
