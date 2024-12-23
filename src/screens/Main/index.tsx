@@ -24,6 +24,7 @@ import {
   GapView,
   MyGauge,
   MyCanvas,
+  Loader,
 } from '../../components';
 import {MyTheme, DistanceUnit, VolumeUnit} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
@@ -41,7 +42,7 @@ import {
 } from '../FMMSetup/utils';
 import {sumOf} from '../Trips/utils';
 
-type MainScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
+type MainScreenProps = NativeStackScreenProps<RootStackParamsList, 'Main'>;
 
 export default function Main() {
   const {
@@ -143,20 +144,6 @@ export default function Main() {
     }
   };
 
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     if (
-  //       (resolvedService1 && enginesData1.length === 0) ||
-  //       (resolvedService2 && enginesData2.length === 0)
-  //     ) {
-  //       console.log('reconnecting socket');
-  //       fetchSocketData();
-  //     }
-  //   }, 5000); // Adjust interval duration as needed
-
-  //   return () => clearInterval(interval);
-  // }, [resolvedService1, resolvedService2, enginesData1, enginesData2]);
-
   const fetchUnits = async () => {
     const unitsData = await getUnits();
     const engineUnits = await getEngineUnits();
@@ -207,10 +194,10 @@ export default function Main() {
 
   useEffect(() => {
     if (units) {
-      console.log('Units preference:', units);
+      // console.log('Units preference:', units);
     }
     if (engineUnits) {
-      console.log('Units preference: Engine ==============', engineUnits);
+      // console.log('Units preference: Engine ==============', engineUnits);
     }
   }, [units, engineUnits]);
 
@@ -241,7 +228,6 @@ export default function Main() {
         ]}
         showsVerticalScrollIndicator={false}>
         <MyHeader />
-
         {confirmation ? (
           <>
             <MyText
@@ -364,7 +350,12 @@ export default function Main() {
                 <MyBox
                   label="Efficiency"
                   text="Speed"
-                  value={Number(speed).toFixed(2)}
+                  // value={Number(speed).toFixed(2)}
+                  value={
+                    !isService1Resolved && !isService2Resolved
+                      ? NaN
+                      : Number(speed).toFixed(2)
+                  }
                   unit="Knots"
                   width={'50%'}
                   gap={22}
@@ -372,11 +363,15 @@ export default function Main() {
                 <View style={styles().fuelBurn}>
                   <MyBox
                     text="Total Fuel Burn"
-                    value={volumeValue(
-                      sumOfBurn,
-                      // volumeUnit(units?.volume!)
-                      'gal',
-                    )}
+                    value={
+                      !isService1Resolved && !isService2Resolved
+                        ? NaN
+                        : volumeValue(
+                            sumOfBurn,
+                            // volumeUnit(units?.volume!)
+                            'gal',
+                          )
+                    }
                     unit={
                       // volumeUnit(units?.volume!)
                       volumeUnit('Gallons') + '/hr'
@@ -398,11 +393,15 @@ export default function Main() {
                   <MyBox
                     label="Range"
                     text="Fuel Remaining"
-                    value={volumeValue(
-                      remainingFuel,
-                      // volumeUnit(units?.volume!),
-                      'gal',
-                    )}
+                    value={
+                      !isService1Resolved && !isService2Resolved
+                        ? NaN
+                        : volumeValue(
+                            remainingFuel,
+                            // volumeUnit(units?.volume!),
+                            'gal',
+                          )
+                    }
                     unit={
                       // volumeUnit(units?.volume!)
                       volumeUnit('Gallons')
@@ -427,10 +426,14 @@ export default function Main() {
               </View>
               <MyBox
                 text="Distance to Empty"
-                value={distanceValue(
-                  distanceToEmpty,
-                  distanceUnit(units?.distance!),
-                )}
+                value={
+                  !isService1Resolved && !isService2Resolved
+                    ? NaN
+                    : distanceValue(
+                        distanceToEmpty,
+                        distanceUnit(units?.distance!),
+                      )
+                }
                 unit={distanceUnit(units?.distance!)}
                 width={'70%'}
               />

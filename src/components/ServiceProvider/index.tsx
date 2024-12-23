@@ -1,16 +1,24 @@
-import {createContext, useContext, useEffect, useState} from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import Zeroconf, {Service} from 'react-native-zeroconf';
 
 type ServiceContextType = {
   resolvedService1: Service | null;
   resolvedService2: Service | null;
   serviceFound: {timesp1: boolean; timesp2: boolean};
+  setServiceFound: (serviceName: 'timesp1' | 'timesp2', value: boolean) => void;
 };
 
 const initialState: ServiceContextType = {
   resolvedService1: null,
   resolvedService2: null,
   serviceFound: {timesp1: false, timesp2: false},
+  setServiceFound: () => {},
 };
 
 const ServiceContext = createContext<ServiceContextType>(initialState);
@@ -43,6 +51,17 @@ const ServiceProvider = ({children}: {children: React.ReactNode}) => {
     timesp1: boolean;
     timesp2: boolean;
   }>({timesp1: false, timesp2: false});
+
+  const updateServiceFound = useCallback(
+    (serviceName: 'timesp1' | 'timesp2', value: boolean) => {
+      setServiceFound(prevState => ({
+        ...prevState,
+        [serviceName]: value,
+      }));
+    },
+    [],
+  );
+
   useEffect(() => {
     const onStart = () => {
       console.log('Zeroconf scan started.');
@@ -65,8 +84,27 @@ const ServiceProvider = ({children}: {children: React.ReactNode}) => {
       }
     };
 
+    const onRemoved = (serviceName: string) => {
+      console.log(
+        'Service Removed:+++++++++++++++++++++++++++++++++++++',
+        serviceName,
+      );
+      if (serviceName === 'timesp1') {
+        setServiceFound(state => {
+          return {...state, timesp1: false};
+        });
+        setResolvedService1(null);
+      }
+      if (serviceName === 'timesp2') {
+        setServiceFound(state => {
+          return {...state, timesp2: false};
+        });
+        setResolvedService2(null);
+      }
+    };
+
     const onResolved = (service: Service) => {
-      console.log('Service resolved:', service);
+      console.log('Service resolved:000000000000000000000', service);
       // Check if this is the service we are looking for
       if (
         service.name === 'timesp1' &&
@@ -91,6 +129,7 @@ const ServiceProvider = ({children}: {children: React.ReactNode}) => {
 
     zeroconf.on('start', onStart);
     zeroconf.on('found', onFound);
+    zeroconf.on('remove', onRemoved);
     zeroconf.on('resolved', onResolved);
     zeroconf.on('error', onError);
 
@@ -99,11 +138,19 @@ const ServiceProvider = ({children}: {children: React.ReactNode}) => {
 
     // Cleanup function
     return () => {
+      console.log('Cleaning up Zeroconf. Service');
       zeroconf.removeListener('start', onStart);
       zeroconf.removeListener('found', onFound);
+      zeroconf.removeListener('remove', onRemoved);
       zeroconf.removeListener('resolved', onResolved);
       zeroconf.removeListener('error', onError);
       zeroconf.stop();
+
+      setResolvedService1(null);
+      setResolvedService2(null);
+      setServiceFound(state => {
+        return {timesp2: false, timesp1: false};
+      });
     };
   }, []);
 
@@ -114,7 +161,12 @@ const ServiceProvider = ({children}: {children: React.ReactNode}) => {
 
   return (
     <ServiceContext.Provider
-      value={{resolvedService1, resolvedService2, serviceFound}}>
+      value={{
+        resolvedService1,
+        resolvedService2,
+        serviceFound,
+        setServiceFound: updateServiceFound,
+      }}>
       {children}
     </ServiceContext.Provider>
   );

@@ -1,9 +1,10 @@
 import {StyleSheet, View} from 'react-native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useTheme} from '@react-navigation/native';
 
 import {
   GapView,
+  Loader,
   MyButton,
   MyCanvas,
   MyFooter,
@@ -12,6 +13,9 @@ import {
 } from '../../../components';
 import {RootStackParamsList} from '../../../types/navigationParams';
 import {useService} from '../../../components/ServiceProvider';
+import {useEffect, useState} from 'react';
+import React from 'react';
+import {MyTheme} from '../../../types';
 
 type ConfirmationScreenProps = NativeStackScreenProps<
   RootStackParamsList,
@@ -19,46 +23,80 @@ type ConfirmationScreenProps = NativeStackScreenProps<
 >;
 
 export default function Confirmation() {
+  const theme = useTheme() as MyTheme;
   const navigation = useNavigation<ConfirmationScreenProps['navigation']>();
-  const {resolvedService1, resolvedService2, serviceFound} = useService();
+  const {serviceFound} = useService();
+  const [loading, setLoading] = useState(true);
+  const [disable, setDisable] = useState(false);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      // Check serviceFound conditions after 5 seconds
+      console.log('checking...');
+
+      if (serviceFound.timesp1 && serviceFound.timesp2) {
+        console.log('both devices connected');
+        setDisable(true);
+      }
+      setLoading(false); // Hide loader after conditions check
+    }, 5000);
+
+    return () => clearTimeout(timeout);
+  }, [serviceFound]);
+
+  useEffect(() => {
+    // Ensure loader visibility is only controlled by loading state
+    setLoading(true);
+  }, []);
+
+  const handleYesPress = () => {
+    if (disable) {
+      console.log('disabled yes');
+      return;
+    }
+    console.log('yes pressed');
+    navigation.navigate('ScanDevices');
+  };
 
   return (
     <MyCanvas>
       <View style={styles.main}>
         <MyHeader />
         <View style={styles.wrapper}>
-          <MyText
-            text="Do you want another network?"
-            size={26}
-            style={styles.caption}
-          />
-          <GapView length={85} />
-          <View
-            style={{
-              justifyContent: 'space-between',
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: 10,
-            }}>
-            <MyButton
-              label="NO"
-              labelStyle={{fontSize: 20}}
-              onPress={() => {
-                navigation.navigate('Main');
-              }}
-            />
-            <MyButton
-              label="YES"
-              labelStyle={{fontSize: 20}}
-              textColor={'red'}
-              onPress={() => {
-                if (serviceFound.timesp1 && serviceFound.timesp2) {
-                  return;
-                }
-                navigation.navigate('ScanDevices');
-              }}
-            />
-          </View>
+          {loading ? (
+            <Loader size="large" />
+          ) : (
+            <>
+              <MyText
+                text="Do you want another network?"
+                size={26}
+                style={styles.caption}
+              />
+              <GapView length={85} />
+              <View
+                style={{
+                  justifyContent: 'space-between',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: 10,
+                }}>
+                <MyButton
+                  label="NO"
+                  labelStyle={{fontSize: 20}}
+                  onPress={() => {
+                    navigation.navigate('Main');
+                  }}
+                />
+                <MyButton
+                  label="YES"
+                  labelStyle={{fontSize: 20}}
+                  textColor={'red'}
+                  onPress={handleYesPress} // Handle YES press
+                  backgroundColor={disable ? 'grey' : theme.colors.pale}
+                />
+              </View>
+            </>
+          )}
         </View>
         <MyFooter />
       </View>

@@ -176,7 +176,7 @@ export default function Login() {
             label="Back"
             style={styles().button}
             gradient
-            onPress={() => navigation.navigate('Main')}
+            onPress={() => navigation.navigate('Main', {isConfirmation: false})}
           />
           <GapView length={160} />
           <MyFooter />

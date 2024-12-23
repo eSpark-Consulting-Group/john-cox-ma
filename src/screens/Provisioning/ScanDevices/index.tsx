@@ -34,6 +34,7 @@ import {
 import {RootStackParamsList} from '../../../types/navigationParams';
 import {MyTheme} from '../../../types';
 import {checkPermissions} from '../utils';
+import {useService} from '../../../components/ServiceProvider';
 
 type ScanDevicesScreenProps = NativeStackScreenProps<
   RootStackParamsList,
@@ -49,6 +50,14 @@ export default function ScanDevices() {
   const [device, setDevice] = useState<ESPDevice>();
   const [devices, setDevices] = useState<ESPDevice[]>();
   const [granted, setGranted] = useState(false);
+  const {setServiceFound} = useService();
+
+  const handleSetService = (
+    serviceName: 'timesp1' | 'timesp2',
+    value: boolean,
+  ) => {
+    setServiceFound(serviceName, value);
+  };
 
   const requestPermissionsAndScan = async () => {
     try {
@@ -63,9 +72,10 @@ export default function ScanDevices() {
     useCallback(() => {
       requestPermissionsAndScan();
       if (granted) {
-        console.log('scanning devices again');
-
         scanDevices();
+        console.log('scanning devices again');
+        // handleSetService('timesp1', false);
+        // handleSetService('timesp2', false);
       }
     }, [granted]),
   );
