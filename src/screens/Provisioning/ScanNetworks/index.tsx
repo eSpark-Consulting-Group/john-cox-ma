@@ -61,6 +61,12 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
   const [animationInterval, setAnimationInterval] = useState<NodeJS.Timeout>();
   const {resolvedService1, resolvedService2, serviceFound} = useService();
 
+  const navigateWithDelay = () => {
+    setTimeout(() => {
+      navigation.navigate('ScanDevices');
+    }, 3000); // Delay of 3 seconds
+  };
+
   const scanWifiList = async () => {
     setLoading(true);
 
@@ -190,6 +196,9 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
         } catch (error) {
           console.error('Error during device provisioning:', error);
           setAuthError(true);
+          setPassword('');
+          setNetwork(undefined);
+          navigateWithDelay();
         }
       } else {
         console.error('Network SSID is undefined');
@@ -198,6 +207,10 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
     } catch (error) {
       console.error('Error during network provisioning:', error);
       setIsLoading(false);
+      setPassword('');
+      setNetwork(undefined);
+      setIsLoading(false);
+      navigateWithDelay();
     } finally {
       setIsLoading(false);
     }
