@@ -778,7 +778,6 @@ export default function Trips() {
       }
       const trip = JSON.parse(tripStartRef);
       console.log({trip});
-
       if (trip?.[id]) {
         clearInterval(trip?.[id]);
         setAllTripData(prev => ({
@@ -793,6 +792,8 @@ export default function Trips() {
             fuelBurned: [0, 0, 0, 0],
           },
         }));
+        console.log('..............', allTripData);
+
         setTripStarted(prev => ({...prev, [id]: false}));
         const newTripRef = {...trip};
         delete newTripRef[id];
@@ -944,7 +945,8 @@ export default function Trips() {
             justifyContent: showConfirmation ? 'center' : 'space-between',
           },
         ]}
-        showsVerticalScrollIndicator={false}>
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="always">
         <MyHeader />
         {showConfirmation ? (
           <View style={[styles.confirmation]}>

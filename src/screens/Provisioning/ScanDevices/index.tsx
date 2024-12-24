@@ -47,17 +47,10 @@ export default function ScanDevices() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<boolean>();
-  const [device, setDevice] = useState<ESPDevice>();
+  const [device, setDevice] = useState<ESPDevice | null>();
   const [devices, setDevices] = useState<ESPDevice[]>();
   const [granted, setGranted] = useState(false);
   const {setServiceFound} = useService();
-
-  const handleSetService = (
-    serviceName: 'timesp1' | 'timesp2',
-    value: boolean,
-  ) => {
-    setServiceFound(serviceName, value);
-  };
 
   const requestPermissionsAndScan = async () => {
     try {
@@ -72,6 +65,8 @@ export default function ScanDevices() {
     useCallback(() => {
       requestPermissionsAndScan();
       if (granted) {
+        setDevices([]);
+        setDevice(null);
         scanDevices();
         console.log('scanning devices again');
         // handleSetService('timesp1', false);
