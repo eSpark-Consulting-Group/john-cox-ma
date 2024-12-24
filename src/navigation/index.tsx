@@ -23,6 +23,7 @@ import Confirmation from '../screens/Provisioning/Confirmation';
 import store from '../app/store';
 import WrappedStackNavigator from './WrappedStackNavigator';
 import ServiceProvider from '../components/ServiceProvider';
+import { OrientationLocker, PORTRAIT} from "react-native-orientation-locker"
 
 const RootStack = createNativeStackNavigator<RootStackParamsList>();
 
@@ -30,6 +31,8 @@ export default function RootNav() {
   useEffect(() => {}, []);
 
   return (
+    <>
+    <OrientationLocker orientation={PORTRAIT} />
     <ServiceProvider>
       <NavigationContainer theme={DarkTheme}>
         <RootStack.Navigator initialRouteName="ScanDevices">
@@ -50,6 +53,7 @@ export default function RootNav() {
         </RootStack.Navigator>
       </NavigationContainer>
     </ServiceProvider>
+    </>
   );
 }
 

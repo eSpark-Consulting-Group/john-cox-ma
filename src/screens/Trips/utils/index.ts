@@ -19,3 +19,11 @@ export const formatTime = (date: Date | null) => {
   };
   return date.toLocaleTimeString(undefined, options);
 };
+
+export function sumOf(arr: number[]) {
+  if (!Array.isArray(arr)) {
+    throw new Error("Input must be an array.");
+  }
+
+  return arr.reduce((total, num) => total + Number(num || 0), 0);
+}

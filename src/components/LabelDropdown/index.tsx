@@ -23,8 +23,16 @@ function LabelDropdown({
   onPress,
   engineId,
   value,
-}: LabelDropdownProps) {
+  openDropdown,
+  setOpenDropdown,
+  dropdownId,
+}: LabelDropdownProps & {
+  openDropdown: string | null;
+  setOpenDropdown: (id: string | null) => void;
+  dropdownId: string;
+}) {
   const theme = useTheme() as MyTheme;
+
   const activeHanlder = () => {
     if (onPress) {
       onPress(engineId);
@@ -33,7 +41,11 @@ function LabelDropdown({
   return (
     <View style={styles.main}>
       <MyText text={text} size={size} />
-      <View style={styles.inner}>
+      <View
+        style={[
+          styles.inner,
+          status ? {justifyContent: 'space-between', width: '52.5%'} : {},
+        ]}>
         {status && (
           <TouchableOpacity onPress={activeHanlder}>
             {isActive ? <Active /> : <Inactive />}
@@ -49,6 +61,9 @@ function LabelDropdown({
           height={height}
           dropdnHeight={dropdnHeight}
           value={value}
+          openDropdown={openDropdown}
+          setOpenDropdown={setOpenDropdown}
+          dropdownId={dropdownId}
         />
       </View>
     </View>

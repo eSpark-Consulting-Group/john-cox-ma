@@ -1,4 +1,4 @@
-import {KeyboardAvoidingView, StyleSheet, View} from 'react-native';
+import {KeyboardAvoidingView, ScrollView, StyleSheet, View} from 'react-native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {ESPDevice} from '@espark-consultants/react-native-esp-idf-provisioning';
@@ -17,6 +17,7 @@ import {RootStackParamsList} from '../../../types/navigationParams';
 import {sendingData} from '../utils';
 import {useState} from 'react';
 import {MyTheme} from '../../../types';
+import {useSocket} from '../../../components/SocketProvider';
 
 type ProofScreenProps = NativeStackScreenProps<RootStackParamsList, 'Proof'>;
 
@@ -27,12 +28,13 @@ export default function Proof({route}: ProofScreenProps) {
   const [error, setError] = useState<boolean>();
   const [pop, setPop] = useState('');
   const theme = useTheme() as MyTheme;
+  const {provision, setProvision} = useSocket();
 
-  const connectDevice = async (device: any) => {
+  const connectDevice = async (device: any, pop: string) => {
     try {
       console.log('Starting connection process...');
       console.log('Device:', device);
-      console.log('Product key:', 'abcd1234');
+      console.log('Product key:', pop);
 
       WifiManager.connectToProtectedSSID(device.name, '', false, false).then(
         async a => {
@@ -43,34 +45,75 @@ export default function Proof({route}: ProofScreenProps) {
           });
           console.log('ESPDevice:', dev);
 
-          const connectedDev: any = await dev.connect('abcd1234');
-          console.log('Connected device:' + connectedDev);
+          const connectedDev: any = await dev.connect(pop);
+          console.log('Connected device:', connectedDev);
 
-          if (connectedDev?.status == 'connected') {
-            console.log('Device connected successfully:' + connectedDev);
-            const res = await sendingData(device);
-            console.log(res!);
-            navigation.navigate('ScanNetworks', {device});
+          if (connectedDev?.status === 'connected') {
+            console.log('Device connected successfully:', connectedDev);
+
+            try {
+              const {res, domain, error} = await sendingData(device);
+              // Check for success or error in 'res'
+              if (res && !res.toString().toLowerCase().includes('error')) {
+                console.log('Data sent successfully:', res);
+                navigation.navigate('ScanNetworks', {device});
+                if (domain) {
+                  setProvision(state => {
+                    return {...state, domain: false};
+                  });
+                }
+              } else {
+                console.log('Error in sending data:', res);
+                setError(true);
+                navigateWithDelay();
+              }
+            } catch (dataError) {
+              console.log('Error during sending data:', dataError);
+              setError(true);
+              navigateWithDelay();
+            }
           } else {
             console.log('Unable to connect');
             setError(true);
-            console.log('Unable to connect');
+            navigateWithDelay();
           }
         },
         e => {
           console.log('Connection failed!', e);
+          setError(true);
+          navigateWithDelay();
         },
       );
     } catch (error) {
       console.log('Error:', error);
+      setError(true);
+      navigateWithDelay();
     }
+  };
+
+  const navigateWithDelay = () => {
+    setTimeout(() => {
+      navigation.navigate('ScanDevices');
+    }, 3000); // Delay of 3 seconds
   };
 
   return (
     <MyCanvas>
-      <KeyboardAvoidingView style={styles.main} behavior="padding">
-        <MyHeader />
-        <View style={styles.wrapper}>
+      <ScrollView
+        contentContainerStyle={{
+          flexGrow: 1,
+        }}
+        keyboardShouldPersistTaps={'always'}
+        showsVerticalScrollIndicator={false}>
+        <KeyboardAvoidingView
+          style={{
+            alignItems: 'center',
+            justifyContent: 'center',
+            flex: 1,
+          }}>
+          <MyHeader />
+          <GapView length={90} />
+
           <MyText
             text="Enter Possession Proof"
             size={24}
@@ -96,21 +139,28 @@ export default function Proof({route}: ProofScreenProps) {
             label="Next"
             style={{paddingHorizontal: 45}}
             labelStyle={{fontSize: 18}}
-            onPress={() => connectDevice(device)}
+            onPress={() => connectDevice(device, pop)}
             textColor={theme.colors.proSecondary}
           />
           <GapView length={20} />
           <MyButton
             label="Back"
             labelStyle={{fontSize: 18}}
-            onPress={() => {}}
+            onPress={() => {
+              if (navigation.canGoBack()) {
+                navigation.goBack();
+              }
+            }}
             gradient
             style={{width: 150}}
           />
-          <GapView length={60} />
-        </View>
-        <MyFooter />
-      </KeyboardAvoidingView>
+          <GapView length={10} />
+          <MyText>{error && 'Error connecting to device'}</MyText>
+          <MyText>{error && 'Navigating Back to Scan devices'}</MyText>
+          <GapView length={50} />
+          <MyFooter />
+        </KeyboardAvoidingView>
+      </ScrollView>
     </MyCanvas>
   );
 }
@@ -124,9 +174,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     alignSelf: 'center',
     width: '100%',
-    paddingBottom: '15%',
+    // paddingBottom: '15%',
   },
-  title: {alignSelf: 'flex-start', paddingLeft: 18, paddingBottom: 20},
+  title: {
+    alignSelf: 'flex-start',
+    paddingLeft: 18,
+    //  paddingBottom: 10
+  },
   reloadRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -137,7 +191,8 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     paddingTop: 30,
     lineHeight: 30,
-    width: '60%',
+    width: '100%',
+    // backgroundColor: 'pink',
     textAlign: 'center',
   },
   flatlist: {height: 240, width: '100%'},

@@ -68,6 +68,7 @@ export interface MyInputProps {
   placeholder?: string;
   value?: string | number | any;
   editable?: boolean;
+  color?: string;
 }
 
 export interface LabelInputProps {
@@ -102,7 +103,7 @@ export interface LabelDropdownProps {
   size?: number;
   data: string[];
   zIndex?: number;
-  onSelect: (value: string) => void;
+  onSelect: (value: any) => void;
   style?: StyleProp<ViewStyle>;
   containerStyle?: ViewStyle;
   height?: number;
@@ -137,15 +138,14 @@ export type DisplayBoxProps = {
 export type FuelManagementData = {
   id: number;
   engine_id: number;
+  current_fuel_consumption: number;
   distance_to_empty: number;
-  remaining_fuel: number;
   total_fuel_burned: number;
 };
 
 export type SensorDataProps = {
   id: number;
   engine_id: number;
-  fuel: string | undefined;
   temperature_return: string;
   temperature_supply: string;
   timestamp_unix: string;
@@ -166,6 +166,7 @@ export type EngineData = {
 export type SocketJSON = {
   Engines: EngineData[];
   speed: string;
+  tanks: number[];
 };
 
 export type TripData = {
@@ -180,3 +181,8 @@ export type TripData = {
   fuelConsumption: number[]; // assuming it's an array of numbers
   tripEfficiency: number | undefined;
 };
+
+export type DistanceUnit = 'Kilometers' | 'Statute Miles' | 'Nautical Miles';
+export type VolumeUnit = 'Gallons' | 'Liters';
+export type TempUnit = 'Fahrenheit' | 'Celsius';
+export type TimeFormat = '12' | '24';

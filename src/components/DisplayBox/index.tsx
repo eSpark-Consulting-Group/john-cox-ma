@@ -31,7 +31,11 @@ function DisplayBox({
         start={[0.5, -0.5]}
         end={[0.5, 1]}
       />
-      <MyText textColor={textColor} size={size} fontFamily={fontFamily}>
+      <MyText
+        textColor={textColor}
+        size={size}
+        fontFamily={fontFamily}
+        style={{flexWrap: 'wrap', textAlign: 'center'}}>
         {value}
       </MyText>
     </View>

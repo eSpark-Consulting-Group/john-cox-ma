@@ -1,5 +1,6 @@
 import {ESPDevice} from '@espark-consultants/react-native-esp-idf-provisioning';
-import {EngineData} from '.';
+import {EngineData, DistanceUnit, VolumeUnit, TimeFormat, TempUnit} from '.';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
 
 export type RootStackParamsList = {
   WithContext: undefined;
@@ -8,12 +9,15 @@ export type RootStackParamsList = {
   Trips: undefined;
   Main: undefined;
   Login: undefined;
-  // Login: {reolvedService?: Service | null};
   Setup: {loggedinDomain: string; deviceName: 'timesp1' | 'timesp2'};
   FMMSetup: {
     config: EngineData[];
     loggedinDomain: string;
     deviceName: 'timesp1' | 'timesp2';
+    distanceToUnit?: DistanceUnit;
+    volumeToUnit?: VolumeUnit;
+    timeToFormat?: TimeFormat;
+    temperatureToUnit?: TempUnit;
   };
   FuelTanks: undefined;
   ScanDevices: undefined;
@@ -21,3 +25,8 @@ export type RootStackParamsList = {
   ScanNetworks: {device: ESPDevice};
   Confirmation: undefined;
 };
+
+export type RootStackScreenProps<T extends keyof RootStackParamsList> =
+  NativeStackScreenProps<RootStackParamsList, T>;
+
+export type FMMSetupScreenProps = RootStackScreenProps<'FMMSetup'>;

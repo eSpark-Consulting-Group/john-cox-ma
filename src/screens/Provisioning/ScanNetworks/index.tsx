@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {
+  BackHandler,
   FlatList,
   KeyboardAvoidingView,
   Modal,
@@ -24,12 +25,15 @@ import {
   MyHeader,
   MyInput,
   MyText,
+  OverlayLoader,
 } from '../../../components';
 import {RootStackParamsList} from '../../../types/navigationParams';
 import {Wifi, Connected} from '../../../assets';
 import {MyTheme} from '../../../types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useSocket} from '../../../components/SocketProvider';
+import {screenWidth} from '../../../constants';
+import {useService} from '../../../components/ServiceProvider';
 
 type ScanNetworksScreenProps = NativeStackScreenProps<
   RootStackParamsList,
@@ -40,7 +44,8 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
   const theme = useTheme() as MyTheme;
   const navigation = useNavigation<ScanNetworksScreenProps['navigation']>();
   const {device} = route.params;
-  const {setProvision} = useSocket();
+  const {setProvision, provision, isService1Resolved, isService2Resolved} =
+    useSocket();
 
   const [error, setError] = useState<boolean>();
   const [authError, setAuthError] = useState<boolean>();
@@ -54,9 +59,17 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
   const [step, setStep] = useState(1);
   const [count, setCount] = useState(0);
   const [animationInterval, setAnimationInterval] = useState<NodeJS.Timeout>();
+  const {resolvedService1, resolvedService2, serviceFound} = useService();
+
+  const navigateWithDelay = () => {
+    setTimeout(() => {
+      navigation.navigate('ScanDevices');
+    }, 3000); // Delay of 3 seconds
+  };
 
   const scanWifiList = async () => {
     setLoading(true);
+
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
       const wifiList = await device?.scanWifiList();
@@ -70,22 +83,30 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
   };
 
   useEffect(() => {
+    const onBackPress = () => {
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      onBackPress,
+    );
+
+    return () => backHandler.remove();
+  }, [navigation]);
+
+  useEffect(() => {
+    console.log('prererererererer', serviceFound);
     if (isVisible) {
       const timeout = setTimeout(() => {
-        setCount(count + 1);
-        if (count % 2 != 0) {
-          navigation.navigate('Main');
-          setIsVisible(false);
-          setStep(1);
-        } else {
-          setIsVisible(false);
-          navigation.navigate('Confirmation');
-        }
-      }, 2000);
+        navigation.navigate('Confirmation');
+        setIsVisible(false);
+        setStep(1);
+      }, 3000);
 
       return () => clearTimeout(timeout);
     }
-  }, [isVisible]);
+  }, [isVisible, serviceFound]);
 
   useEffect(() => {
     if (isLoading) {
@@ -175,6 +196,9 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
         } catch (error) {
           console.error('Error during device provisioning:', error);
           setAuthError(true);
+          setPassword('');
+          setNetwork(undefined);
+          navigateWithDelay();
         }
       } else {
         console.error('Network SSID is undefined');
@@ -183,6 +207,10 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
     } catch (error) {
       console.error('Error during network provisioning:', error);
       setIsLoading(false);
+      setPassword('');
+      setNetwork(undefined);
+      setIsLoading(false);
+      navigateWithDelay();
     } finally {
       setIsLoading(false);
     }
@@ -258,7 +286,13 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
             <MyButton
               label="Back"
               labelStyle={{fontSize: 18}}
-              onPress={() => setStep(2)}
+              onPress={() =>
+                // setStep(2)
+                {
+                  setStep(1);
+                  navigation.navigate('ScanDevices');
+                }
+              }
               gradient
               style={{width: 150}}
             />
@@ -287,15 +321,23 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
                 />
               </View>
               <GapView length={60} />
-              <MyButton
-                label="Connect"
-                width={120}
-                labelStyle={{fontSize: 20}}
-                onPress={() => {
-                  connectNetwork();
-                  setStep(1);
-                }}
-              />
+              <View style={{flexDirection: 'row', gap: 10}}>
+                <MyButton
+                  label="Back"
+                  labelStyle={{fontSize: 20}}
+                  onPress={() => {
+                    setStep(1);
+                  }}
+                />
+                <MyButton
+                  label="Connect"
+                  labelStyle={{fontSize: 20}}
+                  onPress={() => {
+                    connectNetwork();
+                    setStep(1);
+                  }}
+                />
+              </View>
               <GapView length={40} />
             </MyCard>
             <GapView length={150} />
@@ -303,8 +345,10 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
         );
     }
   }
+
   return (
     <MyCanvas>
+      <OverlayLoader isShow={isLoading as boolean} />
       <Modal visible={isVisible} animationType="slide" transparent>
         <MyCanvas>
           <View style={[styles.modalContent]}>

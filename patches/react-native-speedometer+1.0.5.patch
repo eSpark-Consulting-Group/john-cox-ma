@@ -1,5 +1,5 @@
 diff --git a/node_modules/react-native-speedometer/dist/react-native-speedometer.cjs.js b/node_modules/react-native-speedometer/dist/react-native-speedometer.cjs.js
-index 5c05605..19a0512 100644
+index 5c05605..7314dfc 100644
 --- a/node_modules/react-native-speedometer/dist/react-native-speedometer.cjs.js
 +++ b/node_modules/react-native-speedometer/dist/react-native-speedometer.cjs.js
 @@ -164,20 +164,20 @@ function (_Component) {
@@ -7,7 +7,7 @@ index 5c05605..19a0512 100644
      var rotate = this.speedometerValue.interpolate({
        inputRange: [minValue, maxValue],
 -      outputRange: ['-90deg', '90deg']
-+      outputRange: ['-145deg', '120deg']
++      outputRange: ['-138deg', '138deg']
      });
      var currentSize = validateSize(size, width - 20);
      return React__default.createElement(reactNative.View, {

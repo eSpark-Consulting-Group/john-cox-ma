@@ -1,7 +1,7 @@
 import {useTheme} from '@react-navigation/native';
 import {View, Modal, StyleSheet} from 'react-native';
 import {MyText, MyInput, DisplayBox} from '../../components';
-import {MyTheme} from '../../types';
+import {MyTheme, VolumeUnit} from '../../types';
 
 export interface RenderModalProps {
   visible: boolean;
@@ -26,7 +26,7 @@ export function RenderModal({visible, type, onClose}: RenderModalProps) {
             size={24}
             textColor={theme.colors.secondary}
             style={{textAlign: 'center'}}>
-            Trip ! Data will be resetted!
+            Trip ! Data will be reset!
           </MyText>
         </View>
       );
@@ -60,17 +60,22 @@ export function RenderRow({
   unit,
   value,
   editable = true,
+  makeitstring,
 }: {
   title: string;
   unit: string;
-  value?: string | number;
+  value?: string | number | any;
   editable?: boolean;
+  makeitstring?: boolean;
 }) {
   return (
     <View style={styles.sectionContainer}>
       <MyText style={{width: '50%'}}>{title}</MyText>
       <View style={{width: '50%', paddingHorizontal: 15}}>
-        <MyInput value={value} editable={editable} />
+        <MyInput
+          value={makeitstring ? String(value) : value}
+          editable={editable}
+        />
         <MyText text={unit} fontFamily="NotoSans-Regular" />
       </View>
     </View>
@@ -80,9 +85,13 @@ export function RenderRow({
 export function RenderColumn({
   label,
   value,
+  volUnit,
+  size,
 }: {
   label: number | string;
   value: number | string;
+  volUnit: VolumeUnit;
+  size?: number;
 }) {
   const theme = useTheme() as MyTheme;
   return (
@@ -97,8 +106,9 @@ export function RenderColumn({
         value={value || '00'}
         textColor={theme.colors.primary}
         fontFamily="CrimsonText-Bold"
+        size={size}
       />
-      <MyText text={'gal'} />
+      <MyText text={volUnit == 'Gallons' ? 'gal' : 'ltr'} />
     </View>
   );
 }

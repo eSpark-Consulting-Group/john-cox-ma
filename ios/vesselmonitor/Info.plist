@@ -46,6 +46,12 @@
     </dict>
     <key>NSLocationWhenInUseUsageDescription</key>
     <string>[REASON]</string>
+    <key>NSLocalNetworkUsageDescription</key>
+    <string>App would like to use network discovery</string>
+    <key>NSBonjourServices</key>
+    <array>
+        <string>websocket._tcp.</string>
+    </array>
 	<key>UILaunchStoryboardName</key>
 	<string>BootSplash.storyboard</string>
 	<key>UIRequiredDeviceCapabilities</key>

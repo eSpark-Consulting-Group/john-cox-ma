@@ -35,6 +35,7 @@ import {
 import {RootStackParamsList} from '../../../types/navigationParams';
 import {MyTheme} from '../../../types';
 import {checkPermissions} from '../utils';
+import {useService} from '../../../components/ServiceProvider';
 
 type ScanDevicesScreenProps = NativeStackScreenProps<
   RootStackParamsList,
@@ -51,6 +52,14 @@ export default function ScanDevices() {
   const [devices, setDevices] = useState<ESPDevice[]>();
   const [granted, setGranted] = useState(false);
   const [log, setLog] = useState('Helllow');
+  const {setServiceFound} = useService();
+
+  const handleSetService = (
+    serviceName: 'timesp1' | 'timesp2',
+    value: boolean,
+  ) => {
+    setServiceFound(serviceName, value);
+  };
 
   const requestPermissionsAndScan = async () => {
     try {
@@ -65,15 +74,17 @@ export default function ScanDevices() {
     useCallback(() => {
       requestPermissionsAndScan();
       if (granted) {
-        console.log('scanning devices again');
-
         scanDevices();
+        console.log('scanning devices again');
+        // handleSetService('timesp1', false);
+        // handleSetService('timesp2', false);
       }
     }, [granted]),
   );
 
   const scanDevices = async () => {
     try {
+      setDevice(undefined);
       setError(false);
       setLoading(true); // Start loading
 
@@ -83,6 +94,7 @@ export default function ScanDevices() {
           ESPTransport.softap,
           ESPSecurity.unsecure,
         );
+        console.log('🚀 ~ scanDevices ~ myDevices:', myDevices);
 
         if (myDevices.length === 0) {
           setError(true); // No devices found, show error
@@ -96,7 +108,7 @@ export default function ScanDevices() {
         console.log('some issue');
       }
     } catch (error) {
-      console.error('Error scanning devices:', error);
+      // console.error('Error scanning devices:', error);
       setError(true);
       setDevices([]); // Clear devices on error
       setDevice(undefined); // Clear selected device

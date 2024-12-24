@@ -23,6 +23,7 @@ function MyInput({
   placeholder,
   value,
   editable = true,
+  color,
 }: MyInputProps) {
   const theme = useTheme() as MyTheme;
   const [isVisible, setIsVisible] = useState(!password);
@@ -41,7 +42,7 @@ function MyInput({
         secureTextEntry={!isVisible}
         onFocus={onFocus}
         placeholder={placeholder}
-        placeholderTextColor={theme.colors.primary}
+        placeholderTextColor={color ? color : theme.colors.primary}
         editable={editable}
       />
       {password && (

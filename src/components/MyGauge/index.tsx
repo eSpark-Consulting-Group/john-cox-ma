@@ -11,9 +11,10 @@ import {Gauge} from '../../assets';
 interface MyGaugeProps {
   value?: number;
   name: string;
+  volUnit: 'ltr' | 'gal';
 }
 
-function MyGauge({value = 0, name}: MyGaugeProps) {
+function MyGauge({value = 0, name, volUnit}: MyGaugeProps) {
   const theme = useTheme() as MyTheme;
 
   return (
@@ -36,7 +37,10 @@ function MyGauge({value = 0, name}: MyGaugeProps) {
           text={name}
           fontFamily="CrimsonText-Bold"
           size={14}
-          style={styles().name}
+          style={[
+            styles().name,
+            name === 'reload' && {color: 'red'}, // Conditionally set text color to red
+          ]}
         />
         <RNSpeedometer
           value={value}
@@ -66,7 +70,7 @@ function MyGauge({value = 0, name}: MyGaugeProps) {
           {value.toFixed(1)}
         </MyText>
         <MyText fontFamily="NotoSans-Regular" size={18}>
-          gal/hr
+          {volUnit}/hr
         </MyText>
       </View>
     </View>
@@ -85,7 +89,7 @@ const styles = (theme?: MyTheme) =>
     name: {
       position: 'absolute',
       bottom: 30,
-      right: 25,
+      textAlign: 'center',
       width: '50%',
     },
     textBox: {

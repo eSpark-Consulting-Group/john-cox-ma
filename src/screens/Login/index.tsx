@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {KeyboardAvoidingView, ScrollView, StyleSheet, View} from 'react-native';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -20,6 +20,7 @@ import {
 import {MyTheme} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
 import {useService} from '../../components/ServiceProvider';
+import {screenHeight} from '../../constants';
 
 type LoginScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 
@@ -32,10 +33,27 @@ export default function Login() {
   const [selectedDevice, setSelectedDevice] = useState<'timesp1' | 'timesp2'>(
     'timesp1',
   );
+  //   username: 'ESP_409151',
+  //   password: 'fc3258',
   const [creds, setCreds] = useState({
-    username: 'ESP_409151',
-    password: 'fcd96c',
+    username: '',
+    password: '',
   });
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadUsername = async () => {
+      try {
+        const cachedUsername = await AsyncStorage.getItem('username');
+        if (cachedUsername) {
+          setCreds(prev => ({...prev, username: cachedUsername}));
+        }
+      } catch (err) {
+        console.log('Error fetching cached username:', err);
+      }
+    };
+    loadUsername();
+  }, []);
 
   const loginHandler = async () => {
     try {
@@ -50,7 +68,11 @@ export default function Login() {
 
       const response = await axios.post(`http://${domain}/userLogin`, creds);
       const data = response.data as {token: string};
-      await AsyncStorage.setItem('token', data.token);
+      // await AsyncStorage.setItem('token', data.token);
+      await AsyncStorage.multiSet([
+        ['token', data.token],
+        ['username', creds.username],
+      ]);
       navigation.navigate('Setup', {
         loggedinDomain: domain,
         deviceName: selectedDevice,
@@ -66,22 +88,28 @@ export default function Login() {
   return (
     <MyCanvas>
       <ScrollView
-        contentContainerStyle={{flexGrow: 1}}
+        contentContainerStyle={{
+          flexGrow: 1,
+        }}
+        keyboardShouldPersistTaps={'always'}
         showsVerticalScrollIndicator={false}>
         <KeyboardAvoidingView
           style={{
             alignItems: 'center',
             justifyContent: 'center',
+            flex: 1,
           }}>
           <MyHeader />
-          <GapView length={150} />
+
+          <GapView length={90} />
+
           <MyText
             text="Login"
             size={20}
             fontFamily="NotoSans-Bold"
             style={{
               alignSelf: 'flex-start',
-              paddingLeft: 18,
+              paddingLeft: '5%',
               paddingBottom: 20,
             }}
           />
@@ -90,17 +118,19 @@ export default function Login() {
             <LabelInput
               inputValue={creds.username}
               onChange={value => setCreds(prev => ({...prev, username: value}))}
-              text="Username:"
-              width={130}
+              placeholder="Enter username"
+              width={180}
               height={30}
               size={18}
+              text="Username:"
             />
             <GapView length={20} />
             <LabelInput
               inputValue={creds.password}
               onChange={value => setCreds(prev => ({...prev, password: value}))}
               text="Password:"
-              width={130}
+              placeholder="Enter password"
+              width={180}
               height={30}
               size={18}
               password
@@ -114,17 +144,30 @@ export default function Login() {
                 onSelect={e => {
                   setSelectedDevice(e as 'timesp1' | 'timesp2');
                 }}
+                style={{width: 180}}
+                openDropdown={openDropdown}
+                setOpenDropdown={setOpenDropdown}
+                dropdownId="login"
               />
             </View>
-            {isLoading ? (
-              <Loader size="small" />
-            ) : (
-              <MyButton
-                label="Sign In"
-                style={styles().signin}
-                onPress={loginHandler}
-              />
-            )}
+            <View
+              style={{
+                // marginTop: 10,
+                // backgroundColor: 'pink',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: screenHeight * 0.08,
+              }}>
+              {isLoading ? (
+                <Loader size="small" />
+              ) : (
+                <MyButton
+                  label="Sign In"
+                  style={styles().signin}
+                  onPress={loginHandler}
+                />
+              )}
+            </View>
             <GapView length={30} />
             <MyText text={error} />
           </MyCard>
@@ -133,7 +176,7 @@ export default function Login() {
             label="Back"
             style={styles().button}
             gradient
-            onPress={() => navigation.navigate('Main')}
+            onPress={() => navigation.navigate('Main', {isConfirmation: false})}
           />
           <GapView length={160} />
           <MyFooter />
