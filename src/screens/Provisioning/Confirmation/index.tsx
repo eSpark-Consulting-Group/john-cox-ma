@@ -39,7 +39,7 @@ export default function Confirmation() {
         setDisable(true);
       }
       setLoading(false); // Hide loader after conditions check
-    }, 5000);
+    }, 8000);
 
     return () => clearTimeout(timeout);
   }, [serviceFound]);

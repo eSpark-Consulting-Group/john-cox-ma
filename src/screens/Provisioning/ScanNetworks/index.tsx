@@ -57,7 +57,6 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
   const [network, setNetwork] = useState<ESPWifiList>();
   const [password, setPassword] = useState('');
   const [step, setStep] = useState(1);
-  const [count, setCount] = useState(0);
   const [animationInterval, setAnimationInterval] = useState<NodeJS.Timeout>();
   const {resolvedService1, resolvedService2, serviceFound} = useService();
 
@@ -272,7 +271,7 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
               />
             </MyCard>
             {
-              <View style={{height: 20, width: '100%'}}>
+              <View style={{height: 20, width: '95%', alignItems: 'center'}}>
                 {authError && (
                   <MyText
                     text={'Authentication Failed'}
