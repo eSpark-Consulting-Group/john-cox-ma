@@ -112,6 +112,7 @@ export default function ScanDevices() {
       setDevice(undefined); // Clear selected device
     } finally {
       setLoading(false); // Stop loading
+      setDevice(undefined); // Clear selected device
     }
   };
 
