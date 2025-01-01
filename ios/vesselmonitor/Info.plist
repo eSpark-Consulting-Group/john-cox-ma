@@ -25,33 +25,46 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
-    <dict>
-        <key>NSAllowsArbitraryLoads</key>
-        <true/>
-        <key>NSAllowsArbitraryLoadsInWebContent</key>
-        <true/>
-        <key>NSAllowsLocalNetworking</key>
-        <true/>
-    </dict>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+		<key>NSAllowsArbitraryLoadsInWebContent</key>
+		<true/>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
 	<key>NSBluetoothAlwaysUsageDescription</key>
-    <string>[REASON]</string>
-    <key>NSBluetoothPeripheralUsageDescription</key>
-    <string>[REASON]</string>
+	<string>[REASON]</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>[REASON]</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>websocket._tcp.</string>
+	</array>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>App would like to use network discovery</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-    <string>[REASON]</string>
-    <key>NSLocationTemporaryUsageDescriptionDictionary</key>
-    <dict>
-      <key>YOUR-PURPOSE-KEY</key>
-      <string>[REASON]</string>
-    </dict>
-    <key>NSLocationWhenInUseUsageDescription</key>
-    <string>[REASON]</string>
-    <key>NSLocalNetworkUsageDescription</key>
-    <string>App would like to use network discovery</string>
-    <key>NSBonjourServices</key>
-    <array>
-        <string>websocket._tcp.</string>
-    </array>
+	<string>[REASON]</string>
+	<key>NSLocationTemporaryUsageDescriptionDictionary</key>
+	<dict>
+		<key>YOUR-PURPOSE-KEY</key>
+		<string>[REASON]</string>
+	</dict>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>App would like to use location for nearby devices discovery</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>AnonymousPro-Bold.ttf</string>
+		<string>AnonymousPro-Regular.ttf</string>
+		<string>CrimsonText-Bold.ttf</string>
+		<string>CrimsonText-Regular.ttf</string>
+		<string>NotoSerif-Bold.ttf</string>
+		<string>NotoSerif-Regular.ttf</string>
+		<string>NotoSans-Bold.ttf</string>
+		<string>NotoSans-BoldItalic.ttf</string>
+		<string>NotoSans-Regular.ttf</string>
+		<string>AnonymousPro-Italic.ttf</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>BootSplash.storyboard</string>
 	<key>UIRequiredDeviceCapabilities</key>
@@ -66,18 +79,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>UIAppFonts</key>
-	<array>
-		<string>AnonymousPro-Bold.ttf</string>
-		<string>AnonymousPro-Regular.ttf</string>
-		<string>CrimsonText-Bold.ttf</string>
-		<string>CrimsonText-Regular.ttf</string>
-		<string>NotoSerif-Bold.ttf</string>
-		<string>NotoSerif-Regular.ttf</string>
-		<string>NotoSans-Bold.ttf</string>
-		<string>NotoSans-BoldItalic.ttf</string>
-		<string>NotoSans-Regular.ttf</string>
-		<string>AnonymousPro-Italic.ttf</string>
-	</array>
 </dict>
 </plist>
