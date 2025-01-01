@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {GapView, MyButton, MyCanvas, MyInput, MyText} from '../../components';
 import {ActivityIndicator, View} from 'react-native';
 

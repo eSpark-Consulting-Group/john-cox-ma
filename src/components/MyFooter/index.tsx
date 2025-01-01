@@ -6,7 +6,6 @@ import MyText from '../MyText';
 
 import {MyTheme} from '../../types';
 import {FooterBadge} from '../../assets';
-import GapView from '../GapView';
 
 function MyFooter() {
   const theme = useTheme() as MyTheme;

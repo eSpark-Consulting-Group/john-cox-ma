@@ -38,7 +38,6 @@ const SocketContext = createContext(initialState);
 export const useSocket = () => useContext(SocketContext);
 
 function SocketProvider({children}: {children: React.ReactNode}) {
-  // const {resolvedService1, resolvedService2} = useService();
   const resolvedService1 = useService('timesp1') as Service;
   const resolvedService2 = useService('timesp2') as Service;
   const [isService1Resolved, setIsService1Resolved] = useState(
@@ -283,8 +282,6 @@ function SocketProvider({children}: {children: React.ReactNode}) {
 
   // Handle data for timesp1
   const handleTimesp1Data = (enginesData: SocketJSON) => {
-    // console.log(enginesData.Engines);
-
     const currentSpeed = enginesData.speed || 0;
     const current_tanks = enginesData.tanks || 0;
 

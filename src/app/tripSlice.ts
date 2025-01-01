@@ -81,20 +81,6 @@ const tripsSlice = createSlice({
       //yehan se filesystem mein log krwana hey data
       state.Trips[tripId] = initialState.Trips[tripId];
     },
-    // updateTrip: (
-    //   state,
-    //   action: {
-    //     payload: {
-    //       tripId: keyof TripsState['Trips'];
-    //       tripTime: string;
-    //       distanceCovered: number;
-    //     };
-    //   },
-    // ) => {
-    //   const {tripId, tripTime, distanceCovered} = action.payload;
-    //   state.Trips[tripId].tripTime = tripTime;
-    //   state.Trips[tripId].distanceCovered = distanceCovered;
-    // },
   },
 });
 

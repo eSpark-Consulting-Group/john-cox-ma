@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {
   FlatList,
   Pressable,
@@ -34,7 +34,6 @@ import {
 import {RootStackParamsList} from '../../../types/navigationParams';
 import {MyTheme} from '../../../types';
 import {checkPermissions} from '../utils';
-import {useService} from '../../../components/ServiceProvider';
 
 type ScanDevicesScreenProps = NativeStackScreenProps<
   RootStackParamsList,
@@ -50,7 +49,6 @@ export default function ScanDevices() {
   const [device, setDevice] = useState<ESPDevice | null>();
   const [devices, setDevices] = useState<ESPDevice[]>();
   const [granted, setGranted] = useState(false);
-  const {setServiceFound} = useService();
 
   const requestPermissionsAndScan = async () => {
     try {
@@ -69,8 +67,6 @@ export default function ScanDevices() {
         setDevice(null);
         scanDevices();
         console.log('scanning devices again');
-        // handleSetService('timesp1', false);
-        // handleSetService('timesp2', false);
       }
     }, [granted]),
   );
@@ -101,7 +97,6 @@ export default function ScanDevices() {
         console.log('some issue');
       }
     } catch (error) {
-      // console.error('Error scanning devices:', error);
       setError(true);
       setDevices([]); // Clear devices on error
       setDevice(undefined); // Clear selected device

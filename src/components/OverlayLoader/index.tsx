@@ -1,8 +1,8 @@
 import React, {memo} from 'react';
-import {View, Modal, ActivityIndicator, StatusBar} from 'react-native';
+import {View, Modal, ActivityIndicator} from 'react-native';
 import {Theme, useTheme} from '@react-navigation/native';
 
-import {screenHeight, screenWidth} from '../../constants';
+import {screenHeight} from '../../constants';
 
 const OverlayLoader = ({
   isShow = false,

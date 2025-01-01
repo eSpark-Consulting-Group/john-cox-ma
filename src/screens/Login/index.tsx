@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {KeyboardAvoidingView, ScrollView, StyleSheet, View} from 'react-native';
-import {useNavigation, useTheme} from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -19,13 +19,12 @@ import {
 } from '../../components';
 import {MyTheme} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
-import {useService} from '../../components/ServiceProvider';
+import {useService} from '../../providers/ServiceProvider';
 import {screenHeight} from '../../constants';
 
 type LoginScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
 
 export default function Login() {
-  const theme = useTheme() as MyTheme;
   const {resolvedService1, resolvedService2} = useService();
   const navigation = useNavigation<LoginScreenProps['navigation']>();
   const [isLoading, setIsLoading] = useState(false);

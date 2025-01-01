@@ -17,7 +17,7 @@ import {RootStackParamsList} from '../../../types/navigationParams';
 import {sendingData} from '../utils';
 import {useState} from 'react';
 import {MyTheme} from '../../../types';
-import {useSocket} from '../../../components/SocketProvider';
+import {useSocket} from '../../../providers/SocketProvider';
 
 type ProofScreenProps = NativeStackScreenProps<RootStackParamsList, 'Proof'>;
 
@@ -174,12 +174,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     alignSelf: 'center',
     width: '100%',
-    // paddingBottom: '15%',
   },
   title: {
     alignSelf: 'flex-start',
     paddingLeft: 18,
-    //  paddingBottom: 10
   },
   reloadRow: {
     flexDirection: 'row',
@@ -192,7 +190,6 @@ const styles = StyleSheet.create({
     paddingTop: 30,
     lineHeight: 30,
     width: '100%',
-    // backgroundColor: 'pink',
     textAlign: 'center',
   },
   flatlist: {height: 240, width: '100%'},

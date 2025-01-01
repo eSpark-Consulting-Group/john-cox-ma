@@ -31,9 +31,8 @@ import {RootStackParamsList} from '../../../types/navigationParams';
 import {Wifi, Connected} from '../../../assets';
 import {MyTheme} from '../../../types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useSocket} from '../../../components/SocketProvider';
-import {screenWidth} from '../../../constants';
-import {useService} from '../../../components/ServiceProvider';
+import {useSocket} from '../../../providers/SocketProvider';
+import {useService} from '../../../providers/ServiceProvider';
 
 type ScanNetworksScreenProps = NativeStackScreenProps<
   RootStackParamsList,
@@ -44,7 +43,7 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
   const theme = useTheme() as MyTheme;
   const navigation = useNavigation<ScanNetworksScreenProps['navigation']>();
   const {device} = route.params;
-  const {setProvision, provision, isService1Resolved, isService2Resolved} =
+  const {setProvision} =
     useSocket();
 
   const [error, setError] = useState<boolean>();
@@ -58,7 +57,7 @@ export default function ScanNetworks({route}: ScanNetworksScreenProps) {
   const [password, setPassword] = useState('');
   const [step, setStep] = useState(1);
   const [animationInterval, setAnimationInterval] = useState<NodeJS.Timeout>();
-  const {resolvedService1, resolvedService2, serviceFound} = useService();
+  const {serviceFound} = useService();
 
   const navigateWithDelay = () => {
     setTimeout(() => {
@@ -380,7 +379,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    // backgroundColor: 'yellow',
   },
   wrapper: {
     alignItems: 'center',

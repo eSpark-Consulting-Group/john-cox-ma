@@ -90,4 +90,3 @@ const useAppState = () => {
   return {appStateVisible};
 };
 
-const styles = StyleSheet.create({});

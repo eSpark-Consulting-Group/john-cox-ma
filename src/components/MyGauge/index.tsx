@@ -24,7 +24,6 @@ function MyGauge({value = 0, name, volUnit}: MyGaugeProps) {
           style={{
             position: 'absolute',
             top: -10,
-            //  right: -18
           }}>
           <Gauge
             style={{

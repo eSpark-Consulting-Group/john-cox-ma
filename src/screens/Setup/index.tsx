@@ -1,12 +1,11 @@
-import React, {useEffect, useLayoutEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   ScrollView,
   StyleSheet,
   View,
   KeyboardAvoidingView,
-  LogBox,
 } from 'react-native';
-import {useNavigation, useTheme} from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -29,8 +28,8 @@ import {
 import {RootStackParamsList} from '../../types/navigationParams';
 import {temp} from '../../constants';
 import LabelDropdown from '../../components/LabelDropdown';
-import {useSocket} from '../../components/SocketProvider';
-import {getEngineUnits, getUnits} from '../FMMSetup/utils';
+import {useSocket} from '../../providers/SocketProvider';
+import {getEngineUnits} from '../FMMSetup/utils';
 
 type SetupScreenProps = NativeStackScreenProps<RootStackParamsList, 'Setup'>;
 type RouteType = {
@@ -44,7 +43,6 @@ type RouteType = {
 
 export default function Setup({route}: RouteType) {
   const {loggedinDomain, deviceName} = route.params;
-  const theme = useTheme() as MyTheme;
   const navigation = useNavigation<SetupScreenProps['navigation']>();
   const {enginesData1, enginesData2} = useSocket();
   const [config, setConfig] = useState(

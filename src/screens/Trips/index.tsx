@@ -36,7 +36,7 @@ import {
 import {styles} from './styles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as FileSystem from 'expo-file-system';
-import {useService} from '../../components/ServiceProvider';
+import {useService} from '../../providers/ServiceProvider';
 import {
   convertConsumption,
   distanceUnit,
@@ -136,7 +136,6 @@ export default function Trips() {
         (total, value) => total + (value || 0),
         0,
       ),
-      // volumeUnit(units?.volume!),
       volumeUnit('Gallons'),
     )?.toFixed(2);
     setTotalFuel(sumFuel);
@@ -470,7 +469,6 @@ export default function Trips() {
         Number(enginesData.Engines[1]?.FuelManagement.total_fuel_burned) | 0,
       ];
       console.log('on start', initialFuelBurn);
-      // console.log('ye dekhein: ', initialFuelBurn);
 
       await AsyncStorage.setItem(
         'initialFuelBurn',

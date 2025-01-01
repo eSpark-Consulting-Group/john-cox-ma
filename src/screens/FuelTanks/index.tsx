@@ -19,7 +19,6 @@ import {MyTheme} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
 import {fuelData} from '../../constants';
 import {Empty, Full} from '../../assets';
-import {formatDate} from '../Trips/utils';
 
 type FuelTanksScreenProps = NativeStackScreenProps<
   RootStackParamsList,
@@ -61,7 +60,6 @@ export default function FuelTanks() {
             </View>
             <MyBox
               text={'Fuel'}
-              // value={null}
               unit="gal"
               width={'80%'}
               textSize={26}
@@ -70,14 +68,11 @@ export default function FuelTanks() {
             <View style={styles().lowerBoxes}>
               <MyBox
                 text={'Date'}
-                // value={null}
                 width={'50%'}
                 textSize={26}
               />
               <MyBox
                 text={'Time'}
-                // value={null}
-                // unit="PM"
                 width={'50%'}
                 textSize={26}
               />

@@ -24,13 +24,12 @@ import {
   GapView,
   MyGauge,
   MyCanvas,
-  Loader,
 } from '../../components';
 import {MyTheme, DistanceUnit, VolumeUnit} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
-import {useSocket} from '../../components/SocketProvider';
+import {useSocket} from '../../providers/SocketProvider';
 import NauticalMile from './NauticalMilte';
-import {useService} from '../../components/ServiceProvider';
+import {useService} from '../../providers/ServiceProvider';
 import {
   distanceUnit,
   distanceValue,

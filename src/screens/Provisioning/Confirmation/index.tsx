@@ -12,7 +12,7 @@ import {
   MyText,
 } from '../../../components';
 import {RootStackParamsList} from '../../../types/navigationParams';
-import {useService} from '../../../components/ServiceProvider';
+import {useService} from '../../../providers/ServiceProvider';
 import {useEffect, useState} from 'react';
 import React from 'react';
 import {MyTheme} from '../../../types';

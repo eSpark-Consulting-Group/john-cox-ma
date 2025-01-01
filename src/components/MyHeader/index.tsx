@@ -5,7 +5,7 @@ import {useTheme} from '@react-navigation/native';
 import MyText from '../MyText';
 
 import {MyTheme} from '../../types';
-import {HeaderLogo, SplashIcon} from '../../assets';
+import {SplashIcon} from '../../assets';
 
 function MyHeader() {
   const theme = useTheme() as MyTheme;

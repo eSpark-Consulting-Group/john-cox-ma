@@ -1,5 +1,5 @@
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import SocketProvider from '../components/SocketProvider';
+import SocketProvider from '../providers/SocketProvider';
 import {RootStackParamsList} from '../types/navigationParams';
 import ScanDevices from '../screens/Provisioning/ScanDevices';
 import Proof from '../screens/Provisioning/Proof';

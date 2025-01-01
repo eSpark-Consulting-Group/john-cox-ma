@@ -1,7 +1,7 @@
 import {useEffect, useRef, useState} from 'react';
 
 import {MyBox} from '../../components';
-import {useSocket} from '../../components/SocketProvider';
+import {useSocket} from '../../providers/SocketProvider';
 import {DistanceUnit, VolumeUnit} from '../../types';
 import {convertConsumption} from '../FMMSetup/utils';
 

@@ -1,7 +1,6 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
 import {useNavigation, useTheme} from '@react-navigation/native';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {ApiResponse} from 'apisauce';
 
@@ -17,11 +16,7 @@ import {
   MyText,
 } from '../../components';
 import {
-  EngineData,
   MyTheme,
-  DistanceUnit,
-  VolumeUnit,
-  TimeFormat,
 } from '../../types';
 import {FMMSetupScreenProps} from '../../types/navigationParams';
 import LabelDropdown from '../../components/LabelDropdown';
@@ -32,7 +27,6 @@ import {
   updateEngineUnits,
   updateUnits,
 } from './utils';
-import {KeyboardAvoidingView} from 'react-native';
 
 export default function FMMSetup({route}: FMMSetupScreenProps) {
   const {loggedinDomain, deviceName, config} = route.params;
