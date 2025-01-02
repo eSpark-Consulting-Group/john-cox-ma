@@ -21,6 +21,7 @@ const NauticalMile = ({volUnit, distUnit}: NauticalMileProps) => {
   const [time, setTime] = useState(0);
 
   const interval = useRef<NodeJS.Timeout>();
+
   const startTimer = () => {
     interval.current = setInterval(() => {
       setTime(prev => prev + 1);

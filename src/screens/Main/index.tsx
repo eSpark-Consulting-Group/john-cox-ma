@@ -101,30 +101,33 @@ export default function Main() {
     setGeneratorRunning(generatorRunning === 'Yes' ? 'No' : 'Yes');
   };
 
-  const buttonsData = [
-    {
-      label: 'Main',
-      labelStyle: {fontSize: 16, height: 65, textAlignVertical: 'center'},
-      onPress: () => console.log('main'),
-    },
-    {
-      label: 'Fuel Tanks',
-      labelStyle: {fontSize: 16, height: 65, textAlignVertical: 'center'},
-      onPress: () => navigation.navigate('FuelTanks'),
-    },
-    {
-      label: 'Trips',
-      labelStyle: {fontSize: 16, height: 65, textAlignVertical: 'center'},
-      onPress: () => navigation.navigate('Trips'),
-    },
-    {
-      label: 'Setup',
-      labelStyle: {fontSize: 16, height: 65, textAlignVertical: 'center'},
-      onPress: async () => {
-        navigation.navigate('Login');
+  const buttonsData = useMemo(
+    () => [
+      {
+        label: 'Main',
+        labelStyle: {fontSize: 16, height: 65, textAlignVertical: 'center'},
+        onPress: () => console.log('main'),
       },
-    },
-  ];
+      {
+        label: 'Fuel Tanks',
+        labelStyle: {fontSize: 16, height: 65, textAlignVertical: 'center'},
+        onPress: () => navigation.navigate('FuelTanks'),
+      },
+      {
+        label: 'Trips',
+        labelStyle: {fontSize: 16, height: 65, textAlignVertical: 'center'},
+        onPress: () => navigation.navigate('Trips'),
+      },
+      {
+        label: 'Setup',
+        labelStyle: {fontSize: 16, height: 65, textAlignVertical: 'center'},
+        onPress: async () => {
+          navigation.navigate('Login');
+        },
+      },
+    ],
+    [],
+  );
 
   const fetchSocketData = () => {
     if (isService1Resolved && enginesData1.length === 0) {

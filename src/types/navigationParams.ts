@@ -7,7 +7,7 @@ export type RootStackParamsList = {
   Test: undefined;
   Splash: undefined;
   Trips: undefined;
-  Main: undefined;
+  Main: {isConfirmation: boolean} | undefined;
   Login: undefined;
   Setup: {loggedinDomain: string; deviceName: 'timesp1' | 'timesp2'};
   FMMSetup: {
