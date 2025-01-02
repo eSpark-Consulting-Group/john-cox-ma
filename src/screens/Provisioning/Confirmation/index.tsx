@@ -74,12 +74,7 @@ export default function Confirmation() {
               />
               <GapView length={85} />
               <View
-                style={{
-                  justifyContent: 'space-between',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  gap: 10,
-                }}>
+                style={styles.yesNoActions}>
                 <MyButton
                   label="NO"
                   labelStyle={{fontSize: 20}}
@@ -123,4 +118,10 @@ const styles = StyleSheet.create({
     width: '60%',
     textAlign: 'center',
   },
+  yesNoActions: {
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  }
 });
