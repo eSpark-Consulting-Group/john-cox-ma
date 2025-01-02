@@ -106,7 +106,7 @@ export default function Main() {
       {
         label: 'Main',
         labelStyle: {fontSize: 16, height: 65, textAlignVertical: 'center'},
-        onPress: () => console.log('main'),
+        onPress: () => console.log(''),
       },
       {
         label: 'Fuel Tanks',
@@ -149,19 +149,16 @@ export default function Main() {
   const fetchUnits = async () => {
     const unitsData = await getUnits();
     const engineUnits = await getEngineUnits();
-    console.log('Fetched Units Data:', unitsData);
 
     if (unitsData) {
       setUnits(unitsData);
     } else {
-      console.log('default set manually');
       setUnits({distance: 'Kilometers', volume: 'Liters'});
     }
 
     if (engineUnits) {
       setEngineUnits(engineUnits);
     } else {
-      console.log('default set manually');
       setEngineUnits({
         timesp1: {
           distance: 'Kilometers',
@@ -179,7 +176,6 @@ export default function Main() {
     }
   };
 
-  // Only run when the screen comes into focus, once
   useFocusEffect(
     React.useCallback(() => {
       if (hasFocusedRef.current) {
@@ -193,15 +189,6 @@ export default function Main() {
       };
     }, []),
   );
-
-  useEffect(() => {
-    if (units) {
-      // console.log('Units preference:', units);
-    }
-    if (engineUnits) {
-      // console.log('Units preference: Engine ==============', engineUnits);
-    }
-  }, [units, engineUnits]);
 
   useEffect(() => {
     const onBackPress = () => {
@@ -352,7 +339,6 @@ export default function Main() {
                 <MyBox
                   label="Efficiency"
                   text="Speed"
-                  // value={Number(speed).toFixed(2)}
                   value={
                     !isService1Resolved && !isService2Resolved
                       ? NaN
@@ -368,26 +354,16 @@ export default function Main() {
                     value={
                       !isService1Resolved && !isService2Resolved
                         ? NaN
-                        : volumeValue(
-                            sumOfBurn,
-                            // volumeUnit(units?.volume!)
-                            'gal',
-                          )
+                        : volumeValue(sumOfBurn, 'gal')
                     }
-                    unit={
-                      // volumeUnit(units?.volume!)
-                      volumeUnit('Gallons') + '/hr'
-                    }
+                    unit={volumeUnit('Gallons') + '/hr'}
                     width={'100%'}
                     gap={22}
                   />
                 </View>
               </View>
               <NauticalMile
-                volUnit={
-                  // units?.volume ? units.volume : 'Liters'
-                  'Gallons'
-                }
+                volUnit={'Gallons'}
                 distUnit={units?.distance ? units?.distance : 'Kilometers'}
               />
               <View style={styles().range}>
@@ -398,16 +374,9 @@ export default function Main() {
                     value={
                       !isService1Resolved && !isService2Resolved
                         ? NaN
-                        : volumeValue(
-                            remainingFuel,
-                            // volumeUnit(units?.volume!),
-                            'gal',
-                          )
+                        : volumeValue(remainingFuel, 'gal')
                     }
-                    unit={
-                      // volumeUnit(units?.volume!)
-                      volumeUnit('Gallons')
-                    }
+                    unit={volumeUnit('Gallons')}
                   />
                 </View>
                 <View style={{width: '40%'}}>
@@ -479,7 +448,6 @@ const styles = (theme?: MyTheme) =>
     screen: {
       alignItems: 'center',
       justifyContent: 'space-between',
-      // height: '100%',
     },
     container: {alignItems: 'center', width: '90%'},
     row: {
