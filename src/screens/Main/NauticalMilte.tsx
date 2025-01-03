@@ -40,7 +40,6 @@ const NauticalMile = ({volUnit, distUnit}: NauticalMileProps) => {
   }, []);
 
   const calculateConsumption = (speed: string | number, time: number) => {
-    // return (Number(speed) * time) / 60;
     const consumptionLPerKm = (Number(speed) * time) / 60;
     return convertConsumption(consumptionLPerKm, volUnit!, distUnit!);
   };
