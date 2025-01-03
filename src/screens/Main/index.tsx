@@ -1,17 +1,12 @@
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import React, {useEffect} from 'react';
 import {
   BackHandler,
   ScrollView,
-  StyleSheet,
   TextStyle,
   TouchableOpacity,
   View,
 } from 'react-native';
-import {
-  useFocusEffect,
-  useNavigation,
-  useTheme,
-} from '@react-navigation/native';
+import {useNavigation, useTheme} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {Ionicons} from '@expo/vector-icons';
 
@@ -25,171 +20,46 @@ import {
   MyGauge,
   MyCanvas,
 } from '../../components';
-import {MyTheme, DistanceUnit, VolumeUnit} from '../../types';
+import {MyTheme} from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
-import {useSocket} from '../../providers/SocketProvider';
 import NauticalMile from './NauticalMilte';
-import {useService} from '../../providers/ServiceProvider';
 import {
   distanceUnit,
   distanceValue,
-  EngineUnits,
-  getEngineUnits,
-  getUnits,
   volumeUnit,
   volumeValue,
 } from '../FMMSetup/utils';
-import {sumOf} from '../Trips/utils';
 import {styles} from './styles';
+import {useMainLogic} from './utils/useMainLogic';
 
-type MainScreenProps = NativeStackScreenProps<RootStackParamsList, 'Main'>;
+export type MainScreenProps = NativeStackScreenProps<
+  RootStackParamsList,
+  'Main'
+>;
 
 export default function Main() {
+  const theme = useTheme() as MyTheme;
   const {
     enginesData1,
     enginesData2,
-    getSocketData,
+    sumOfBurn,
+    remainingFuel,
+    distanceToEmpty,
+    generatorRunning,
+    toggleGeneratorRunning,
+    confirmation,
+    setConfirmation,
+    fetchSocketData,
+    units,
+    engineUnits,
     speed,
-    tanks,
     isService1Resolved,
     isService2Resolved,
-  } = useSocket();
-  const {resolvedService1, resolvedService2} = useService();
-  const theme = useTheme() as MyTheme;
+    YesResponse,
+    NoResponse,
+    buttonsData,
+  } = useMainLogic();
   const navigation = useNavigation<MainScreenProps['navigation']>();
-  const [generatorRunning, setGeneratorRunning] = useState<'Yes' | 'No'>('Yes');
-  const [confirmation, setConfirmation] = useState(false);
-  const [units, setUnits] = useState<{
-    distance: DistanceUnit;
-    volume: VolumeUnit;
-  }>();
-  const [engineUnits, setEngineUnits] = useState<EngineUnits>();
-  const hasFocusedRef = useRef(false);
-
-  const sumOfBurn = useMemo(() => {
-    return (
-      Number(enginesData1[0]?.FuelManagement.total_fuel_burned || 0) +
-      Number(enginesData1[1]?.FuelManagement.total_fuel_burned || 0) +
-      Number(enginesData2[0]?.FuelManagement.total_fuel_burned || 0) +
-      Number(enginesData2[1]?.FuelManagement.total_fuel_burned || 0)
-    );
-  }, [
-    enginesData1[0]?.FuelManagement.total_fuel_burned,
-    enginesData1[1]?.FuelManagement.total_fuel_burned,
-    enginesData2[0]?.FuelManagement.total_fuel_burned,
-    enginesData2[1]?.FuelManagement.total_fuel_burned,
-  ]);
-
-  const remainingFuel = useMemo(() => {
-    return sumOf(tanks);
-  }, [tanks]);
-
-  const distanceToEmpty = useMemo(() => {
-    return (
-      Number(enginesData1[0]?.FuelManagement.distance_to_empty || 0) +
-      Number(enginesData1[1]?.FuelManagement.distance_to_empty || 0) +
-      Number(enginesData2[0]?.FuelManagement.distance_to_empty || 0) +
-      Number(enginesData2[1]?.FuelManagement.distance_to_empty || 0)
-    );
-  }, [
-    enginesData1[0]?.FuelManagement.distance_to_empty,
-    enginesData1[1]?.FuelManagement.distance_to_empty,
-    enginesData2[0]?.FuelManagement.distance_to_empty,
-    enginesData2[1]?.FuelManagement.distance_to_empty,
-  ]);
-
-  const toggleGeneratorRunning = () => {
-    setGeneratorRunning(generatorRunning === 'Yes' ? 'No' : 'Yes');
-  };
-
-  const buttonsData = useMemo(
-    () => [
-      {
-        label: 'Main',
-        labelStyle: {fontSize: 16, height: 65, textAlignVertical: 'center'},
-        onPress: () => console.log(''),
-      },
-      {
-        label: 'Fuel Tanks',
-        labelStyle: {fontSize: 16, height: 65, textAlignVertical: 'center'},
-        onPress: () => navigation.navigate('FuelTanks'),
-      },
-      {
-        label: 'Trips',
-        labelStyle: {fontSize: 16, height: 65, textAlignVertical: 'center'},
-        onPress: () => navigation.navigate('Trips'),
-      },
-      {
-        label: 'Setup',
-        labelStyle: {fontSize: 16, height: 65, textAlignVertical: 'center'},
-        onPress: async () => {
-          navigation.navigate('Login');
-        },
-      },
-    ],
-    [],
-  );
-
-  const fetchSocketData = () => {
-    if (isService1Resolved && enginesData1.length === 0) {
-      getSocketData(
-        resolvedService1?.host!,
-        resolvedService1?.port!,
-        'timesp1',
-      );
-    }
-    if (isService2Resolved && enginesData2.length === 0) {
-      getSocketData(
-        resolvedService2?.host!,
-        resolvedService2?.port!,
-        'timesp2',
-      );
-    }
-  };
-
-  const fetchUnits = async () => {
-    const unitsData = await getUnits();
-    const engineUnits = await getEngineUnits();
-
-    if (unitsData) {
-      setUnits(unitsData);
-    } else {
-      setUnits({distance: 'Kilometers', volume: 'Liters'});
-    }
-
-    if (engineUnits) {
-      setEngineUnits(engineUnits);
-    } else {
-      setEngineUnits({
-        timesp1: {
-          distance: 'Kilometers',
-          volume: 'Gallons',
-          temp: 'Fahrenheit',
-          time: '24',
-        },
-        timesp2: {
-          distance: 'Kilometers',
-          volume: 'Gallons',
-          temp: 'Fahrenheit',
-          time: '24',
-        },
-      });
-    }
-  };
-
-  useFocusEffect(
-    React.useCallback(() => {
-      if (hasFocusedRef.current) {
-        return;
-      }
-      fetchUnits();
-      hasFocusedRef.current = true;
-
-      return () => {
-        hasFocusedRef.current = false;
-      };
-    }, []),
-  );
 
   useEffect(() => {
     const onBackPress = () => {
@@ -232,19 +102,13 @@ export default function Main() {
               <MyButton
                 label="NO"
                 labelStyle={{fontSize: 20}}
-                onPress={() => {
-                  setConfirmation(false);
-                  navigation.navigate('Main');
-                }}
+                onPress={NoResponse}
               />
               <MyButton
                 label="YES"
                 labelStyle={{fontSize: 20}}
                 textColor={'red'}
-                onPress={() => {
-                  setConfirmation(false);
-                  navigation.navigate('ScanDevices');
-                }}
+                onPress={YesResponse}
               />
             </View>
             <GapView length={90} />
