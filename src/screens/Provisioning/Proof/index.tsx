@@ -28,7 +28,7 @@ export default function Proof({route}: ProofScreenProps) {
   const [error, setError] = useState<boolean>();
   const [pop, setPop] = useState('');
   const theme = useTheme() as MyTheme;
-  const {provision, setProvision} = useSocket();
+  const {setProvision} = useSocket();
 
   const connectDevice = async (device: any, pop: string) => {
     try {
@@ -106,11 +106,7 @@ export default function Proof({route}: ProofScreenProps) {
         keyboardShouldPersistTaps={'always'}
         showsVerticalScrollIndicator={false}>
         <KeyboardAvoidingView
-          style={{
-            alignItems: 'center',
-            justifyContent: 'center',
-            flex: 1,
-          }}>
+          style={styles.keyboardAvoid}>
           <MyHeader />
           <GapView length={90} />
 
@@ -193,4 +189,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   flatlist: {height: 240, width: '100%'},
+  keyboardAvoid: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+  }
 });
