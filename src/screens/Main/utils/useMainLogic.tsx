@@ -1,12 +1,12 @@
-import {useState, useMemo, useRef, useEffect} from 'react';
+import React, {useState, useMemo, useRef} from 'react';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
+
+import {MainScreenProps} from '..';
 import {useSocket} from '../../../providers/SocketProvider';
 import {useService} from '../../../providers/ServiceProvider';
 import {DistanceUnit, VolumeUnit} from '../../../types';
 import {EngineUnits, getEngineUnits, getUnits} from '../../FMMSetup/utils';
 import {sumOf} from '../../Trips/utils';
-import React from 'react';
-import {MainScreenProps} from '..';
 
 export const useMainLogic = () => {
   const {
