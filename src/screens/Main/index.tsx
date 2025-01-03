@@ -40,6 +40,7 @@ import {
   volumeValue,
 } from '../FMMSetup/utils';
 import {sumOf} from '../Trips/utils';
+import {styles} from './styles';
 
 type MainScreenProps = NativeStackScreenProps<RootStackParamsList, 'Main'>;
 
@@ -210,9 +211,6 @@ export default function Main() {
           styles().screen,
           {
             flex: confirmation ? 1 : 0,
-            width: '100%',
-            justifyContent: 'center',
-            flexGrow: 1,
           },
         ]}
         showsVerticalScrollIndicator={false}>
@@ -230,13 +228,7 @@ export default function Main() {
               style={styles().subCaption}
             />
             <GapView length={55} />
-            <View
-              style={{
-                width: '100%',
-                justifyContent: 'center',
-                gap: 20,
-                flexDirection: 'row',
-              }}>
+            <View style={styles(theme).warn}>
               <MyButton
                 label="NO"
                 labelStyle={{fontSize: 20}}
@@ -258,16 +250,9 @@ export default function Main() {
             <GapView length={90} />
           </>
         ) : (
-          <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '100%',
-            }}>
+          <View style={styles().main}>
             <GapView length={90} />
-            <TouchableOpacity
-              style={{alignSelf: 'flex-end', paddingRight: '4%'}}
-              onPress={fetchSocketData}>
+            <TouchableOpacity style={styles().reload} onPress={fetchSocketData}>
               <Ionicons name="reload" size={35} color={theme.colors.primary} />
             </TouchableOpacity>
             {isService1Resolved && (
@@ -442,49 +427,3 @@ export default function Main() {
     </MyCanvas>
   );
 }
-
-const styles = (theme?: MyTheme) =>
-  StyleSheet.create({
-    screen: {
-      alignItems: 'center',
-      justifyContent: 'space-between',
-    },
-    container: {alignItems: 'center', width: '90%'},
-    row: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    fuelBurn: {paddingTop: 2, width: '50%'},
-    range: {
-      flexDirection: 'row',
-      width: '100%',
-      justifyContent: 'space-between',
-    },
-    box: {
-      justifyContent: 'space-between',
-      paddingTop: 25,
-      gap: 20,
-      width: '100%',
-    },
-    buttons: {
-      flexDirection: 'row',
-      width: '90%',
-      justifyContent: 'space-between',
-    },
-    GaugeRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-evenly',
-      width: '100%',
-    },
-    caption: {
-      alignSelf: 'center',
-      paddingVertical: 20,
-      lineHeight: 30,
-      width: '60%',
-      textAlign: 'center',
-      letterSpacing: 1,
-    },
-    subCaption: {alignSelf: 'center', textAlign: 'center', width: '75%'},
-  });
