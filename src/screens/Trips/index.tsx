@@ -7,6 +7,8 @@ import {
 } from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import BackgroundService from 'react-native-background-actions';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as FileSystem from 'expo-file-system';
 
 import {
   GapView,
@@ -24,6 +26,8 @@ import {
   MyTheme,
   SocketJSON,
   TimeFormat,
+  TripData,
+  TripsState,
   VolumeUnit,
 } from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';
@@ -34,8 +38,6 @@ import {
   RenderColumn,
 } from './Trips_components';
 import {styles} from './styles';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as FileSystem from 'expo-file-system';
 import {useService} from '../../providers/ServiceProvider';
 import {
   convertConsumption,
@@ -46,8 +48,23 @@ import {
   volumeUnit,
   volumeValue,
 } from '../FMMSetup/utils';
+import {calculateDistance, calculateEfficiency} from './utils';
 
 type TripsScreenProps = NativeStackScreenProps<RootStackParamsList, 'Login'>;
+
+const options = {
+  taskName: 'Example',
+  taskTitle: 'ExampleTask title',
+  taskDesc: 'ExampleTask description',
+  taskIcon: {
+    name: 'ic_launcher',
+    type: 'mipmap',
+  },
+  color: '#ff00ff',
+  parameters: {
+    delay: 1000,
+  },
+};
 
 export default function Trips() {
   const theme = useTheme() as MyTheme;
@@ -57,6 +74,14 @@ export default function Trips() {
   const [resetVisible, setResetVisible] = useState(false);
   const [selectedSwitch, setSelectedSwitch] = useState<1 | 2 | 3>(1); // Stores the currently selected switch index
   const {resolvedService1, resolvedService2} = useService();
+  const [units, setUnits] = useState<{
+    distance: DistanceUnit;
+    volume: VolumeUnit;
+    time: TimeFormat;
+  }>();
+  const hasFocusedRef = useRef(false);
+  const [nameError, setNameError] = useState(false);
+  const [totalFuel, setTotalFuel] = useState('');
 
   const [tripStarted, setTripStarted] = useState({
     1: false,
@@ -92,14 +117,14 @@ export default function Trips() {
       fuelBurned: [0, 0, 0, 0],
     },
   });
-  const [units, setUnits] = useState<{
-    distance: DistanceUnit;
-    volume: VolumeUnit;
-    time: TimeFormat;
-  }>();
-  const hasFocusedRef = useRef(false);
-  const [nameError, setNameError] = useState(false);
-  const [totalFuel, setTotalFuel] = useState('');
+
+  const sockCon = useRef<{
+    timesp1: WebSocket | null;
+    timesp2: WebSocket | null;
+  }>({
+    timesp1: null,
+    timesp2: null,
+  });
 
   const handleSwitchPress = (index: 1 | 2 | 3) => {
     setSelectedSwitch(index);
@@ -144,235 +169,8 @@ export default function Trips() {
 
   useEffect(() => {
     console.log('check:', allTripData[selectedSwitch].fuelBurned);
-
     setNameError(false);
   }, [selectedSwitch]);
-
-  const continueTrip = async (tripsState: any, tripRefs: any) => {
-    const tripJSON = await AsyncStorage.getItem('tripData');
-    const newConn = await AsyncStorage.getItem('newConn');
-    if (tripJSON) {
-      if (!newConn) {
-        console.log('TRIPS====== =====WEB SOCKET START======');
-
-        if (resolvedService1?.addresses[0]) {
-          const ws = new WebSocket(
-            `ws://${resolvedService1?.addresses[0]}:${resolvedService1?.port}/ws`,
-          );
-          sockCon.current.timesp1 = ws;
-
-          ws.onmessage = async e => {
-            try {
-              const tripStartRef = await AsyncStorage.getItem('tripStartRef');
-              if (!tripStartRef) {
-                ws.close();
-                return;
-              }
-              const jsonData: SocketJSON = JSON.parse(e.data);
-              const enginesData = jsonData;
-              if (!enginesData?.Engines || enginesData.Engines.length === 0) {
-                console.log(
-                  'TRIPS====== No engine data or empty array received',
-                );
-                ws.close();
-                return;
-              }
-              await AsyncStorage.setItem(
-                'enginesData',
-                JSON.stringify(enginesData),
-              );
-            } catch (error) {
-              console.log(
-                'TRIPS====== Error during WebSocket message processing:',
-                error,
-              );
-              ws.close();
-            }
-          };
-
-          ws.onerror = e => {
-            console.log('TRIPS====== WebSocket error:', e.message);
-          };
-
-          ws.onclose = e => {
-            const {reason} = e;
-            if (e.code === 1006) {
-              console.log('TRIPS====== idher');
-            }
-            console.log(
-              'TRIPS====== WebSocket connection closed:',
-              e.code,
-              reason,
-            );
-          };
-        }
-
-        if (resolvedService2?.addresses[0]) {
-          const ws2 = new WebSocket(
-            `ws://${resolvedService2?.addresses[0]}:${resolvedService2?.port}/ws`,
-          );
-          sockCon.current.timesp2 = ws2;
-
-          if (sockCon.current.timesp1) {
-            sockCon.current.timesp1.onopen = async () => {
-              await AsyncStorage.setItem('newConn', 'true');
-              console.log(
-                'TRIPS====== WebSocket connection opened for : ',
-                `${resolvedService1?.addresses[0]}:${resolvedService1?.port}`,
-              );
-            };
-          }
-
-          ws2.onopen = async () => {
-            console.log(
-              'TRIPS====== WebSocket connection opened for : ',
-              `timesp2.local`,
-            );
-          };
-          ws2.onmessage = async e => {
-            try {
-              const tripStartRef = await AsyncStorage.getItem('tripStartRef');
-              if (!tripStartRef) {
-                ws2.close();
-                return;
-              }
-              const jsonData: SocketJSON = JSON.parse(e.data);
-              const enginesData = jsonData;
-              if (!enginesData?.Engines || enginesData.Engines.length === 0) {
-                console.log(
-                  'TRIPS====== No engine data or empty array received',
-                );
-                ws2.close();
-                return;
-              }
-              await AsyncStorage.setItem(
-                'enginesData2',
-                JSON.stringify(enginesData),
-              );
-            } catch (error) {
-              console.log(
-                'TRIPS====== Error during WebSocket message processing:',
-                error,
-              );
-              ws2.close();
-            }
-          };
-        }
-      }
-      const tripData = JSON.parse(tripJSON);
-      const initialFuelBurn = JSON.parse(
-        (await AsyncStorage.getItem('initialFuelBurn')) || JSON.stringify({}),
-      );
-      const initialFuelBurn2 = JSON.parse(
-        (await AsyncStorage.getItem('initialFuelBurn2')) || JSON.stringify({}),
-      );
-      console.log('intitninit: ', initialFuelBurn);
-
-      const keys = Object.keys(tripsState);
-      for (let i = 0; i < keys.length; i++) {
-        const key = keys[i] as '1' | '2' | '3';
-        if (tripsState?.[key]) {
-          let totalDistance = tripData?.[key].totalDistance;
-          let estimatedTime = tripData?.[key].estimatedTime;
-          const date = tripData?.[key].date;
-          const time = tripData?.[key].time;
-          const name = tripData?.[key].name;
-          setAllTripData(prev => ({
-            ...prev,
-            [key]: {
-              ...prev[key],
-              estimatedTime,
-              totalDistance,
-              date,
-              time,
-              name,
-            },
-          }));
-          const tripStartRef = setInterval(async () => {
-            const cachedData: SocketJSON = JSON.parse(
-              (await AsyncStorage.getItem('enginesData')) || JSON.stringify([]),
-            );
-            const cachedData2: SocketJSON = JSON.parse(
-              (await AsyncStorage.getItem('enginesData2')) ||
-                JSON.stringify([]),
-            );
-            const speed = cachedData.speed || cachedData2.speed || 0;
-            const currDistance = calculateDistance(Number(speed));
-            totalDistance += currDistance;
-            estimatedTime++;
-            const o = JSON.parse(
-              (await AsyncStorage.getItem('tripData')) || JSON.stringify({}),
-            );
-            console.log('inintinintinit: ', initialFuelBurn);
-
-            let currentFuelBurn = [0, 0, 0, 0];
-            if (cachedData.Engines) {
-              currentFuelBurn = cachedData.Engines.map((e, i) => {
-                const parsedFuel: number[] = initialFuelBurn?.[key] || [
-                  0, 0, 0, 0,
-                ];
-
-                const diff =
-                  Number(e.FuelManagement.total_fuel_burned) - parsedFuel[i];
-
-                return diff < 0 ? 0 : diff;
-              });
-            }
-            const currentFuelBurn2 = cachedData2.Engines
-              ? cachedData2.Engines.map((e, i) => {
-                  const parsedFuel: number[] = initialFuelBurn2?.[key] || [
-                    0, 0, 0, 0,
-                  ];
-                  console.log('parsed:', parsedFuel);
-
-                  const diff =
-                    Number(e.FuelManagement.total_fuel_burned) - parsedFuel[i];
-                  return diff < 0 ? 0 : diff;
-                })
-              : [0, 0];
-
-            console.log('22222222: ', currentFuelBurn2);
-
-            const [a, b] = currentFuelBurn;
-
-            setAllTripData(prev => ({
-              ...prev,
-              [key]: {
-                ...prev[key],
-                estimatedTime: prev[key].estimatedTime + 1,
-                totalDistance: prev[key].totalDistance + currDistance,
-                speed: speed,
-                fuelBurned: [a, b, ...currentFuelBurn2],
-              },
-            }));
-            const n = {
-              ...o,
-              [key]: {
-                totalDistance,
-                estimatedTime,
-                date,
-                time,
-                name,
-                fuelBurned: [a, b, ...currentFuelBurn2],
-              },
-            };
-            await AsyncStorage.setItem('tripData', JSON.stringify(n));
-          }, 1000);
-          const allTripRefs = JSON.parse(
-            (await AsyncStorage.getItem('tripStartRef')) || JSON.stringify({}),
-          );
-          const a = {
-            ...allTripRefs,
-            [key]: tripStartRef,
-          };
-          await AsyncStorage.setItem('tripStartRef', JSON.stringify(a));
-        }
-      }
-      while (BackgroundService.isRunning()) {
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Adjust the interval if needed
-      }
-    }
-  };
 
   useEffect(() => {
     (async () => {
@@ -427,30 +225,6 @@ export default function Trips() {
     }
   }, [resetVisible]);
 
-  const options = {
-    taskName: 'Example',
-    taskTitle: 'ExampleTask title',
-    taskDesc: 'ExampleTask description',
-    taskIcon: {
-      name: 'ic_launcher',
-      type: 'mipmap',
-    },
-    color: '#ff00ff',
-    parameters: {
-      delay: 1000,
-    },
-  };
-
-  const calculateDistance = (speed: number) => {
-    return speed * (1 / 3600);
-  };
-  const sockCon = useRef<{
-    timesp1: WebSocket | null;
-    timesp2: WebSocket | null;
-  }>({
-    timesp1: null,
-    timesp2: null,
-  });
   const startTrip = async (id: 1 | 2 | 3) => {
     const enginesData: SocketJSON = JSON.parse(
       (await AsyncStorage.getItem('enginesData')) || JSON.stringify([]),
@@ -768,6 +542,232 @@ export default function Trips() {
     }
   };
 
+  const continueTrip = async (tripsState: any, tripRefs: any) => {
+    const tripJSON = await AsyncStorage.getItem('tripData');
+    const newConn = await AsyncStorage.getItem('newConn');
+    if (tripJSON) {
+      if (!newConn) {
+        console.log('TRIPS====== =====WEB SOCKET START======');
+
+        if (resolvedService1?.addresses[0]) {
+          const ws = new WebSocket(
+            `ws://${resolvedService1?.addresses[0]}:${resolvedService1?.port}/ws`,
+          );
+          sockCon.current.timesp1 = ws;
+
+          ws.onmessage = async e => {
+            try {
+              const tripStartRef = await AsyncStorage.getItem('tripStartRef');
+              if (!tripStartRef) {
+                ws.close();
+                return;
+              }
+              const jsonData: SocketJSON = JSON.parse(e.data);
+              const enginesData = jsonData;
+              if (!enginesData?.Engines || enginesData.Engines.length === 0) {
+                console.log(
+                  'TRIPS====== No engine data or empty array received',
+                );
+                ws.close();
+                return;
+              }
+              await AsyncStorage.setItem(
+                'enginesData',
+                JSON.stringify(enginesData),
+              );
+            } catch (error) {
+              console.log(
+                'TRIPS====== Error during WebSocket message processing:',
+                error,
+              );
+              ws.close();
+            }
+          };
+
+          ws.onerror = e => {
+            console.log('TRIPS====== WebSocket error:', e.message);
+          };
+
+          ws.onclose = e => {
+            const {reason} = e;
+            if (e.code === 1006) {
+              console.log('TRIPS====== idher');
+            }
+            console.log(
+              'TRIPS====== WebSocket connection closed:',
+              e.code,
+              reason,
+            );
+          };
+        }
+
+        if (resolvedService2?.addresses[0]) {
+          const ws2 = new WebSocket(
+            `ws://${resolvedService2?.addresses[0]}:${resolvedService2?.port}/ws`,
+          );
+          sockCon.current.timesp2 = ws2;
+
+          if (sockCon.current.timesp1) {
+            sockCon.current.timesp1.onopen = async () => {
+              await AsyncStorage.setItem('newConn', 'true');
+              console.log(
+                'TRIPS====== WebSocket connection opened for : ',
+                `${resolvedService1?.addresses[0]}:${resolvedService1?.port}`,
+              );
+            };
+          }
+
+          ws2.onopen = async () => {
+            console.log(
+              'TRIPS====== WebSocket connection opened for : ',
+              `timesp2.local`,
+            );
+          };
+          ws2.onmessage = async e => {
+            try {
+              const tripStartRef = await AsyncStorage.getItem('tripStartRef');
+              if (!tripStartRef) {
+                ws2.close();
+                return;
+              }
+              const jsonData: SocketJSON = JSON.parse(e.data);
+              const enginesData = jsonData;
+              if (!enginesData?.Engines || enginesData.Engines.length === 0) {
+                console.log(
+                  'TRIPS====== No engine data or empty array received',
+                );
+                ws2.close();
+                return;
+              }
+              await AsyncStorage.setItem(
+                'enginesData2',
+                JSON.stringify(enginesData),
+              );
+            } catch (error) {
+              console.log(
+                'TRIPS====== Error during WebSocket message processing:',
+                error,
+              );
+              ws2.close();
+            }
+          };
+        }
+      }
+      const tripData = JSON.parse(tripJSON);
+      const initialFuelBurn = JSON.parse(
+        (await AsyncStorage.getItem('initialFuelBurn')) || JSON.stringify({}),
+      );
+      const initialFuelBurn2 = JSON.parse(
+        (await AsyncStorage.getItem('initialFuelBurn2')) || JSON.stringify({}),
+      );
+      console.log('intitninit: ', initialFuelBurn);
+
+      const keys = Object.keys(tripsState);
+      for (let i = 0; i < keys.length; i++) {
+        const key = keys[i] as '1' | '2' | '3';
+        if (tripsState?.[key]) {
+          let totalDistance = tripData?.[key].totalDistance;
+          let estimatedTime = tripData?.[key].estimatedTime;
+          const date = tripData?.[key].date;
+          const time = tripData?.[key].time;
+          const name = tripData?.[key].name;
+          setAllTripData(prev => ({
+            ...prev,
+            [key]: {
+              ...prev[key],
+              estimatedTime,
+              totalDistance,
+              date,
+              time,
+              name,
+            },
+          }));
+          const tripStartRef = setInterval(async () => {
+            const cachedData: SocketJSON = JSON.parse(
+              (await AsyncStorage.getItem('enginesData')) || JSON.stringify([]),
+            );
+            const cachedData2: SocketJSON = JSON.parse(
+              (await AsyncStorage.getItem('enginesData2')) ||
+                JSON.stringify([]),
+            );
+            const speed = cachedData.speed || cachedData2.speed || 0;
+            const currDistance = calculateDistance(Number(speed));
+            totalDistance += currDistance;
+            estimatedTime++;
+            const o = JSON.parse(
+              (await AsyncStorage.getItem('tripData')) || JSON.stringify({}),
+            );
+            console.log('inintinintinit: ', initialFuelBurn);
+
+            let currentFuelBurn = [0, 0, 0, 0];
+            if (cachedData.Engines) {
+              currentFuelBurn = cachedData.Engines.map((e, i) => {
+                const parsedFuel: number[] = initialFuelBurn?.[key] || [
+                  0, 0, 0, 0,
+                ];
+
+                const diff =
+                  Number(e.FuelManagement.total_fuel_burned) - parsedFuel[i];
+
+                return diff < 0 ? 0 : diff;
+              });
+            }
+            const currentFuelBurn2 = cachedData2.Engines
+              ? cachedData2.Engines.map((e, i) => {
+                  const parsedFuel: number[] = initialFuelBurn2?.[key] || [
+                    0, 0, 0, 0,
+                  ];
+                  console.log('parsed:', parsedFuel);
+
+                  const diff =
+                    Number(e.FuelManagement.total_fuel_burned) - parsedFuel[i];
+                  return diff < 0 ? 0 : diff;
+                })
+              : [0, 0];
+
+            console.log('22222222: ', currentFuelBurn2);
+
+            const [a, b] = currentFuelBurn;
+
+            setAllTripData(prev => ({
+              ...prev,
+              [key]: {
+                ...prev[key],
+                estimatedTime: prev[key].estimatedTime + 1,
+                totalDistance: prev[key].totalDistance + currDistance,
+                speed: speed,
+                fuelBurned: [a, b, ...currentFuelBurn2],
+              },
+            }));
+            const n = {
+              ...o,
+              [key]: {
+                totalDistance,
+                estimatedTime,
+                date,
+                time,
+                name,
+                fuelBurned: [a, b, ...currentFuelBurn2],
+              },
+            };
+            await AsyncStorage.setItem('tripData', JSON.stringify(n));
+          }, 1000);
+          const allTripRefs = JSON.parse(
+            (await AsyncStorage.getItem('tripStartRef')) || JSON.stringify({}),
+          );
+          const a = {
+            ...allTripRefs,
+            [key]: tripStartRef,
+          };
+          await AsyncStorage.setItem('tripStartRef', JSON.stringify(a));
+        }
+      }
+      while (BackgroundService.isRunning()) {
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Adjust the interval if needed
+      }
+    }
+  };
+
   const endTrip = async (id: 1 | 2 | 3, reset?: boolean) => {
     const tripStartRef = await AsyncStorage.getItem('tripStartRef');
     if (tripStartRef) {
@@ -917,19 +917,6 @@ export default function Trips() {
     }
   };
 
-  const calculateEfficiency = (id: 1 | 2 | 3): string => {
-    const tripData = allTripData[id];
-
-    const totalFuelBurned = tripData.fuelBurned.reduce((a, b) => a + b, 0);
-    const result = totalFuelBurned / tripData.totalDistance;
-
-    if (!Number.isNaN(result) && result !== Infinity) {
-      return result.toFixed(2);
-    }
-
-    return '0.00';
-  };
-
   return (
     <MyCanvas>
       <RenderModal visible={warningVisible} type="warning" />
@@ -1063,23 +1050,16 @@ export default function Trips() {
                       key={'fuel' + index}
                       value={volumeValue(
                         Number(fuel),
-                        // volumeUnit(units?.volume!),
                         volumeUnit('Gallons'),
                       )!.toFixed(0)}
                       label={index + 1}
-                      volUnit={
-                        // units?.volume!
-                        'Gallons'
-                      }
+                      volUnit={'Gallons'}
                     />
                   ))}
                   <RenderColumn
                     label={'Total'}
                     value={totalFuel}
-                    volUnit={
-                      // units?.volume!
-                      'Gallons'
-                    }
+                    volUnit={'Gallons'}
                   />
                 </View>
               </View>
@@ -1103,7 +1083,7 @@ export default function Trips() {
               />
               <RenderRow
                 title="Average Speed"
-                value={Number(allTripData[selectedSwitch].speed)!.toFixed(3)} //xxx
+                value={Number(allTripData[selectedSwitch].speed)!.toFixed(3)}
                 unit="knots"
                 editable={false}
               />
@@ -1111,13 +1091,13 @@ export default function Trips() {
                 editable={false}
                 title="Efficiency"
                 unit={
-                  // volumeUnit(units?.volume!)
                   volumeUnit('Gallons') + '/' + distanceUnit(units?.distance!)
                 }
                 value={Number(
                   convertConsumption(
-                    parseFloat(calculateEfficiency(selectedSwitch)), // Use parseFloat for safety
-                    // units?.volume!,
+                    parseFloat(
+                      calculateEfficiency(selectedSwitch, allTripData),
+                    ), // Use parseFloat for safety
                     'Gallons',
                     units?.distance!,
                   ),
