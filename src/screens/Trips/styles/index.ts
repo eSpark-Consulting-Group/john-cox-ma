@@ -1,60 +1,119 @@
 import {StyleSheet} from 'react-native';
 
-export const styles = StyleSheet.create({
-  screen: {
+/**
+ * Layout constants for consistent spacing and sizing
+ */
+const LAYOUT = {
+  screenPadding: '90%',
+  contentWidth: '70%',
+  inputWidth: '50%',
+  buttonWidth: 130,
+  rowGap: 5,
+  cardHeight: 50,
+  confirmationWidth: '85%',
+} as const;
+
+/**
+ * Common style mixins for reusable patterns
+ */
+const mixins = {
+  centerContent: {
     alignItems: 'center',
-    
-    flexGrow: 1
   },
+  row: {
+    flexDirection: 'row',
+  },
+  spaceBetween: {
+    justifyContent: 'space-between',
+  },
+  spaceEvenly: {
+    justifyContent: 'space-evenly',
+  },
+} as const;
+
+/**
+ * Application styles organized by component/section
+ */
+export const styles = StyleSheet.create({
+  // Screen layout styles
+  screen: {
+    ...mixins.centerContent,
+    flexGrow: 1,
+  },
+
+  // Title section styles
   titleContainer: {
-    width: '90%',
+    width: LAYOUT.screenPadding,
   },
   title: {
     alignSelf: 'flex-start',
     paddingBottom: 10,
   },
+
+  // Input and control styles
   switchContainer: {
-    flexDirection: 'row',
+    ...mixins.row,
+    ...mixins.centerContent,
+    ...mixins.spaceEvenly,
+    width: LAYOUT.inputWidth,
     gap: 2,
-    width: '50%',
-    alignItems: 'center',
-    justifyContent: 'space-evenly',
   },
   inputContainer: {
-    width: '50%',
+    ...mixins.centerContent,
+    width: LAYOUT.inputWidth,
     paddingHorizontal: 15,
-    alignItems: 'center',
-    gap: 5,
+    gap: LAYOUT.rowGap,
   },
-  button: {width: 130, alignSelf: 'center'},
+
+  // Button styles
+  button: {
+    width: LAYOUT.buttonWidth,
+    alignSelf: 'center',
+  },
+  buttonRow: {
+    ...mixins.row,
+    ...mixins.centerContent,
+    ...mixins.spaceEvenly,
+    width: '100%',
+  },
+  rowButtons: {
+    fontSize: 18,
+    paddingHorizontal: 10,
+  },
+
+  // Confirmation section styles
   confirmation: {
-    width: '85%',
-    alignItems: 'center',
+    ...mixins.centerContent,
+    width: LAYOUT.confirmationWidth,
     textAlign: 'center',
   },
+  confirmationMessage: {
+    textAlign: 'center',
+    paddingBottom: 5,
+    lineHeight: 30,
+  },
+
+  // Content container styles
   inner: {
-    width: '70%',
-    alignItems: 'center',
+    width: LAYOUT.contentWidth,
+    ...mixins.centerContent,
     gap: 20,
   },
-  confirmationMessage: {textAlign: 'center', paddingBottom: 5, lineHeight: 30},
-  buttonRow: {
-    flexDirection: 'row',
+
+  // Card styles
+  card2: {
+    ...mixins.row,
     width: '100%',
-    alignItems: 'center',
-    justifyContent: 'space-evenly',
   },
-  rowButtons: {fontSize: 18, paddingHorizontal: 10},
-  card2: {flexDirection: 'row', width: '100%'},
   innercard2: {
-    justifyContent: 'space-between',
+    ...mixins.spaceBetween,
     flexGrow: 1,
-    height: 50,
+    height: LAYOUT.cardHeight,
   },
   boxes: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    ...mixins.row,
+    ...mixins.centerContent,
     justifyContent: 'flex-end',
-    gap: 5,
+    gap: LAYOUT.rowGap,
   },
 });

@@ -1,51 +1,95 @@
-import {useTheme} from '@react-navigation/native';
 import {View, Modal, StyleSheet} from 'react-native';
+import {useTheme} from '@react-navigation/native';
+
 import {MyText, MyInput, DisplayBox} from '../../components';
 import {MyTheme, VolumeUnit} from '../../types';
 
+// Modal Types
+type ModalType = 'warning' | 'reset';
+
+interface BaseModalConfig {
+  message: string;
+  messageSize: number;
+}
+
+interface WarningModalConfig extends BaseModalConfig {
+  title: string;
+  titleColor: string;
+}
+
+interface ResetModalConfig extends BaseModalConfig {}
+
+// Types
 export interface RenderModalProps {
   visible: boolean;
-  type: 'warning' | 'reset';
+  type: ModalType;
   onClose?: () => void;
 }
+
+interface RenderRowProps {
+  title: string;
+  unit: string;
+  value?: string | number;
+  editable?: boolean;
+  makeitstring?: boolean;
+}
+
+interface RenderColumnProps {
+  label: number | string;
+  value: number | string;
+  volUnit: VolumeUnit;
+  size?: number;
+}
+
+interface TripSectionProps {
+  label: string;
+  children: React.ReactNode;
+}
+
+// Modal content configuration with proper typing
+const modalConfig: Record<ModalType, WarningModalConfig | ResetModalConfig> = {
+  warning: {
+    title: 'Warning:',
+    titleColor: '#B81106',
+    message: 'Trip ! Data will be reset!',
+    messageSize: 24,
+  },
+  reset: {
+    message: 'Reset Successful!',
+    messageSize: 36,
+  },
+};
+
 export function RenderModal({visible, type, onClose}: RenderModalProps) {
   const theme = useTheme() as MyTheme;
 
   const renderContent = () => {
-    if (type === 'warning') {
-      return (
-        <View
-          style={[
-            styles.modalContent,
-            {backgroundColor: theme.colors.background},
-          ]}>
-          <MyText size={24} textColor={'#B81106'}>
-            Warning:
-          </MyText>
+    const config = modalConfig[type];
+    const isWarningModal = type === 'warning';
+
+    return (
+      <View
+        style={[
+          styles.modalContent,
+          {backgroundColor: theme.colors.background},
+        ]}>
+        {isWarningModal && (
           <MyText
-            size={24}
-            textColor={theme.colors.secondary}
-            style={{textAlign: 'center'}}>
-            Trip ! Data will be reset!
+            size={config.messageSize}
+            textColor={(config as WarningModalConfig).titleColor}>
+            {(config as WarningModalConfig).title}
           </MyText>
-        </View>
-      );
-    } else if (type === 'reset') {
-      return (
-        <View
-          style={[
-            styles.modalContent,
-            {backgroundColor: theme.colors.background},
-          ]}>
-          <MyText
-            size={36}
-            textColor={theme.colors.primary}
-            style={{textAlign: 'center', lineHeight: 38}}>
-            Reset Successful!
-          </MyText>
-        </View>
-      );
-    }
+        )}
+        <MyText
+          size={config.messageSize}
+          textColor={
+            isWarningModal ? theme.colors.secondary : theme.colors.primary
+          }
+          style={[styles.modalText, type === 'reset' && styles.resetText]}>
+          {config.message}
+        </MyText>
+      </View>
+    );
   };
 
   return (
@@ -55,51 +99,37 @@ export function RenderModal({visible, type, onClose}: RenderModalProps) {
   );
 }
 
+// Rest of the code remains the same...
 export function RenderRow({
   title,
   unit,
   value,
   editable = true,
   makeitstring,
-}: {
-  title: string;
-  unit: string;
-  value?: string | number | any;
-  editable?: boolean;
-  makeitstring?: boolean;
-}) {
+}: RenderRowProps) {
+  const displayValue = makeitstring ? String(value) : value;
+
   return (
     <View style={styles.sectionContainer}>
-      <MyText style={{width: '50%'}}>{title}</MyText>
-      <View style={{width: '50%', paddingHorizontal: 15}}>
-        <MyInput
-          value={makeitstring ? String(value) : value}
-          editable={editable}
-        />
+      <MyText style={styles.rowTitle}>{title}</MyText>
+      <View style={styles.inputContainer}>
+        <MyInput value={displayValue} editable={editable} />
         <MyText text={unit} fontFamily="NotoSans-Regular" />
       </View>
     </View>
   );
 }
 
-export function RenderColumn({
-  label,
-  value,
-  volUnit,
-  size,
-}: {
-  label: number | string;
-  value: number | string;
-  volUnit: VolumeUnit;
-  size?: number;
-}) {
+export function RenderColumn({label, value, volUnit, size}: RenderColumnProps) {
   const theme = useTheme() as MyTheme;
+  const unitText = volUnit === 'Gallons' ? 'gal' : 'ltr';
+
   return (
     <View style={styles.column}>
       <MyText
         text={label.toString()}
         fontFamily="AnonymousPro-Regular"
-        style={{paddingBottom: 5}}
+        style={styles.columnLabel}
         size={15}
       />
       <DisplayBox
@@ -108,18 +138,12 @@ export function RenderColumn({
         fontFamily="CrimsonText-Bold"
         size={size}
       />
-      <MyText text={volUnit == 'Gallons' ? 'gal' : 'ltr'} />
+      <MyText text={unitText} />
     </View>
   );
 }
 
-export function TripSection({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
+export function TripSection({label, children}: TripSectionProps) {
   return (
     <View style={styles.sectionContainer}>
       <MyText size={18}>{label}</MyText>
@@ -134,7 +158,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     width: '100%',
   },
-
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -150,8 +173,24 @@ const styles = StyleSheet.create({
     gap: 15,
     paddingHorizontal: 40,
   },
+  modalText: {
+    textAlign: 'center',
+  },
+  resetText: {
+    lineHeight: 38,
+  },
   column: {
     alignItems: 'center',
     justifyContent: 'space-between',
+  },
+  rowTitle: {
+    width: '50%',
+  },
+  inputContainer: {
+    width: '50%',
+    paddingHorizontal: 15,
+  },
+  columnLabel: {
+    paddingBottom: 5,
   },
 });
