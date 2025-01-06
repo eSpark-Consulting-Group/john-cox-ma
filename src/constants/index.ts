@@ -1,6 +1,7 @@
-import { Dimensions } from "react-native";
+import {Dimensions} from 'react-native';
 
-export const {width: screenWidth, height: screenHeight} = Dimensions.get('window');
+export const {width: screenWidth, height: screenHeight} =
+  Dimensions.get('window');
 
 export const temp = {
   volume: {text: 'Volume', options: ['US Gallons', 'Liters'], zindez: 64},
@@ -9,7 +10,11 @@ export const temp = {
     options: ['Kilometers', 'Statute Miles', 'Nautical Miles'],
     zindez: 62,
   },
-  temperature: {text: 'Temperature', options: ['Fahrenheit', 'Celsius'], zindez: 60},
+  temperature: {
+    text: 'Temperature',
+    options: ['Fahrenheit', 'Celsius'],
+    zindez: 60,
+  },
   clock: {text: 'Clock', options: ['12-Hour', '24-Hour'], zindez: 58},
 };
 

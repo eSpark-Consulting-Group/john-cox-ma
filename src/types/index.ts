@@ -170,17 +170,20 @@ export type SocketJSON = {
 };
 
 export type TripData = {
-  id: 1 | 2 | 3;
   name: string;
-  tripStarted?: boolean;
-  tripEnded?: boolean;
-  startingTime: Date | null;
-  distanceCovered: number;
-  tripTime: string;
-  initialFuel: number[];
-  fuelConsumption: number[]; // assuming it's an array of numbers
-  tripEfficiency: number | undefined;
+  totalDistance: number;
+  estimatedTime: number;
+  speed: number;
+  date: string;
+  time: string;
+  fuelBurned: number[];
 };
+
+export interface TripsState {
+  1: TripData;
+  2: TripData;
+  3: TripData;
+}
 
 export type DistanceUnit = 'Kilometers' | 'Statute Miles' | 'Nautical Miles';
 export type VolumeUnit = 'Gallons' | 'Liters';
