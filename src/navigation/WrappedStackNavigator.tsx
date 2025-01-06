@@ -5,7 +5,6 @@ import ScanDevices from '../screens/Provisioning/ScanDevices';
 import Proof from '../screens/Provisioning/Proof';
 import ScanNetworks from '../screens/Provisioning/ScanNetworks';
 import Confirmation from '../screens/Provisioning/Confirmation';
-import Test from '../screens/TestScreen';
 import Main from '../screens/Main';
 import Login from '../screens/Login';
 import Setup from '../screens/Setup';
@@ -42,13 +41,6 @@ const WrappedStackNavigator = () => {
           <RootStack.Screen
             name="Confirmation"
             component={Confirmation}
-            options={{
-              headerShown: false,
-            }}
-          />
-          <RootStack.Screen
-            name="Test"
-            component={Test}
             options={{
               headerShown: false,
             }}

@@ -132,11 +132,7 @@ export default function Setup({route}: RouteType) {
           style={[styles().screen, {justifyContent: 'space-between'}]}>
           <MyHeader />
           <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '100%',
-            }}>
+            style={styles().container}>
             <GapView length={90} />
             <MyText
               text="Setup"
@@ -335,6 +331,11 @@ export default function Setup({route}: RouteType) {
 
 const styles = (theme?: MyTheme) =>
   StyleSheet.create({
+    container: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: '100%',
+    },
     screen: {
       alignItems: 'center',
       justifyContent: 'center',

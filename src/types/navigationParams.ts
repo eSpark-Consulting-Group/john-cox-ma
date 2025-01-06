@@ -4,7 +4,6 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 
 export type RootStackParamsList = {
   WithContext: undefined;
-  Test: undefined;
   Splash: undefined;
   Trips: undefined;
   Main: {isConfirmation: boolean} | undefined;
