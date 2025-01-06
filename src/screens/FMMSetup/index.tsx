@@ -139,21 +139,13 @@ export default function FMMSetup({route}: FMMSetupScreenProps) {
         keyboardShouldPersistTaps={'always'}>
         <MyHeader />
         <View
-          style={{
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '100%',
-          }}>
+          style={styles().container}>
           <GapView length={90} />
           <MyText
             text="Fuel Mgt Module Setup"
             size={18}
             fontFamily="NotoSans-Bold"
-            style={{
-              alignSelf: 'flex-start',
-              paddingLeft: 38,
-              paddingBottom: 20,
-            }}
+            style={styles().headingTxt}
           />
           <MyCard>
             <MyText
@@ -243,4 +235,14 @@ const styles = () =>
       justifyContent: 'space-between',
       flexGrow: 1,
     },
+    container: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: '100%',
+    },
+    headingTxt: {
+      alignSelf: 'flex-start',
+      paddingLeft: 38,
+      paddingBottom: 20,
+    }
   });
