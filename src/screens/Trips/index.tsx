@@ -26,8 +26,6 @@ import {
   MyTheme,
   SocketJSON,
   TimeFormat,
-  TripData,
-  TripsState,
   VolumeUnit,
 } from '../../types';
 import {RootStackParamsList} from '../../types/navigationParams';

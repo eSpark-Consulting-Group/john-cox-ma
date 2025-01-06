@@ -105,10 +105,7 @@ export default function Splash() {
           }}>
           <Image
             source={SplashIcon}
-            style={{
-              width: 77,
-              height: 62,
-            }}
+            style={styles.splashImg}
           />
         </Animated.View>
       </View>
@@ -118,4 +115,8 @@ export default function Splash() {
 
 const styles = StyleSheet.create({
   main: {alignItems: 'center', justifyContent: 'center', flex: 1},
+  splashImg: {
+    width: 77,
+    height: 62,
+  }
 });

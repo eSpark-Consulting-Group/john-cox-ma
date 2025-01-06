@@ -1,4 +1,4 @@
-import {memo, useState} from 'react';
+import {memo} from 'react';
 import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 

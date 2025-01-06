@@ -32,8 +32,6 @@ export default function Login() {
   const [selectedDevice, setSelectedDevice] = useState<'timesp1' | 'timesp2'>(
     'timesp1',
   );
-  //   username: 'ESP_409151',
-  //   password: 'fc3258',
   const [creds, setCreds] = useState({
     username: '',
     password: '',
@@ -67,7 +65,6 @@ export default function Login() {
 
       const response = await axios.post(`http://${domain}/userLogin`, creds);
       const data = response.data as {token: string};
-      // await AsyncStorage.setItem('token', data.token);
       await AsyncStorage.multiSet([
         ['token', data.token],
         ['username', creds.username],
@@ -93,11 +90,7 @@ export default function Login() {
         keyboardShouldPersistTaps={'always'}
         showsVerticalScrollIndicator={false}>
         <KeyboardAvoidingView
-          style={{
-            alignItems: 'center',
-            justifyContent: 'center',
-            flex: 1,
-          }}>
+          style={styles().container}>
           <MyHeader />
 
           <GapView length={90} />
@@ -106,11 +99,7 @@ export default function Login() {
             text="Login"
             size={20}
             fontFamily="NotoSans-Bold"
-            style={{
-              alignSelf: 'flex-start',
-              paddingLeft: '5%',
-              paddingBottom: 20,
-            }}
+            style={styles().loginHeading}
           />
           <MyCard>
             <GapView length={10} />
@@ -150,13 +139,7 @@ export default function Login() {
               />
             </View>
             <View
-              style={{
-                // marginTop: 10,
-                // backgroundColor: 'pink',
-                alignItems: 'center',
-                justifyContent: 'center',
-                height: screenHeight * 0.08,
-              }}>
+              style={styles().loaderSignInBtn}>
               {isLoading ? (
                 <Loader size="small" />
               ) : (
@@ -197,4 +180,19 @@ const styles = (theme?: MyTheme) =>
     },
     signin: {alignSelf: 'center'},
     button: {width: 130, alignSelf: 'center'},
+    container: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      flex: 1,
+    },
+    loginHeading: {
+      alignSelf: 'flex-start',
+      paddingLeft: '5%',
+      paddingBottom: 20,
+    },
+    loaderSignInBtn: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      height: screenHeight * 0.08,
+    }
   });

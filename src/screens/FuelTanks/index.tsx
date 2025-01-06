@@ -37,11 +37,7 @@ export default function FuelTanks() {
         showsVerticalScrollIndicator={false}>
         <MyHeader />
         <View
-          style={{
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '100%',
-          }}>
+          style={styles().subContainer}>
           <GapView length={90} />
           <MyText
             text="Fuel Update Utility"
@@ -172,6 +168,11 @@ const styles = (theme?: MyTheme) =>
       alignItems: 'center',
       justifyContent: 'space-between',
       flexGrow: 1,
+    },
+    subContainer: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: '100%',
     },
     row: {
       flexDirection: 'row',
